@@ -30,7 +30,7 @@
   * Box office
   * Tech specs
   * Favorite?
-  * Watched?
+  * In watchlist / watched / none
   * Streaming availability
   * Watch trailer
 
