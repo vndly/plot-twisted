@@ -22,10 +22,9 @@
   * Duration
   * Genres
   * Peggy rating
-  * Cast
   * Directors
   * Writers
-  * Actors
+  * Cast
   * IMDB rating and open IMDB page
   * Box office
   * Tech specs
