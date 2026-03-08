@@ -6,6 +6,7 @@
 * Search for movies and TV shows
 * Trending/popular sections
 * Open the details of an entry
+* Filters on various fields
 * Grid vs. list view
 
 ### Library
