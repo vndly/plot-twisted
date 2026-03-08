@@ -21,14 +21,15 @@
   * Languages
   * Duration
   * Genres
-  * Peggy rating
   * Directors
   * Writers
   * Cast
+  * Peggy rating
   * IMDB rating and open IMDB page
   * Box office
   * Tech specs
   * Favorite?
+  * 5 star rating
   * In watchlist / watched / none
   * Streaming availability
   * Watch trailer
