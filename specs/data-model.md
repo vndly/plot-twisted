@@ -2,8 +2,18 @@
 
 ## Services
 
-- **`StorageService`** — Typed localStorage wrapper with JSON serialization. Handles schema migration between versions.
-- **`TMDBService`** — API client for TMDB. Implements circuit breaker pattern and caches responses in localStorage to reduce API calls.
+- **`StorageService`** — Typed localStorage wrapper with JSON serialization. Handles schema migration between versions. Validates all reads with Zod schemas.
+- **`TMDBService`** — API client for TMDB. Implements circuit breaker pattern and caches responses in localStorage to reduce API calls. All responses are validated through Zod schemas before returning.
+
+## Composables
+
+Composables are the public data-access layer for components. They wrap services with Vue reactivity and expose loading/error state.
+
+- **`useMovie(id)`** — Fetches and exposes reactive movie data via `TMDBService`.
+- **`useTVShow(id)`** — Fetches and exposes reactive TV show data via `TMDBService`.
+- **`useLibrary()`** — Reads/writes library entries via `StorageService`. Exposes watchlist, watched, favorites, etc.
+- **`useSearch(query)`** — Runs TMDB search queries via `TMDBService`, exposes reactive results.
+- **`useTrending()`** — Fetches trending titles via `TMDBService`.
 
 ## Models
 
