@@ -36,6 +36,7 @@
   * In watchlist / watched / none
   * Streaming availability
   * Watch trailer
+* Share link
 
 ### Release Calendar Sync
 * A calendar view with upcoming release dates for movies
