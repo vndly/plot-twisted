@@ -10,7 +10,6 @@ A personal, offline-first movie and TV tracker.
 
 ## 2. Tech Stack
 
-- **Runtime:** Node.js 22+
 - **Language:** TypeScript 5 (strict mode)
 - **Framework:** Vue 3 (Composition API, `<script setup>`)
 - **Build:** Vite
@@ -18,6 +17,7 @@ A personal, offline-first movie and TV tracker.
 - **Validation:** Zod
 - **Styling:** Tailwind CSS (dark theme config)
 - **Storage:** localStorage via a typed service wrapper
+- **Hosting:** Firebase Hosting
 - **API:** TMDB REST API with response caching in localStorage
 
 ## 3. Data Access
