@@ -1,8 +1,4 @@
-# Constitution
-
-A personal, offline-first movie and TV tracker.
-
-## 1. Tech Stack
+## Tech Stack
 
 - **Language:** TypeScript 5 (strict mode)
 - **Framework:** Vue 3 (Composition API, `<script setup>`)
