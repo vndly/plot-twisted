@@ -24,6 +24,10 @@ What is broken or missing today? Describe the "current state."
 * Primary: Content Creator
 * Secondary: System Admin (Monitoring)
 
+**Dependencies**
+* WebSocket server for real-time sync
+* Database for persistence
+
 ## Scope
 In scope:
 - Theme toggle in settings
@@ -59,6 +63,11 @@ Out of scope:
 - Screen reader support for "user joined/left" announcements.
 - High-contrast mode for cursor colors.
 
+## Constraints
+- Technical: [Any technical limitations]
+- Time: [Deadline or time budget]
+- Resources: [Available tools/people]
+
 7. UI/UX Specifications
 7.1 Design References
 [Figma Link]
@@ -83,3 +92,8 @@ Manual Testing: QA script located at /tests/manual/sync-check.md.
 Automated Testing: npm run test:e2e must pass with 100% coverage on sync logic.
 
 Load Testing: Use K6 to simulate 1,000 concurrent socket connections.
+
+**Deliverables**
+- Project scaffold (React/Next.js)
+- Basic component structure
+- Simple styling system
