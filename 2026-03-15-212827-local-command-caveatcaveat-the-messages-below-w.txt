@@ -1,0 +1,25 @@
+
+  ┌─────────────────┬────────────────────────────────────────────────────────┐
+  │      File       │                         Status                         │
+  ├─────────────────┼────────────────────────────────────────────────────────┤
+  │ conventions.md  │ Complete                                               │
+  ├─────────────────┼────────────────────────────────────────────────────────┤
+  │ api.md          │ Partial — only 1 endpoint (GET /movie/popular)         │
+  │                 │ documented; OMDB/IMDB just listed as links             │
+  ├─────────────────┼────────────────────────────────────────────────────────┤
+  │ data-model.md   │ Partial — models are one-liner descriptions, no actual │
+  │                 │  field definitions or Zod schemas                      │
+  ├─────────────────┼────────────────────────────────────────────────────────┤
+  │ ui-ux.md        │ Partial — just 6 high-level bullet points              │
+  └─────────────────┴────────────────────────────────────────────────────────┘
+
+  I'd recommend starting with data-model.md. It's foundational — the actual
+  field definitions and Zod schemas need to be spelled out before you can
+  properly document API endpoints (which map to those models) or design UI
+  components (which render those fields). Right now the "Models" section is just
+   placeholder descriptions like Movie — Movie data (title, year, genres, cast, 
+  images, etc.) without any actual field-level detail.
+
+  Want me to plan out what a properly filled data-model.md should contain?
+
+✻ Sautéed for 33s

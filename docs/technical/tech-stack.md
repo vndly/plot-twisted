@@ -1,12 +1,26 @@
-## Tech Stack
+# Tech Stack
 
-- **Language:** TypeScript 5 (strict mode)
-- **Framework:** Vue 3 (Composition API, `<script setup>`)
-- **Build:** Vite
-- **Routing:** Vue Router
-- **Validation:** Zod
-- **Styling:** Tailwind CSS (dark theme config)
-- **Storage:** localStorage via a typed service wrapper
-- **Hosting:** Firebase Hosting
-- **API:** TMDB REST API with response caching in localStorage
-- **Browsers:** Modern evergreen only (Chrome, Firefox, Safari, Edge)
+## Core
+
+- **TypeScript 5** (strict mode) — Catches bugs at compile time; strict mode enforces no implicit `any` and stricter null checks.
+- **Vue 3** (Composition API, `<script setup>`) — Lightweight, fast, and the Composition API pairs naturally with TypeScript for type-safe reactive logic.
+- **Vue Router** — Official Vue router — handles SPA navigation, route guards, and lazy loading.
+- **Zod** — Runtime schema validation with TypeScript type inference (`z.infer<>`). Used at every data boundary (API responses, localStorage reads, user input).
+- **Tailwind CSS** (dark theme config) — Utility-first CSS that keeps styles co-located with markup. Dark theme configured via `tailwind.config.ts`.
+
+## Dev Tooling
+
+- **Vite** — Near-instant HMR during development, optimized Rollup-based production builds.
+- **ESLint** — Enforces code quality rules, including the no-`any` guardrail defined in conventions.
+- **Prettier** — Consistent code formatting across the project, integrated with ESLint.
+- **Vitest** — Vite-native test runner — fast, compatible with Vue components, and shares the same config as the dev build.
+
+## Infrastructure
+
+- **Firebase Hosting** — Free tier covers a personal project, with CDN and automatic SSL.
+- **localStorage** — All user data stays on-device — no backend, no auth, no server costs. Accessed through a typed `StorageService` wrapper with Zod validation.
+- **TMDB REST API** — Comprehensive, free-tier API for metadata, images, trending, and search. Responses cached in localStorage with a TTL.
+
+## Browser Support
+
+Modern evergreen browsers only: Chrome, Firefox, Safari, Edge. No IE or legacy polyfills.
