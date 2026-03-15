@@ -1,1 +1,10 @@
-This file acts as a table of contents for the folder, listing the name of all the files in it with a small description
+# Search Movies
+
+## Contents
+
+1. [Requirements](./requirements.md)
+2. [Scenarios](./scenarios.md)
+3. [API contracts](./api.md)
+4. [Data model](./data-model.md)
+5. [Implementation spec](./implementation.md)
+6. [Plan](./plan.md)
