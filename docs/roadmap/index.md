@@ -10,6 +10,6 @@
 6. **[Home Screen: Filters and Grid/List View](./06-home-filters-and-views.md)**: Add filtering controls and layout toggle to home.
 7. **[Library: Sort and Filter](./07-library-sort-and-filter.md)**: Sort and filter within the user's saved items.
 8. **[Stats: Charts and Insights](./08-stats.md)**: Visualize viewing habits with charts over the library.
-9. **[Recommendations](./09-recommendations.md)**: Suggest movies based on user taste and TMDB data.
+9. **[Recommendations](./09-recommendations.md)**: Suggest movies based on user taste and API data.
 10. **[Release Calendar Sync](./10-release-calendar.md)**: Calendar view for tracking upcoming releases.
 11. **[Settings](./11-settings.md)**: Theme, language, region, and import/export options.

@@ -1,1 +1,1 @@
-Explains the basic folder structure of the project explaining what's in each folder and how to use it.
+Explains the basic folder structure of the project explaining what's in each folder and how to use it. Refer to the file architecture.md for details on the "src" folder

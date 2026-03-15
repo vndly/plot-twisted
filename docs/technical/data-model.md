@@ -3,22 +3,22 @@
 ## Services
 
 - **`StorageService`** — Typed localStorage wrapper with JSON serialization. Handles schema migration between versions. Validates all reads with Zod schemas.
-- **`TMDBService`** — API client for TMDB. Implements circuit breaker pattern. All responses are validated through Zod schemas before returning.
+- **`ApiService`** — API client for fetching movie/TV metadata. Implements circuit breaker pattern. All responses are validated through Zod schemas before returning.
 
 ## Composables
 
 Composables are the public data-access layer for components. They wrap services with Vue reactivity and expose loading/error state.
 
-- **`useMovie(id)`** — Fetches and exposes reactive movie data via `TMDBService`.
-- **`useTVShow(id)`** — Fetches and exposes reactive TV show data via `TMDBService`.
+- **`useMovie(id)`** — Fetches and exposes reactive movie data via `ApiService`.
+- **`useTVShow(id)`** — Fetches and exposes reactive TV show data via `ApiService`.
 - **`useLibrary()`** — Reads/writes library entries via `StorageService`. Exposes watchlist, watched, favorites, etc.
-- **`useSearch(query)`** — Runs TMDB search queries via `TMDBService`, exposes reactive results.
-- **`useTrending()`** — Fetches trending titles via `TMDBService`.
+- **`useSearch(query)`** — Runs search queries via `ApiService`, exposes reactive results.
+- **`useTrending()`** — Fetches trending titles via `ApiService`.
 
 ## Models
 
-- **`Movie`** — TMDB movie data (title, year, genres, cast, images, etc.)
-- **`TVShow`** — TMDB TV show data (title, seasons, episodes, cast, images, etc.)
+- **`Movie`** — Movie data (title, year, genres, cast, images, etc.)
+- **`TVShow`** — TV show data (title, seasons, episodes, cast, images, etc.)
 - **`LibraryEntry`** — User data per title: rating, watchlist status, lists, tags, watch dates
 
 ## localStorage Schema
@@ -26,8 +26,8 @@ Composables are the public data-access layer for components. They wrap services 
 ```json
 {
   "library": {
-    "[tmdb_id]": {
-      "tmdbId": "number",
+    "[id]": {
+      "id": "number",
       "mediaType": "movie | tv",
       "status": "watchlist | watched | none",
       "rating": "0-5",

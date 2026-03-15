@@ -9,12 +9,12 @@
 ## 2. Data Access
 
 - **Composables are the public API** — Components fetch and mutate data exclusively through composables (`use*` functions). Components never import or call services directly.
-- **Services are internal** — `TMDBService` and `StorageService` handle HTTP, caching, and persistence. Only composables may call services.
+- **Services are internal** — `ApiService` and `StorageService` handle HTTP, caching, and persistence. Only composables may call services.
 - **Reactivity lives in composables** — Composables wrap service calls with Vue reactivity (`ref`, `computed`, `watchEffect`) and expose loading/error state.
 
 ## 3. Validation
 
-- **Zod at every boundary** — All TMDB API responses must be parsed through a Zod schema before use. No raw response data flows into components.
+- **Zod at every boundary** — All API responses must be parsed through a Zod schema before use. No raw response data flows into components.
 - **Validate on read** — All localStorage reads must be validated with Zod to guard against corrupted or migrated data.
 - **Sanitize user input** — All user-provided strings (search queries, tags, notes, list names) must be trimmed and sanitized before storage or use in API calls.
 
@@ -31,7 +31,7 @@
 
 ## 6. Naming Conventions
 
-- **Files:** kebab-case (`movie-card.vue`, `tmdb-service.ts`, `use-movie.ts`)
+- **Files:** kebab-case (`movie-card.vue`, `api-service.ts`, `use-movie.ts`)
 - **Components:** PascalCase in templates and imports (`<MovieCard />`)
 - **Composables:** camelCase prefixed with `use` (`useMovie`, `useLibrary`)
 - **Types/Interfaces:** PascalCase (`Movie`, `LibraryEntry`)
