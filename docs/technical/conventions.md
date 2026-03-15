@@ -57,6 +57,6 @@ Every `.vue` file follows this block order:
 
 ## 9. Responsive Design
 
-- **Mobile-first** — Base styles target mobile. Use Tailwind's `sm:`, `md:`, `lg:`, `xl:` prefixes to layer on wider-screen overrides.
+- **Desktop-first** — Base styles target desktop. Use Tailwind's responsive prefixes to override for smaller screens.
 - **Layout breakpoints** — Below `md`: bottom navigation bar, single-column layout. `md` and above: sidebar navigation, multi-column grids.
 - **Touch targets** — Interactive elements must be at least 44×44px on mobile to meet tap-target guidelines.
