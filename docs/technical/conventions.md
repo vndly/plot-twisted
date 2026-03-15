@@ -11,6 +11,8 @@
 - **Composables are the public API** — Components fetch and mutate data exclusively through composables (`use*` functions). Components never import or call services directly.
 - **Services are internal** — `ApiService` and `StorageService` handle HTTP, caching, and persistence. Only composables may call services.
 - **Reactivity lives in composables** — Composables wrap service calls with Vue reactivity (`ref`, `computed`, `watchEffect`) and expose loading/error state.
+- **Standard return shape** — Every composable returns `{ data, loading, error, refresh? }`. Components can rely on this consistent interface.
+- **Layer import rules** — Components import composables only. Composables import services and types only. Services import types and utils only. Types and utils have no app imports. No layer may skip or reach across levels.
 
 ## 3. Validation
 
@@ -18,18 +20,33 @@
 - **Validate on read** — All localStorage reads must be validated with Zod to guard against corrupted or migrated data.
 - **Sanitize user input** — All user-provided strings (search queries, tags, notes, list names) must be trimmed and sanitized before storage or use in API calls.
 
-## 4. Guardrails
+## 4. Vue SFC Order
+
+Every `.vue` file follows this block order:
+
+1. `<script setup lang="ts">` — logic first
+2. `<template>` — markup second
+3. `<style>` — styles last (rare — Tailwind covers most cases)
+
+## 5. Guardrails
 
 - **No `any`** — Every `any` requires a suppressed lint rule and a documented reason.
 - **No server state** — All persistence is localStorage. No backend, no cookies, no IndexedDB.
 - **Typed everywhere** — All localStorage access goes through a typed service. Raw `JSON.parse` / `JSON.stringify` calls outside that service are prohibited.
 - **Tailwind only** — No inline styles or separate CSS files. All styling through Tailwind utility classes and the theme config.
 
-## 5. Documentation
+## 6. Testing
+
+- **Test file naming** — `*.test.ts` (or `*.test.vue` for component tests), co-located next to the source file they test.
+- **What to test** — Composables (data flow, loading/error states), services (API calls, storage reads/writes, validation), and utils (pure functions). Components only need tests for non-trivial interaction logic.
+- **No mocking localStorage** — Tests use a real `StorageService` instance backed by a fresh in-memory store to keep behavior close to production.
+- **Arrange-Act-Assert** — Every test follows the AAA pattern with clear separation between setup, execution, and assertions.
+
+## 7. Documentation
 
 - **JSDoc required** — Every public class and function must have a JSDoc comment documenting its purpose, parameters, and return value.
 
-## 6. Naming Conventions
+## 8. Naming Conventions
 
 - **Files:** kebab-case (`movie-card.vue`, `api-service.ts`, `use-movie.ts`)
 - **Components:** PascalCase in templates and imports (`<MovieCard />`)
@@ -37,3 +54,9 @@
 - **Types/Interfaces:** PascalCase (`Movie`, `LibraryEntry`)
 - **Constants:** UPPER_SNAKE_CASE (`API_BASE_URL`, `CACHE_TTL`)
 - **Variables/functions:** camelCase (`getMovie`, `isLoading`)
+
+## 9. Responsive Design
+
+- **Mobile-first** — Base styles target mobile. Use Tailwind's `sm:`, `md:`, `lg:`, `xl:` prefixes to layer on wider-screen overrides.
+- **Layout breakpoints** — Below `md`: bottom navigation bar, single-column layout. `md` and above: sidebar navigation, multi-column grids.
+- **Touch targets** — Interactive elements must be at least 44×44px on mobile to meet tap-target guidelines.

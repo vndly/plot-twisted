@@ -2,8 +2,6 @@
   ┌─────────────────┬────────────────────────────────────────────────────────┐
   │      File       │                         Status                         │
   ├─────────────────┼────────────────────────────────────────────────────────┤
-  │ conventions.md  │ Complete                                               │
-  ├─────────────────┼────────────────────────────────────────────────────────┤
   │ api.md          │ Partial — only 1 endpoint (GET /movie/popular)         │
   │                 │ documented; OMDB/IMDB just listed as links             │
   ├─────────────────┼────────────────────────────────────────────────────────┤
@@ -19,7 +17,3 @@
   components (which render those fields). Right now the "Models" section is just
    placeholder descriptions like Movie — Movie data (title, year, genres, cast, 
   images, etc.) without any actual field-level detail.
-
-  Want me to plan out what a properly filled data-model.md should contain?
-
-✻ Sautéed for 33s
