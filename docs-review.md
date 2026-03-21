@@ -1,19 +1,5 @@
 # Docs Review
 
-## Things to Improve
-
-### 1. Roadmap items are very thin
-
-Most phases (01, 02, 04, 06, 07, 08, 09, 10) are 2-4 bullet points. Compare with 03 (Entry Details) and 05 (Library) which have much more detail. The sparse phases could benefit from acceptance criteria or key decisions.
-
-### 2. Circuit breaker parameters undefined
-
-Mentioned in glossary, architecture, and conventions, but no doc specifies the actual thresholds (failure count, cooldown period, recovery strategy).
-
-### 3. `project.md` title says "Product Vision Document"
-
-But `docs/index.md` links to it as "Product Vision Document" while the file is named `project.md`. The naming is a bit confusing — consider renaming the file to `vision.md` or the title to "Project Overview".
-
 ## Missing Documentation
 
 ### 1. Genre list endpoints

@@ -103,6 +103,5 @@ Domain terminology used consistently across the codebase and documentation.
 | **localStorage** | The browser storage mechanism where all user data persists. No backend or server-side storage. | All access goes through `storage.service.ts`. Raw `localStorage` calls outside the service are prohibited. |
 | **Schema Version** | An integer tracking breaking changes in the localStorage data shape. | Field: `schemaVersion` in the top-level localStorage object. Incremented on breaking changes. |
 | **Schema Migration** | The process of transforming old localStorage data to match a new schema version on app startup. | Handled by `storage.service.ts`. |
-| **Circuit Breaker** | A pattern in `tmdb.client.ts` that stops making API calls after repeated failures or rate-limit hits, preventing request floods. | Protects against TMDB's ~40 requests per 10 seconds rate limit. |
 | **Zod Schema** | A runtime validation definition that also infers the corresponding TypeScript type via `z.infer<>`. | Used at every data boundary: API responses, localStorage reads, and user input. |
 | **Settings** | User preferences stored in localStorage: theme, language, default home section, and preferred region. | Type: `Settings`. Defaults applied if missing keys are detected during Zod validation. |

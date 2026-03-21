@@ -84,7 +84,7 @@ Because this layer has no dependencies, it is trivially testable with Vitest.
 
 Plain TypeScript with no Vue dependencies. Handles all external integration, importing only from Domain for type definitions:
 
-- **`tmdb.client.ts`** — TMDB API client with Bearer token auth, Zod response validation, and circuit breaker for rate limits.
+- **`tmdb.client.ts`** — TMDB API client with Bearer token auth and Zod response validation.
 - **`storage.service.ts`** — Typed localStorage wrapper with Zod validation on reads and schema migration between versions.
 
 ## Dependency Rules
