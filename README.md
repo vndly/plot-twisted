@@ -12,5 +12,4 @@ one command to do
 | `lint` | Zero ESLint errors |
 | `format:check` | All files pass Prettier |
 | `build` | Successful — 34 modules, output to `dist/` |
-
 and more
