@@ -114,7 +114,7 @@ function migrateV1ToV2(data: SchemaV1): SchemaV2 {
 ## Infrastructure
 
 - **`storage.service.ts`** — Typed localStorage wrapper with JSON serialization. Handles schema migration between versions. Validates all reads with Zod schemas.
-- **`tmdb.client.ts`** — API client for fetching movie/TV metadata. Implements circuit breaker pattern. All responses are validated through Zod schemas before returning.
+- **`tmdb.client.ts`** — API client for fetching movie/TV metadata. All responses are validated through Zod schemas before returning.
 
 ## Application (Composables)
 
