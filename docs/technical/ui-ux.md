@@ -220,16 +220,16 @@ Custom lists are managed from the Library screen's "Lists" tab and from entry de
 
 Per-screen messages:
 
-| Screen         | Heading                    | Supporting text                                 | CTA                            |
-| -------------- | -------------------------- | ----------------------------------------------- | ------------------------------ |
-| Library (all)  | "Your library is empty"    | "Search for a movie or TV show to get started." | "Discover something to watch"  |
-| Watchlist      | "Your watchlist is empty"  | "Find something you want to watch."             | "Browse trending titles"       |
-| Watched        | "Nothing watched yet"      | "Mark titles as watched to see them here."      | "Check your watchlist"         |
-| Search results | "No results found"         | "Try a different search term."                  | *(text only, no button)*       |
-| Stats          | "No stats yet"             | "Watch some movies to see your statistics."     | "Go to your library"           |
-| Recommendations| "No recommendations yet"   | "Rate some titles so we can suggest new ones."  | "Discover something to watch"  |
-| Release Calendar| "No upcoming releases"    | "No theatrical releases found for your region." | *(text only, no button)*       |
-| Custom List    | "This list is empty"       | "Add titles from their detail page."            | "Browse trending titles"       |
+| Screen           | Heading                    | Supporting text                                 | CTA                            |
+| ---------------- | -------------------------- | ----------------------------------------------- | ------------------------------ |
+| Library (all)    | "Your library is empty"    | "Search for a movie or TV show to get started." | "Discover something to watch"  |
+| Watchlist        | "Your watchlist is empty"  | "Find something you want to watch."             | "Browse trending titles"       |
+| Watched          | "Nothing watched yet"      | "Mark titles as watched to see them here."      | "Check your watchlist"         |
+| Search results   | "No results found"         | "Try a different search term."                  | *(text only, no button)*       |
+| Stats            | "No stats yet"             | "Watch some movies to see your statistics."     | "Go to your library"           |
+| Recommendations  | "No recommendations yet"   | "Rate some titles so we can suggest new ones."  | "Discover something to watch"  |
+| Release Calendar | "No upcoming releases"     | "No theatrical releases found for your region." | *(text only, no button)*       |
+| Custom List      | "This list is empty"       | "Add titles from their detail page."            | "Browse trending titles"       |
 
 ## 10. Error States & Notifications
 
