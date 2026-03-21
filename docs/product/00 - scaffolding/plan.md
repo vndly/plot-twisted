@@ -8,11 +8,11 @@
 
 - [ ] Create `package.json` manually (`name: "plot-twisted"`, `version: "0.1.0"`, `private: true`, `type: "module"`).
 
-**Scripts:** `dev`, `build`, `preview`, `lint`, `lint:fix`, `format`, `format:check`, `type-check`
+**Scripts:** `dev`, `build`, `preview`, `lint`, `lint:fix`, `format`, `format:check`, `test`, `test:coverage`, `type-check`
 
 **Production deps:** `vue@^3`, `vue-router@^4`, `zod`, `lucide-vue-next`
 
-**Dev deps:** `typescript@~5.7`, `vite@^6`, `@vitejs/plugin-vue`, `@tailwindcss/vite`, `tailwindcss`, `eslint`, `@eslint/js`, `typescript-eslint`, `eslint-plugin-vue`, `prettier`, `eslint-config-prettier`, `vue-tsc`
+**Dev deps:** `typescript@~5.7`, `vite@^6`, `vitest`, `@vitejs/plugin-vue`, `@tailwindcss/vite`, `tailwindcss`, `eslint`, `@eslint/js`, `typescript-eslint`, `eslint-plugin-vue`, `prettier`, `eslint-config-prettier`, `vue-tsc`
 
 Run `npm install`.
 
@@ -109,4 +109,5 @@ Empty directories get `.gitkeep` files until real files are added.
   - `npm run dev` — app loads with blank dark screen
   - `npm run build` — production build succeeds
   - `npm run lint` — zero errors
+  - `npm run test` — test suite runs (no tests yet, exits clean)
   - `npm run type-check` — zero TS errors
