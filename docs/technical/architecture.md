@@ -229,11 +229,9 @@ App.vue
 
 No external state library (no Pinia/Vuex). State is managed across three tiers:
 
-| Tier                  | What lives here                                | Mechanism                                                                         |
-| --------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------- |
-| **Component-local**   | UI toggles, form inputs, modal open/close      | `ref()` / `computed()` inside `<script setup>`                                    |
-| **Application-shared** | Library entries, search results, trending data | `ref()` inside composables, shared across components                              |
-| **Persistent**        | User library, lists, tags, settings            | localStorage via `storage.service.ts` (see [Data Model](./data-model.md))         |
+- **Component-local** — UI toggles, form inputs, modal open/close. Uses `ref()` / `computed()` inside `<script setup>`.
+- **Application-shared** — Library entries, search results, trending data. Uses `ref()` inside composables, shared across components.
+- **Persistent** — User library, lists, tags, settings. Uses localStorage via `storage.service.ts` (see [Data Model](./data-model.md)).
 
 All persistent data is validated with Zod on read to guard against corruption or schema drift.
 
