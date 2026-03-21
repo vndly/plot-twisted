@@ -44,7 +44,7 @@ interface Settings {
   theme: "dark" | "light"
   language: string                  // ISO 639-1, e.g. "en"
   defaultHomeSection: "trending" | "popular" | "search"  // which section is scrolled-to on initial load
-  preferredRegion: string           // ISO 3166-1, e.g. "US" — for streaming availability
+  preferredRegion: string           // ISO 3166-1, e.g. "US" — for streaming availability and release calendar region filtering
 }
 ```
 
@@ -146,5 +146,6 @@ Composables are the public data-access layer for Presentation components. They o
 - **`useRecommendations()`** — Selects up to 5 seed entries from the user's library (highest-rated first) and fetches recommendations for each via `tmdb.client.ts`. Deduplicates results across seeds and excludes entries already in the library.
 - **`useUpcoming()`** — Fetches upcoming movie releases via `tmdb.client.ts`.
 - **`useStats()`** — Computes viewing statistics from library data via `storage.service.ts`.
+- **`useGenres()`** — Fetches movie and TV genre lists from TMDB on first call and caches the result in memory for the session. Returns a lookup map of genre ID → name for resolving `genre_ids` in list responses. Subsequent calls return the cached data without additional API requests.
 - **`useSettings()`** — Reads/writes user preferences via `storage.service.ts`.
 - **`useLists()`** — Manages custom lists and list membership via `storage.service.ts`.

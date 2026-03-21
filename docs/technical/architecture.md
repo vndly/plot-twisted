@@ -191,6 +191,7 @@ App.vue
         │
         ├── /library → LibraryScreen
         │       ├── TabToggle (watchlist / watched / lists)
+        │       ├── ViewStatsLink (visible when watched entries exist)
         │       ├── FilterBar
         │       ├── SortDropdown
         │       └── EntryGrid → MovieCard[]
@@ -202,8 +203,15 @@ App.vue
         │       └── TopRatedList
         │
         ├── /recommendations → RecommendationsScreen
+        │       ├── FilterBar
+        │       └── EntryGrid → MovieCard[]
+        │
         ├── /calendar → ReleaseCalendar → CalendarGrid → ReleaseCard[]
         └── /settings → SettingsScreen
+                ├── ThemeToggle
+                ├── LanguageSelect
+                ├── RegionSelect
+                └── HomeSectionSelect
 ```
 
 ## State Management

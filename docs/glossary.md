@@ -24,7 +24,7 @@ Domain terminology used consistently across the codebase and documentation.
 | :--- | :--- | :--- |
 | **Library** | The user's personal collection of saved entries. Contains all entries the user has explicitly saved, regardless of watch status. | Stored in `localStorage` under the `library` key. Not a TMDB concept — purely local. |
 | **Library Entry** | A saved record in the user's library, holding status, rating, tags, notes, and watch dates for a single entry. | Type: `LibraryEntry`. Keyed by TMDB ID in localStorage. |
-| **Watch Status** | The state of a library entry: `"watchlist"`, `"watched"`, or `"none"`. | Field: `LibraryEntry.status`. Determines which tab the entry appears under in the Library screen. `"none"` entries appear only in the All view. |
+| **Watch Status** | The state of a library entry: `"watchlist"`, `"watched"`, or `"none"`. | Field: `LibraryEntry.status`. Determines which tab the entry appears under in the Library screen. `"none"` entries remain in the library but do not appear in the Watchlist or Watched tabs — they are accessible via the entry's detail screen or by searching. |
 | **Watchlist** | Entries the user plans to watch. | `status: "watchlist"`. Displayed in the Library's "Watchlist" tab. |
 | **Watched** | Entries the user has already seen. | `status: "watched"`. Displayed in the Library's "Watched" tab. |
 | **Rating** | The user's 1–5 star score for an entry. `0` means unrated. | Field: `LibraryEntry.rating`. Not the same as TMDB's `vote_average` (0–10 scale). |
@@ -43,7 +43,7 @@ Domain terminology used consistently across the codebase and documentation.
 | **Search** | Multi-search across movies and TV shows via TMDB's `/search/multi` endpoint. | Returns both movie and TV results; `"person"` results are discarded. |
 | **Trending** | Entries currently gaining popularity, fetched from TMDB's trending endpoints. | Configurable time window: `"day"` or `"week"`. Displayed in the Home screen's trending carousel. |
 | **Popular** | Entries with high overall popularity scores, fetched from TMDB's popular endpoints. | Displayed in the Home screen's popular grid. |
-| **Recommendations** | Entries suggested by TMDB based on similarity to a given entry. | Endpoint: `/movie/{id}/recommendations` or `/tv/{id}/recommendations`. Powers the Recommendations screen. |
+| **Recommendations** | Entries suggested by TMDB based on similarity to a given entry. | Endpoint: `/movie/{id}/recommendations` or `/tv/{id}/recommendations`. Powers the Recommendations screen. The app fetches recommendations from multiple seed entries (up to 5, highest-rated first) and deduplicates results; see [Data Model](./technical/data-model.md) for aggregation logic. |
 | **Release Calendar** | A calendar view of upcoming movie theatrical releases. | Data source: TMDB `/movie/upcoming` endpoint, filterable by region. |
 | **Upcoming** | Movies with future theatrical release dates, as reported by TMDB. | Synonym for the data behind the Release Calendar. |
 
@@ -94,6 +94,7 @@ Domain terminology used consistently across the codebase and documentation.
 | **Content Rating** | An age/content classification for a TV show (e.g., "TV-MA", "TV-14"). | Type: `ContentRating`. Movies use `certification` from `release_dates` instead. |
 | **Certification** | An age/content classification for a movie (e.g., "PG-13", "R"). | Found in `release_dates.results[].release_dates[].certification`. TV shows use Content Rating instead. |
 | **Vote Average** | TMDB's community rating on a 0–10 scale. | Field: `vote_average`. Not the same as the user's 1–5 star Rating. |
+| **Genre List** | The TMDB endpoint that returns the full set of genre IDs and display names for a media type. | Endpoints: `/genre/movie/list` and `/genre/tv/list`. Used to resolve `genre_ids` (numeric) from list endpoints into human-readable genre names for the Filter Bar. Response type: `GenreListResponse`. |
 
 ---
 

@@ -37,7 +37,7 @@ Every `.vue` file follows this block order:
 
 ## 6. Testing
 
-- **Test file naming** — `*.test.ts` (or `*.test.vue` for component tests), in a dedicated `tests/` folder at the project root mirroring the `src/` directory structure.
+- **Test file naming** — `*.test.ts` for all tests (including component tests), in a dedicated `tests/` folder at the project root mirroring the `src/` directory structure.
 - **What to test** — Application composables (data flow, loading/error states), Infrastructure (API calls, storage reads/writes, validation), and Domain (schemas, pure functions). Presentation components only need tests for non-trivial interaction logic.
 - **No mocking localStorage** — Tests use a real `storage.service.ts` instance backed by a fresh in-memory store to keep behavior close to production.
 - **Arrange-Act-Assert** — Every test follows the AAA pattern with clear separation between setup, execution, and assertions.
@@ -65,7 +65,7 @@ Every `.vue` file follows this block order:
 
 Language handling has two separate layers:
 
-- **TMDB API responses** — All API calls pass the user's `Settings.language` value (ISO 639-1, e.g. `"en"`) as the `language` query parameter. TMDB returns localized titles, overviews, and genre names for supported languages. If a translation is unavailable, TMDB falls back to English automatically.
+- **TMDB API responses** — All API calls pass the user's `Settings.language` value (ISO 639-1, e.g. `"en"`) as the `language` query parameter. TMDB accepts both ISO 639-1 (`"en"`) and locale codes (`"en-US"`); the app uses the shorter ISO 639-1 format. TMDB returns localized titles, overviews, and genre names for supported languages. If a translation is unavailable, TMDB falls back to English automatically.
 - **UI strings** — All interface text (labels, button text, empty-state messages, error messages) is hardcoded in English. There is no i18n library (e.g. vue-i18n) and no translation files. UI strings do not change when the user switches language in Settings.
 
 The language setting in Settings controls TMDB content language only. Changing it affects movie titles, synopses, and genre names returned by the API, but the app shell, navigation labels, and system messages remain in English.

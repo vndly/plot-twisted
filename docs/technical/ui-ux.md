@@ -65,7 +65,7 @@ Design specification for the movie tracker interface. All styling uses Tailwind 
 | `/library`         | Library         | Bookmark icon |
 | `/settings`        | Settings        | Gear/cog icon |
 
-`/movie/:id`, `/tv/:id`, and `/stats` are not in the nav — accessed via card clicks and internal links. Stats is reached via a "View Stats" link on the Library screen (visible when the user has watched entries).
+`/movie/:id`, `/tv/:id`, and `/stats` are not in the nav — accessed via card clicks and internal links. Stats is reached via a "View Stats" link on the Library screen (visible only when the user has at least one watched entry).
 
 ### Search Bar
 
@@ -122,9 +122,28 @@ Horizontal row of text tabs (e.g., Library: Watchlist / Watched / Lists).
 - **Synopsis** — Paragraph of body text below metadata.
 - **Info pairs** — Genre, Cast, Writer, Director displayed as bold label + normal value.
 - **Poster** — Positioned to the right of metadata on desktop. Standard poster image.
-- **IMDb badge** — "IMDb" label + score (e.g., "8.1/10") + "REVIEWS" link.
+- **TMDB rating badge** — "TMDB" label + `vote_average` score (e.g., "8.1/10"). Displayed as a small badge alongside the metadata.
+- **IMDb link** — Text link opening the IMDb page via the entry's `imdb_id` (e.g., `https://www.imdb.com/title/tt1234567`). Only shown when `imdb_id` is available.
 - **Watch Trailer** — Primary button with play icon.
 - **Gallery** — Horizontal row of thumbnail images at the bottom.
+
+### Library Screen
+
+- **Tab Toggle** — Switches between Watchlist / Watched / Lists tabs.
+- **"View Stats" link** — A text link displayed below the tab toggle, visible only when the user has at least one watched entry. Navigates to `/stats`.
+- **Filter Bar** — Filters entries by genre, media type, or tag.
+- **Sort Dropdown** — Orders entries by date added, rating, title, or release date.
+- **Entry Grid** — Grid of MovieCard components for entries in the active tab.
+
+### Custom List Management
+
+Custom lists are managed from the Library screen's "Lists" tab and from entry detail screens.
+
+- **Lists tab** — Displays all user-created custom lists as clickable rows (list name + entry count). Tap to view list contents.
+- **Create list** — A "New List" button at the top of the Lists tab. Opens an inline text input for the list name. Submit creates the list; cancel dismisses the input.
+- **Rename list** — Long-press or context menu on a list row reveals a "Rename" option. Opens the same inline text input with the current name pre-filled.
+- **Delete list** — Long-press or context menu reveals a "Delete" option. Confirmation prompt before deletion. Deleting a list does not remove the entries from the library.
+- **Add to list** — On the entry detail screen, a "Add to List" button opens a dropdown/modal showing all custom lists with checkboxes. Toggling a checkbox adds or removes the entry from that list.
 
 ## 6. Interaction Patterns
 
@@ -174,6 +193,9 @@ Per-screen messages:
 | Watched        | "Nothing watched yet"      | "Mark titles as watched to see them here."      | "Check your watchlist"         |
 | Search results | "No results found"         | "Try a different search term."                  | *(text only, no button)*       |
 | Stats          | "No stats yet"             | "Watch some movies to see your statistics."     | "Go to your library"           |
+| Recommendations| "No recommendations yet"   | "Rate some titles so we can suggest new ones."  | "Discover something to watch"  |
+| Release Calendar| "No upcoming releases"    | "No theatrical releases found for your region." | *(text only, no button)*       |
+| Custom List    | "This list is empty"       | "Add titles from their detail page."            | "Browse trending titles"       |
 
 ## 10. Error States & Notifications
 

@@ -4,3 +4,20 @@
 !scripts/
 .firebase/
 firebase-debug.log
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Coverage
+coverage/
+
+# Editor files
+*.local
