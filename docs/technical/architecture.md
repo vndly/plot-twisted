@@ -93,17 +93,6 @@ Plain TypeScript with no Vue dependencies. Handles all external integration, imp
 - **`storage.service.ts`** — Typed localStorage wrapper with Zod validation on reads and schema migration between versions.
 - **`image.helper.ts`** — `buildImageUrl(path, size)` — returns a full image URL or `null` when no image path is available.
 
-## Dependency Rules
-
-```
-Presentation   →  Application (only)
-Application    →  Domain + Infrastructure
-Infrastructure →  Domain (only)
-Domain         →  nothing
-```
-
-No layer may skip or reach across levels. Presentation never imports Infrastructure or Domain directly — it always goes through Application.
-
 ## Data Flow
 
 ### Read path (API → screen)
@@ -159,8 +148,6 @@ Navigation guards on `/movie/:id` and `/show/:id` reject non-numeric IDs and red
 }
 ```
 
-**No API caching** — Every navigation or action that needs media provider data makes a fresh API request. There is no response cache, no request deduplication, and no stale-while-revalidate layer. This keeps the data layer simple and avoids cache-invalidation bugs. The media provider's rate limit (≈40 requests per 10 seconds) is well above typical usage. The one exception is `useGenres()`, which caches genre lists in memory for the session to avoid redundant lookups (see [Data Model — useGenres()](./data-model.md#application-composables)).
-
 ### Deep Linking
 
 Every route is directly navigable via URL. Navigating to `/movie/550` or `/show/1396` works the same whether the user clicks a card or pastes the URL into the browser:
@@ -175,8 +162,6 @@ Every route is directly navigable via URL. Navigating to `/movie/550` or `/show/
 - **The API returns 404 (ID not found)** — The view shows a "not found" message with a link back to Home.
 - **Network error** — Toast notification with a retry option; the view stays in its error state.
 - **Non-numeric ID (e.g. `/movie/abc`)** — A navigation guard rejects the route and redirects to Home.
-
-**No offline handling** — The app requires a network connection. There is no service worker or offline fallback.
 
 ## Component Hierarchy
 
@@ -235,10 +220,3 @@ No external state library (no Pinia/Vuex). State is managed across three tiers:
 
 All persistent data is validated with Zod on read to guard against corruption or schema drift.
 
-## Testing
-
-Because the Domain and Application layers are cleanly separated:
-
-- **Domain tests** — Test Zod schemas and pure logic functions with zero overhead. No mocking required.
-- **Application tests** — Mock the Infrastructure layer to test composable orchestration logic without touching localStorage or the media provider API.
-- **Infrastructure tests** — Use a real `storage.service.ts` instance backed by a fresh in-memory store to keep behavior close to production.

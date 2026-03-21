@@ -12,7 +12,16 @@
 - **Infrastructure is internal** — `provider.client.ts` and `storage.service.ts` handle HTTP and persistence. Only Application composables may call Infrastructure.
 - **Reactivity lives in Application** — Composables wrap Infrastructure calls with Vue reactivity (`ref`, `computed`, `watchEffect`) and expose loading/error state.
 - **Standard return shape** — Every composable returns `{ data, loading, error, refresh? }`. Presentation components can rely on this consistent interface.
-- **Layer import rules** — Presentation imports Application only. Application imports Domain and Infrastructure. Infrastructure imports Domain only. Domain has no app imports. No layer may skip or reach across levels.
+- **Layer import rules:**
+
+```
+Presentation   →  Application (only)
+Application    →  Domain + Infrastructure
+Infrastructure →  Domain (only)
+Domain         →  nothing
+```
+
+No layer may skip or reach across levels. Presentation never imports Infrastructure or Domain directly — it always goes through Application.
 
 ## 3. Validation
 
@@ -51,6 +60,8 @@ Every `.vue` file follows this block order:
 
 - **No `any`** — Every `any` requires a suppressed lint rule and a documented reason.
 - **No server state** — All persistence is localStorage. No backend, no cookies, no IndexedDB.
+- **No API caching** — Every navigation or action that needs media provider data makes a fresh API request. There is no response cache, no request deduplication, and no stale-while-revalidate layer. This keeps the data layer simple and avoids cache-invalidation bugs. The media provider's rate limit (≈40 requests per 10 seconds) is well above typical usage. The one exception is `useGenres()`, which caches genre lists in memory for the session to avoid redundant lookups (see [Data Model — useGenres()](./data-model.md#application-composables)).
+- **No offline handling** — The app requires a network connection. There is no service worker or offline fallback.
 - **Typed everywhere** — All localStorage access goes through a typed service. Raw `JSON.parse` / `JSON.stringify` calls outside that service are prohibited.
 - **Tailwind only** — No inline styles or separate CSS files. All styling through Tailwind utility classes and the theme config.
 
