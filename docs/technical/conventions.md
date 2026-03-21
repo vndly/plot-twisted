@@ -172,13 +172,13 @@ All API calls pass `Settings.language` as the `language` query parameter. The me
 
 Use the smallest media provider image size that looks sharp at the rendered dimensions. Larger sizes waste bandwidth without visible benefit.
 
-| Context              | Image Type | Size   | Rationale                                      |
-| -------------------- | ---------- | ------ | ---------------------------------------------- |
-| Movie/show card grid | Poster     | `w342` | Sharp on desktop grid cards and retina mobile  |
-| Detail page poster   | Poster     | `w500` | Larger display area on the detail screen       |
-| Hero banner          | Backdrop   | `w780` | Full-width banner; `original` only if needed   |
-| Cast headshots       | Profile    | `w185` | Small circular/square thumbnails               |
-| Gallery thumbnails   | Any        | `w185` | Compact horizontal row                         |
+| Context              | Image Type | Size   | Rationale                                     |
+| -------------------- | ---------- | ------ | --------------------------------------------- |
+| Movie/show card grid | Poster     | `w342` | Sharp on desktop grid cards and retina mobile |
+| Detail page poster   | Poster     | `w500` | Larger display area on the detail screen      |
+| Hero banner          | Backdrop   | `w780` | Full-width banner; `original` only if needed  |
+| Cast headshots       | Profile    | `w185` | Small circular/square thumbnails              |
+| Gallery thumbnails   | Any        | `w185` | Compact horizontal row                        |
 
 ### Lazy Loading
 

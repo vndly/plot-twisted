@@ -1,9 +1,9 @@
 # Home Screen: Search
 
-* Search for movies and TV shows via `GET /search/multi`
-* Display results as `MovieCard` items in a responsive grid
-* Tapping a card navigates to `/movie/:id` or `/show/:id`
-* **Key components:** SearchBar, MovieCard
+- Search for movies and TV shows via `GET /search/multi`
+- Display results as `MovieCard` items in a responsive grid
+- Tapping a card navigates to `/movie/:id` or `/show/:id`
+- **Key components:** SearchBar, MovieCard
 
 ## Acceptance Criteria
 
@@ -24,5 +24,5 @@ The home screen has two mutually exclusive modes:
 
 ## Key Decisions
 
-* **`/search/multi` over separate endpoints** — single request covers both movies and TV shows, reducing API calls
-* **Client-side person filtering** — simpler than calling two separate endpoints and merging results
+- **`/search/multi` over separate endpoints** — single request covers both movies and TV shows, reducing API calls
+- **Client-side person filtering** — simpler than calling two separate endpoints and merging results

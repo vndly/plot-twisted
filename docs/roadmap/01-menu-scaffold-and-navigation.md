@@ -1,9 +1,9 @@
 # Menu Scaffold and Navigation
 
-* App shell with sidebar on desktop, bottom navigation bar on mobile
-* Route structure: `/`, `/movie/:id`, `/show/:id`, `/library`, `/stats`, `/recommendations`, `/calendar`, `/settings`
-* Active route is visually highlighted in both sidebar and bottom nav
-* Navigation remains visible on all screens (no full-page takeovers)
+- App shell with sidebar on desktop, bottom navigation bar on mobile
+- Route structure: `/`, `/movie/:id`, `/show/:id`, `/library`, `/stats`, `/recommendations`, `/calendar`, `/settings`
+- Active route is visually highlighted in both sidebar and bottom nav
+- Navigation remains visible on all screens (no full-page takeovers)
 
 ## Acceptance Criteria
 
@@ -15,4 +15,4 @@
 
 ## Key Decisions
 
-* **Tailwind responsive utilities** — breakpoint-based show/hide for sidebar vs. bottom nav, no JavaScript resize listeners
+- **Tailwind responsive utilities** — breakpoint-based show/hide for sidebar vs. bottom nav, no JavaScript resize listeners

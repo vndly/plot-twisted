@@ -6,17 +6,17 @@ All types are defined as Zod schemas in `src/domain/` with TypeScript types infe
 
 `src/domain/constants.ts` defines app-wide constants used across layers:
 
-| Constant                 | Type     | Description                                                  |
-| ------------------------ | -------- | ------------------------------------------------------------ |
-| `API_BASE_URL`           | `string` | Media provider API base URL (`https://api.themoviedb.org/3`) |
-| `IMAGE_BASE_URL`         | `string` | Media provider image base URL                                |
-| `IMAGE_SIZES`            | `object` | Available image sizes per type (poster, backdrop, etc.)      |
-| `CURRENT_SCHEMA_VERSION` | `number` | Current localStorage schema version                          |
-| `STORAGE_KEY`            | `string` | localStorage key for all persisted data                      |
-| `MAX_RETRY_ATTEMPTS`     | `number` | Maximum retries for rate-limited API requests                |
-| `TOAST_DISMISS_MS`       | `number` | Auto-dismiss duration for toast notifications                |
-| `SUPPORTED_LANGUAGES`    | `readonly string[]` | Supported UI/content languages: `['en', 'es', 'fr']`          |
-| `DEFAULT_LANGUAGE`       | `string` | Default language when browser locale is unsupported (`'en'`) |
+| Constant                 | Type                | Description                                                  |
+| ------------------------ | ------------------- | ------------------------------------------------------------ |
+| `API_BASE_URL`           | `string`            | Media provider API base URL (`https://api.themoviedb.org/3`) |
+| `IMAGE_BASE_URL`         | `string`            | Media provider image base URL                                |
+| `IMAGE_SIZES`            | `object`            | Available image sizes per type (poster, backdrop, etc.)      |
+| `CURRENT_SCHEMA_VERSION` | `number`            | Current localStorage schema version                          |
+| `STORAGE_KEY`            | `string`            | localStorage key for all persisted data                      |
+| `MAX_RETRY_ATTEMPTS`     | `number`            | Maximum retries for rate-limited API requests                |
+| `TOAST_DISMISS_MS`       | `number`            | Auto-dismiss duration for toast notifications                |
+| `SUPPORTED_LANGUAGES`    | `readonly string[]` | Supported UI/content languages: `['en', 'es', 'fr']`         |
+| `DEFAULT_LANGUAGE`       | `string`            | Default language when browser locale is unsupported (`'en'`) |
 
 ## Models
 
@@ -26,16 +26,16 @@ User data for a saved movie or TV show. Stored in localStorage, validated with Z
 
 ```ts
 interface LibraryEntry {
-  id: number                        // provider ID
-  mediaType: "movie" | "tv"
-  status: "watchlist" | "watched" | "none"
-  rating: number                    // 0 (unrated) to 5
+  id: number // provider ID
+  mediaType: 'movie' | 'tv'
+  status: 'watchlist' | 'watched' | 'none'
+  rating: number // 0 (unrated) to 5
   favorite: boolean
-  lists: string[]                   // IDs of custom lists this entry belongs to
-  tags: string[]                    // user-defined tags, e.g. ["horror", "90s"]
-  notes: string                     // free-text user notes
-  watchDates: string[]              // ISO dates, e.g. ["2026-03-08"] (supports rewatches)
-  addedAt: string                   // ISO date — when the entry was first saved
+  lists: string[] // IDs of custom lists this entry belongs to
+  tags: string[] // user-defined tags, e.g. ["horror", "90s"]
+  notes: string // free-text user notes
+  watchDates: string[] // ISO dates, e.g. ["2026-03-08"] (supports rewatches)
+  addedAt: string // ISO date — when the entry was first saved
 }
 ```
 
@@ -45,9 +45,9 @@ User-created list for grouping library entries.
 
 ```ts
 interface CustomList {
-  id: string                        // generated UUID
-  name: string                      // user-provided name, trimmed + sanitized
-  createdAt: string                 // ISO date
+  id: string // generated UUID
+  name: string // user-provided name, trimmed + sanitized
+  createdAt: string // ISO date
 }
 ```
 
@@ -57,10 +57,10 @@ User preferences. Persisted in localStorage.
 
 ```ts
 interface Settings {
-  theme: "dark" | "light"
-  language: string                  // ISO 639-1, e.g. "en" — controls both UI translations (vue-i18n) and media provider API content
-  defaultHomeSection: "trending" | "popular" | "search"  // which section is scrolled-to on initial load
-  preferredRegion: string           // ISO 3166-1, e.g. "US" — for streaming availability and release calendar region filtering
+  theme: 'dark' | 'light'
+  language: string // ISO 639-1, e.g. "en" — controls both UI translations (vue-i18n) and media provider API content
+  defaultHomeSection: 'trending' | 'popular' | 'search' // which section is scrolled-to on initial load
+  preferredRegion: string // ISO 3166-1, e.g. "US" — for streaming availability and release calendar region filtering
 }
 ```
 
@@ -112,10 +112,7 @@ const migrations: Record<number, (data: unknown) => unknown> = {
 
 function migrateV1ToV2(data: SchemaV1): SchemaV2 {
   const lists = Object.fromEntries(
-    Object.entries(data.lists).map(([id, list]) => [
-      id,
-      { ...list, color: null },
-    ])
+    Object.entries(data.lists).map(([id, list]) => [id, { ...list, color: null }]),
   )
   return { ...data, lists, schemaVersion: 2 }
 }

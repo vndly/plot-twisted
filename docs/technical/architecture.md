@@ -74,6 +74,7 @@ Vue 3 SFCs using `<script setup>` and Tailwind. Components call composables from
 Composables prefixed with `use` that orchestrate the Domain and Infrastructure layers using Vue reactivity (`ref`, `computed`, `watchEffect`). Each composable returns a standard shape: `{ data, loading, error, refresh? }`. This is the **only public API** that Presentation components use to read or mutate data.
 
 **Example flow** — when the UI calls `addToWatchlist(movieId)`, the composable:
+
 1. Asks Infrastructure to fetch movie details from the media provider.
 2. Passes that data to Domain to validate it against the Zod schema.
 3. Tells Infrastructure to save the validated entry to localStorage.
@@ -222,4 +223,3 @@ No external state library (no Pinia/Vuex). State is managed across three tiers:
 - **Persistent** — User library, lists, tags, settings. Uses localStorage via `storage.service.ts` (see [Data Model](./data-model.md)).
 
 All persistent data is validated with Zod on read to guard against corruption or schema drift.
-

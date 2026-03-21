@@ -38,18 +38,18 @@ The project uses three tsconfig files with project references:
 
 ## Commands
 
-| Command                | Description                                      |
-| ---------------------- | ------------------------------------------------ |
-| `npm run dev`          | Start the Vite dev server with hot module reload |
-| `npm run build`        | Production build to `dist/`                      |
-| `npm run preview`      | Preview the production build locally             |
-| `npm run lint`         | Run ESLint across the project                    |
-| `npm run lint:fix`     | Run ESLint with auto-fix                         |
-| `npm run format`       | Format all files with Prettier                   |
-| `npm run format:check` | Check formatting without writing changes         |
-| `npm run test`         | Run Vitest test suite                            |
-| `npm run test:coverage`| Run Vitest with coverage report                  |
-| `npm run type-check`   | Run `vue-tsc` for TypeScript type checking       |
+| Command                 | Description                                      |
+| ----------------------- | ------------------------------------------------ |
+| `npm run dev`           | Start the Vite dev server with hot module reload |
+| `npm run build`         | Production build to `dist/`                      |
+| `npm run preview`       | Preview the production build locally             |
+| `npm run lint`          | Run ESLint across the project                    |
+| `npm run lint:fix`      | Run ESLint with auto-fix                         |
+| `npm run format`        | Format all files with Prettier                   |
+| `npm run format:check`  | Check formatting without writing changes         |
+| `npm run test`          | Run Vitest test suite                            |
+| `npm run test:coverage` | Run Vitest with coverage report                  |
+| `npm run type-check`    | Run `vue-tsc` for TypeScript type checking       |
 
 ## Editor Setup
 

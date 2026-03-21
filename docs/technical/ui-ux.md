@@ -29,13 +29,13 @@ Design specification for the app's interface. All styling uses Tailwind utility 
 - **Content area** — Fills remaining width. Padded `p-4` to `p-6`. Fluid width, no max-width constraint.
 - **Card grids** — CSS grid via Tailwind with responsive column counts. Base styles target desktop; use `max-*` breakpoints to reduce columns for smaller screens:
 
-| Breakpoint            | Columns | Context                       |
-| --------------------- | ------- | ----------------------------- |
-| Base (desktop)        | 5–6     | Wide desktop                  |
-| `max-xl` (< 1280px)   | 4–5     | Standard desktop              |
-| `max-lg` (< 1024px)   | 3–4     | Sidebar visible, multi-column |
-| `max-md` (< 768px)    | 2–3     | Bottom nav, narrower layout   |
-| `max-sm` (< 640px)    | 2       | Two-column mobile layout      |
+| Breakpoint          | Columns | Context                       |
+| ------------------- | ------- | ----------------------------- |
+| Base (desktop)      | 5–6     | Wide desktop                  |
+| `max-xl` (< 1280px) | 4–5     | Standard desktop              |
+| `max-lg` (< 1024px) | 3–4     | Sidebar visible, multi-column |
+| `max-md` (< 768px)  | 2–3     | Bottom nav, narrower layout   |
+| `max-sm` (< 640px)  | 2       | Two-column mobile layout      |
 
 - **Spacing** — `space-y-6` or `space-y-8` between major sections. `gap-4` between grid cards.
 - **Responsive behavior** — Desktop-first. Base styles target desktop; Tailwind breakpoints override for smaller screens. Below `md`: sidebar hidden, bottom nav bar visible, two-column layout. `md` and above: sidebar visible, multi-column grids.
@@ -220,16 +220,16 @@ Custom lists are managed from the Library screen's "Lists" tab and from entry de
 
 Per-screen messages (English values shown — all strings come from translation files and are localized per `Settings.language`):
 
-| Screen           | Heading                    | Supporting text                                 | CTA                            |
-| ---------------- | -------------------------- | ----------------------------------------------- | ------------------------------ |
-| Library (all)    | "Your library is empty"    | "Search for a movie or TV show to get started." | "Discover something to watch"  |
-| Watchlist        | "Your watchlist is empty"  | "Find something you want to watch."             | "Browse trending titles"       |
-| Watched          | "Nothing watched yet"      | "Mark titles as watched to see them here."      | "Check your watchlist"         |
-| Search results   | "No results found"         | "Try a different search term."                  | *(text only, no button)*       |
-| Stats            | "No stats yet"             | "Watch some movies to see your statistics."     | "Go to your library"           |
-| Recommendations  | "No recommendations yet"   | "Rate some titles so we can suggest new ones."  | "Discover something to watch"  |
-| Release Calendar | "No upcoming releases"     | "No theatrical releases found for your region." | *(text only, no button)*       |
-| Custom List      | "This list is empty"       | "Add titles from their detail page."            | "Browse trending titles"       |
+| Screen           | Heading                   | Supporting text                                 | CTA                           |
+| ---------------- | ------------------------- | ----------------------------------------------- | ----------------------------- |
+| Library (all)    | "Your library is empty"   | "Search for a movie or TV show to get started." | "Discover something to watch" |
+| Watchlist        | "Your watchlist is empty" | "Find something you want to watch."             | "Browse trending titles"      |
+| Watched          | "Nothing watched yet"     | "Mark titles as watched to see them here."      | "Check your watchlist"        |
+| Search results   | "No results found"        | "Try a different search term."                  | _(text only, no button)_      |
+| Stats            | "No stats yet"            | "Watch some movies to see your statistics."     | "Go to your library"          |
+| Recommendations  | "No recommendations yet"  | "Rate some titles so we can suggest new ones."  | "Discover something to watch" |
+| Release Calendar | "No upcoming releases"    | "No theatrical releases found for your region." | _(text only, no button)_      |
+| Custom List      | "This list is empty"      | "Add titles from their detail page."            | "Browse trending titles"      |
 
 ## 10. Error States & Notifications
 

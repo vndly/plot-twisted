@@ -6,7 +6,17 @@
   "editor.tabSize": 2,
   "editor.fontSize": 16,
   "editor.detectIndentation": false,
-  "editor.formatOnSave": false,
+  "editor.formatOnSave": true,
   "editor.fontFamily": "'Source Code Pro'",
-  "eslint.run": "onSave"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.run": "onSave",
+  "tailwindCSS.includeLanguages": {
+    "vue": "html"
+  },
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
 }

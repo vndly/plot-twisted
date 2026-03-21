@@ -32,7 +32,7 @@ Build and deploy in two steps:
 
 ```bash
 npm run build
-firebase deploy --only hosting
+npm run deploy
 ```
 
 The CLI outputs the live URL after a successful deploy.
@@ -44,7 +44,7 @@ There is no automated CI/CD pipeline. The project does not use GitHub Actions, p
 The deploy process is fully manual:
 
 1. Run `npm run build` locally.
-2. Run `firebase deploy --only hosting`.
+2. Run `npm run deploy`.
 
 Linting (`npm run lint`) and tests (`npm run test`) are available as local commands but are not enforced automatically before deploy.
 

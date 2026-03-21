@@ -1,7 +1,7 @@
 # Stats
 
-* Overview charts and lists computed from the user's localStorage library
-* **Key components:** StatCards, GenreChart, MonthlyChart, TopRatedList
+- Overview charts and lists computed from the user's localStorage library
+- **Key components:** StatCards, GenreChart, MonthlyChart, TopRatedList
 
 ## Acceptance Criteria
 
@@ -14,5 +14,5 @@
 
 ## Key Decisions
 
-* **Client-side computation only** — all stats are derived from localStorage; no API calls needed
-* **Chart library TBD** — lightweight option (e.g., Chart.js or a headless charting lib) chosen at implementation time to minimize bundle size
+- **Client-side computation only** — all stats are derived from localStorage; no API calls needed
+- **Chart library TBD** — lightweight option (e.g., Chart.js or a headless charting lib) chosen at implementation time to minimize bundle size

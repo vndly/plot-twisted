@@ -1,16 +1,16 @@
 # Entry Details
 
-* Display title, synopsis, poster, and backdrop image for a movie or TV show
-* Show metadata: year, languages, duration (or season/episode count for TV), and genres
-* List directors, writers, and cast members
-* Display provider rating and link to the IMDB page via `imdb_id`
-* Show box office data (revenue and budget from the media provider)
-* Toggle favorite status and set a 1–5 star personal rating
-* Set watch status (watchlist, watched, or none)
-* Display streaming availability for the user's region
-* Play the official trailer inline
-* Share link — uses the Web Share API when available; falls back to copying the entry detail URL (`/movie/:id` or `/show/:id`) to the clipboard. Displays a success toast on copy.
-* **Key components:** HeroBackdrop, MetadataPanel, CastCarousel, TrailerEmbed, StreamingBadges, RatingStars
+- Display title, synopsis, poster, and backdrop image for a movie or TV show
+- Show metadata: year, languages, duration (or season/episode count for TV), and genres
+- List directors, writers, and cast members
+- Display provider rating and link to the IMDB page via `imdb_id`
+- Show box office data (revenue and budget from the media provider)
+- Toggle favorite status and set a 1–5 star personal rating
+- Set watch status (watchlist, watched, or none)
+- Display streaming availability for the user's region
+- Play the official trailer inline
+- Share link — uses the Web Share API when available; falls back to copying the entry detail URL (`/movie/:id` or `/show/:id`) to the clipboard. Displays a success toast on copy.
+- **Key components:** HeroBackdrop, MetadataPanel, CastCarousel, TrailerEmbed, StreamingBadges, RatingStars
 
 ## Acceptance Criteria
 
@@ -29,5 +29,5 @@
 
 ## Key Decisions
 
-* **Single API call with `append_to_response`** — credits, videos, watch/providers, and release_dates are fetched in one request to minimize latency
-* **Web Share API with clipboard fallback** — provides native sharing on supported devices without requiring a third-party library
+- **Single API call with `append_to_response`** — credits, videos, watch/providers, and release_dates are fetched in one request to minimize latency
+- **Web Share API with clipboard fallback** — provides native sharing on supported devices without requiring a third-party library

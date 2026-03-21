@@ -1,8 +1,8 @@
 # Release Calendar Sync
 
-* Calendar view showing upcoming movie releases via `GET /movie/upcoming`
-* Filterable by the user's preferred region (from Settings)
-* **Key components:** CalendarGrid, ReleaseCard
+- Calendar view showing upcoming movie releases via `GET /movie/upcoming`
+- Filterable by the user's preferred region (from Settings)
+- **Key components:** CalendarGrid, ReleaseCard
 
 ## Acceptance Criteria
 
@@ -15,5 +15,5 @@
 
 ## Key Decisions
 
-* **Movies only** — The media provider's `/movie/upcoming` has no TV equivalent; TV release tracking is out of scope
-* **Region from Settings** — the `region` parameter comes from the user's preferred region configured in phase 11
+- **Movies only** — The media provider's `/movie/upcoming` has no TV equivalent; TV release tracking is out of scope
+- **Region from Settings** — the `region` parameter comes from the user's preferred region configured in phase 11

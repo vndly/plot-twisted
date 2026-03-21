@@ -1,9 +1,9 @@
 # Home Screen: Filters and Grid/List View
 
-* Filter home screen results by genre, media type (movie/TV), and year range
-* Toggle between grid view (poster cards) and list view (compact rows)
-* Filters apply client-side to already-fetched trending/popular data
-* **Key components:** FilterBar, MovieCard
+- Filter home screen results by genre, media type (movie/TV), and year range
+- Toggle between grid view (poster cards) and list view (compact rows)
+- Filters apply client-side to already-fetched trending/popular data
+- **Key components:** FilterBar, MovieCard
 
 ## Acceptance Criteria
 
@@ -16,5 +16,5 @@
 
 ## Key Decisions
 
-* **Client-side filtering** — trending/popular data sets are small enough (20 items per page) to filter in-memory without re-fetching
-* **Genre IDs from the media provider** — genre names are resolved via `/genre/movie/list` and `/genre/tv/list`, not hardcoded
+- **Client-side filtering** — trending/popular data sets are small enough (20 items per page) to filter in-memory without re-fetching
+- **Genre IDs from the media provider** — genre names are resolved via `/genre/movie/list` and `/genre/tv/list`, not hardcoded

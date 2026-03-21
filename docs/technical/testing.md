@@ -45,12 +45,12 @@ tests/
 
 ## What to Test
 
-| Layer          | What to cover                                                    | Mocking strategy                                    |
-| -------------- | ---------------------------------------------------------------- | --------------------------------------------------- |
-| Domain         | Zod schema parsing (valid + invalid inputs), pure logic functions | None — zero dependencies                            |
-| Infrastructure | API calls, localStorage reads/writes, schema migration           | Fresh in-memory store (no mocking localStorage)     |
-| Application    | Data flow, loading/error states, composable orchestration        | Mock Infrastructure layer                           |
-| Presentation   | Non-trivial interaction logic only                               | Mock Application composables                        |
+| Layer          | What to cover                                                     | Mocking strategy                                |
+| -------------- | ----------------------------------------------------------------- | ----------------------------------------------- |
+| Domain         | Zod schema parsing (valid + invalid inputs), pure logic functions | None — zero dependencies                        |
+| Infrastructure | API calls, localStorage reads/writes, schema migration            | Fresh in-memory store (no mocking localStorage) |
+| Application    | Data flow, loading/error states, composable orchestration         | Mock Infrastructure layer                       |
+| Presentation   | Non-trivial interaction logic only                                | Mock Application composables                    |
 
 ## Coverage Expectations
 

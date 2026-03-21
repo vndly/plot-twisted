@@ -36,21 +36,21 @@ All TMDB endpoints return errors in the following shape:
 
 ```ts
 interface TMDBError {
-  success: boolean           // false
-  status_code: number        // TMDB-specific error code
-  status_message: string     // Human-readable description
+  success: boolean // false
+  status_code: number // TMDB-specific error code
+  status_message: string // Human-readable description
 }
 ```
 
 Common HTTP status codes:
 
-| Status | Meaning                | Retry        | App behavior                                          |
-| ------ | ---------------------- | ------------ | ----------------------------------------------------- |
-| `401`  | Invalid or expired token | No           | Surface error toast; prompt user to check API key in Settings |
-| `404`  | Resource not found     | No           | Show inline "not found" message on the detail screen  |
-| `429`  | Rate limit exceeded    | **Automatic** | Exponential backoff: 1 s, 2 s, 4 s — up to 3 attempts (see Rate Limiting) |
-| `500+` | TMDB server error      | Manual       | Show error toast with a Retry action the user can click |
-| Network error | Connection failure | Manual    | Show error toast with a Retry action the user can click |
+| Status        | Meaning                  | Retry         | App behavior                                                              |
+| ------------- | ------------------------ | ------------- | ------------------------------------------------------------------------- |
+| `401`         | Invalid or expired token | No            | Surface error toast; prompt user to check API key in Settings             |
+| `404`         | Resource not found       | No            | Show inline "not found" message on the detail screen                      |
+| `429`         | Rate limit exceeded      | **Automatic** | Exponential backoff: 1 s, 2 s, 4 s — up to 3 attempts (see Rate Limiting) |
+| `500+`        | TMDB server error        | Manual        | Show error toast with a Retry action the user can click                   |
+| Network error | Connection failure       | Manual        | Show error toast with a Retry action the user can click                   |
 
 **Automatic vs manual retry:** Only `429` responses trigger automatic retry with exponential backoff. All other errors (server errors, network failures) surface a toast notification with a manual Retry action — the user decides whether to retry.
 
@@ -106,15 +106,15 @@ interface MovieListItem {
   title: string
   original_title: string
   overview: string
-  release_date: string              // "YYYY-MM-DD"
-  poster_path: string | null        // relative path, e.g. "/kqjL17y...jpg"
+  release_date: string // "YYYY-MM-DD"
+  poster_path: string | null // relative path, e.g. "/kqjL17y...jpg"
   backdrop_path: string | null
-  vote_average: number              // 0–10
+  vote_average: number // 0–10
   vote_count: number
   popularity: number
-  genre_ids: number[]               // e.g. [28, 12, 878]
+  genre_ids: number[] // e.g. [28, 12, 878]
   adult: boolean
-  original_language: string         // ISO 639-1, e.g. "en"
+  original_language: string // ISO 639-1, e.g. "en"
   video: boolean
 }
 ```
@@ -130,20 +130,20 @@ interface MovieDetail {
   original_title: string
   overview: string
   tagline: string
-  release_date: string              // "YYYY-MM-DD"
-  runtime: number | null            // minutes
-  status: string                    // "Released", "Post Production", etc.
+  release_date: string // "YYYY-MM-DD"
+  runtime: number | null // minutes
+  status: string // "Released", "Post Production", etc.
   poster_path: string | null
   backdrop_path: string | null
-  vote_average: number              // 0–10
+  vote_average: number // 0–10
   vote_count: number
   popularity: number
   adult: boolean
   original_language: string
-  budget: number                    // USD (0 if unknown)
-  revenue: number                   // USD (0 if unknown)
+  budget: number // USD (0 if unknown)
+  revenue: number // USD (0 if unknown)
   homepage: string | null
-  imdb_id: string | null            // e.g. "tt1234567"
+  imdb_id: string | null // e.g. "tt1234567"
   genres: Genre[]
   spoken_languages: SpokenLanguage[]
   production_companies: ProductionCompany[]
@@ -158,8 +158,8 @@ interface MovieDetail {
   videos: {
     results: Video[]
   }
-  "watch/providers": {
-    results: Record<string, WatchProviderRegion>  // keyed by region code, e.g. "US"
+  'watch/providers': {
+    results: Record<string, WatchProviderRegion> // keyed by region code, e.g. "US"
   }
   release_dates: {
     results: ReleaseDateRegion[]
@@ -177,16 +177,16 @@ interface ShowListItem {
   name: string
   original_name: string
   overview: string
-  first_air_date: string            // "YYYY-MM-DD"
+  first_air_date: string // "YYYY-MM-DD"
   poster_path: string | null
   backdrop_path: string | null
-  vote_average: number              // 0–10
+  vote_average: number // 0–10
   vote_count: number
   popularity: number
   genre_ids: number[]
   adult: boolean
   original_language: string
-  origin_country: string[]          // ISO 3166-1, e.g. ["US"]
+  origin_country: string[] // ISO 3166-1, e.g. ["US"]
 }
 ```
 
@@ -203,10 +203,10 @@ interface ShowDetail {
   tagline: string
   first_air_date: string
   last_air_date: string | null
-  status: string                    // "Returning Series", "Ended", "Canceled"
+  status: string // "Returning Series", "Ended", "Canceled"
   number_of_seasons: number
   number_of_episodes: number
-  episode_run_time: number[]        // typical episode length(s) in minutes
+  episode_run_time: number[] // typical episode length(s) in minutes
   poster_path: string | null
   backdrop_path: string | null
   vote_average: number
@@ -232,7 +232,7 @@ interface ShowDetail {
   videos: {
     results: Video[]
   }
-  "watch/providers": {
+  'watch/providers': {
     results: Record<string, WatchProviderRegion>
   }
   content_ratings: {
@@ -246,60 +246,60 @@ interface ShowDetail {
 ```ts
 interface Genre {
   id: number
-  name: string                      // e.g. "Action", "Comedy"
+  name: string // e.g. "Action", "Comedy"
 }
 
 interface CastMember {
   id: number
   name: string
   character: string
-  profile_path: string | null       // headshot image
-  order: number                     // billing order
+  profile_path: string | null // headshot image
+  order: number // billing order
 }
 
 interface CrewMember {
   id: number
   name: string
-  job: string                       // e.g. "Director", "Screenplay"
-  department: string                // e.g. "Directing", "Writing"
+  job: string // e.g. "Director", "Screenplay"
+  department: string // e.g. "Directing", "Writing"
   profile_path: string | null
 }
 
 interface Video {
   id: string
-  key: string                       // YouTube video ID
+  key: string // YouTube video ID
   name: string
-  site: string                      // "YouTube"
-  type: string                      // "Trailer", "Teaser", "Featurette"
+  site: string // "YouTube"
+  type: string // "Trailer", "Teaser", "Featurette"
   official: boolean
 }
 
 interface WatchProviderRegion {
   link: string
-  flatrate?: StreamingProvider[]    // subscription services
+  flatrate?: StreamingProvider[] // subscription services
   rent?: StreamingProvider[]
   buy?: StreamingProvider[]
 }
 
 interface StreamingProvider {
   provider_id: number
-  provider_name: string             // e.g. "Netflix", "Apple TV+"
+  provider_name: string // e.g. "Netflix", "Apple TV+"
   logo_path: string
   display_priority: number
 }
 
 interface ReleaseDateRegion {
-  iso_3166_1: string                // e.g. "US"
+  iso_3166_1: string // e.g. "US"
   release_dates: {
-    certification: string           // e.g. "PG-13", "R"
+    certification: string // e.g. "PG-13", "R"
     release_date: string
-    type: number                    // 1=Premiere, 2=Limited, 3=Theatrical, etc.
+    type: number // 1=Premiere, 2=Limited, 3=Theatrical, etc.
   }[]
 }
 
 interface ContentRating {
-  iso_3166_1: string                // e.g. "US"
-  rating: string                    // e.g. "TV-MA", "TV-14"
+  iso_3166_1: string // e.g. "US"
+  rating: string // e.g. "TV-MA", "TV-14"
 }
 
 interface SpokenLanguage {
@@ -365,12 +365,12 @@ Searches movies, TV shows, and people in a single request. The app filters resul
 
 **URL:** `https://api.themoviedb.org/3/search/multi`
 
-| Parameter       | In    | Type   | Required | Default | Description                    |
-| --------------- | ----- | ------ | -------- | ------- | ------------------------------ |
-| `query`         | query | string | Yes      | —       | Search text                    |
-| `language`      | query | string | No       | `en-US` | ISO 639-1 language code        |
-| `page`          | query | int    | No       | `1`     | Page number (1–500)            |
-| `include_adult` | query | bool   | No       | `false` | Include adult content          |
+| Parameter       | In    | Type   | Required | Default | Description             |
+| --------------- | ----- | ------ | -------- | ------- | ----------------------- |
+| `query`         | query | string | Yes      | —       | Search text             |
+| `language`      | query | string | No       | `en-US` | ISO 639-1 language code |
+| `page`          | query | int    | No       | `1`     | Page number (1–500)     |
+| `include_adult` | query | bool   | No       | `false` | Include adult content   |
 
 **Response:** `PaginatedResponse<MovieListItem | ShowListItem>`
 
@@ -389,11 +389,11 @@ Returns trending movies for a given time window.
 
 **URL:** `https://api.themoviedb.org/3/trending/movie/{time_window}`
 
-| Parameter     | In    | Type   | Required | Default | Description                    |
-| ------------- | ----- | ------ | -------- | ------- | ------------------------------ |
-| `time_window` | path  | string | Yes      | —       | `"day"` or `"week"`            |
-| `language`    | query | string | No       | `en-US` | ISO 639-1 language code        |
-| `page`        | query | int    | No       | `1`     | Page number (1–500)            |
+| Parameter     | In    | Type   | Required | Default | Description             |
+| ------------- | ----- | ------ | -------- | ------- | ----------------------- |
+| `time_window` | path  | string | Yes      | —       | `"day"` or `"week"`     |
+| `language`    | query | string | No       | `en-US` | ISO 639-1 language code |
+| `page`        | query | int    | No       | `1`     | Page number (1–500)     |
 
 **Response:** `PaginatedResponse<MovieListItem>`
 
@@ -408,11 +408,11 @@ Returns trending TV shows for a given time window.
 
 **URL:** `https://api.themoviedb.org/3/trending/tv/{time_window}`
 
-| Parameter     | In    | Type   | Required | Default | Description                    |
-| ------------- | ----- | ------ | -------- | ------- | ------------------------------ |
-| `time_window` | path  | string | Yes      | —       | `"day"` or `"week"`            |
-| `language`    | query | string | No       | `en-US` | ISO 639-1 language code        |
-| `page`        | query | int    | No       | `1`     | Page number (1–500)            |
+| Parameter     | In    | Type   | Required | Default | Description             |
+| ------------- | ----- | ------ | -------- | ------- | ----------------------- |
+| `time_window` | path  | string | Yes      | —       | `"day"` or `"week"`     |
+| `language`    | query | string | No       | `en-US` | ISO 639-1 language code |
+| `page`        | query | int    | No       | `1`     | Page number (1–500)     |
 
 **Response:** `PaginatedResponse<ShowListItem>`
 
@@ -467,11 +467,11 @@ Returns full details for a single movie, including credits, videos, streaming av
 
 **URL:** `https://api.themoviedb.org/3/movie/{id}`
 
-| Parameter            | In    | Type   | Required | Default | Description                                      |
-| -------------------- | ----- | ------ | -------- | ------- | ------------------------------------------------ |
-| `id`                 | path  | int    | Yes      | —       | TMDB movie ID                                    |
-| `language`           | query | string | No       | `en-US` | ISO 639-1 language code                          |
-| `append_to_response` | query | string | No       | —       | Comma-separated sub-requests (see note below)    |
+| Parameter            | In    | Type   | Required | Default | Description                                   |
+| -------------------- | ----- | ------ | -------- | ------- | --------------------------------------------- |
+| `id`                 | path  | int    | Yes      | —       | TMDB movie ID                                 |
+| `language`           | query | string | No       | `en-US` | ISO 639-1 language code                       |
+| `append_to_response` | query | string | No       | —       | Comma-separated sub-requests (see note below) |
 
 The app requests `append_to_response=credits,videos,watch/providers,release_dates` to fetch all related data in a single call.
 
@@ -488,11 +488,11 @@ Returns full details for a single TV show, including credits, videos, streaming 
 
 **URL:** `https://api.themoviedb.org/3/tv/{id}`
 
-| Parameter            | In    | Type   | Required | Default | Description                                      |
-| -------------------- | ----- | ------ | -------- | ------- | ------------------------------------------------ |
-| `id`                 | path  | int    | Yes      | —       | TMDB TV show ID                                  |
-| `language`           | query | string | No       | `en-US` | ISO 639-1 language code                          |
-| `append_to_response` | query | string | No       | —       | Comma-separated sub-requests (see note below)    |
+| Parameter            | In    | Type   | Required | Default | Description                                   |
+| -------------------- | ----- | ------ | -------- | ------- | --------------------------------------------- |
+| `id`                 | path  | int    | Yes      | —       | TMDB TV show ID                               |
+| `language`           | query | string | No       | `en-US` | ISO 639-1 language code                       |
+| `append_to_response` | query | string | No       | —       | Comma-separated sub-requests (see note below) |
 
 The app requests `append_to_response=credits,videos,watch/providers,content_ratings` to fetch all related data in a single call.
 
@@ -551,11 +551,11 @@ Returns movies with upcoming theatrical release dates. Used for the release cale
 
 **URL:** `https://api.themoviedb.org/3/movie/upcoming`
 
-| Parameter  | In    | Type   | Required | Default | Description                                    |
-| ---------- | ----- | ------ | -------- | ------- | ---------------------------------------------- |
-| `language` | query | string | No       | `en-US` | ISO 639-1 language code                        |
-| `page`     | query | int    | No       | `1`     | Page number (1–500)                            |
-| `region`   | query | string | No       | —       | ISO 3166-1 code to filter by release region    |
+| Parameter  | In    | Type   | Required | Default | Description                                 |
+| ---------- | ----- | ------ | -------- | ------- | ------------------------------------------- |
+| `language` | query | string | No       | `en-US` | ISO 639-1 language code                     |
+| `page`     | query | int    | No       | `1`     | Page number (1–500)                         |
+| `region`   | query | string | No       | —       | ISO 3166-1 code to filter by release region |
 
 **Response:** `PaginatedResponse<MovieListItem>`
 
@@ -582,7 +582,7 @@ Returns the list of movie genre IDs and their display names. Used by the filter 
 
 ```ts
 interface GenreListResponse {
-  genres: Genre[]   // e.g. [{ id: 28, name: "Action" }, { id: 12, name: "Adventure" }]
+  genres: Genre[] // e.g. [{ id: 28, name: "Action" }, { id: 12, name: "Adventure" }]
 }
 ```
 
@@ -605,7 +605,7 @@ Returns the list of TV genre IDs and their display names. Same shape as the movi
 
 ```ts
 interface GenreListResponse {
-  genres: Genre[]   // e.g. [{ id: 10759, name: "Action & Adventure" }, { id: 16, name: "Animation" }]
+  genres: Genre[] // e.g. [{ id: 10759, name: "Action & Adventure" }, { id: 16, name: "Animation" }]
 }
 ```
 

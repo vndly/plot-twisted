@@ -1,9 +1,9 @@
 # Library: Sort and Filter
 
-* Sort library entries by date added, title, year, or user rating
-* Filter by genre, media type, watch status, rating range, and custom list
-* All operations run client-side against localStorage data
-* **Key components:** FilterBar, SortDropdown, EntryGrid
+- Sort library entries by date added, title, year, or user rating
+- Filter by genre, media type, watch status, rating range, and custom list
+- All operations run client-side against localStorage data
+- **Key components:** FilterBar, SortDropdown, EntryGrid
 
 ## Acceptance Criteria
 
@@ -16,5 +16,5 @@
 
 ## Key Decisions
 
-* **Reuse `FilterBar` component from phase 06** — same component with additional filter options (rating, list) enabled via props
-* **No pagination** — library is fully in localStorage, so all entries are rendered (virtualized scrolling deferred to performance phase)
+- **Reuse `FilterBar` component from phase 06** — same component with additional filter options (rating, list) enabled via props
+- **No pagination** — library is fully in localStorage, so all entries are rendered (virtualized scrolling deferred to performance phase)

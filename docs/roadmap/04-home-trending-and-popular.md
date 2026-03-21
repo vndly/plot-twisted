@@ -1,9 +1,9 @@
 # Home Screen: Trending and Popular Sections
 
-* Trending section via `GET /trending/movie/week` and `GET /trending/tv/week`
-* Popular section via `GET /movie/popular` and `GET /tv/popular`
-* Tapping a card navigates to the entry's detail page
-* **Key components:** TrendingCarousel, PopularGrid, MovieCard
+- Trending section via `GET /trending/movie/week` and `GET /trending/tv/week`
+- Popular section via `GET /movie/popular` and `GET /tv/popular`
+- Tapping a card navigates to the entry's detail page
+- **Key components:** TrendingCarousel, PopularGrid, MovieCard
 
 ## Acceptance Criteria
 
@@ -15,5 +15,5 @@
 
 ## Key Decisions
 
-* **Weekly time window for trending** — `"week"` gives more stable results than `"day"` for a personal tracker
-* **Movies and TV combined** — both trending endpoints are called and results are interleaved by popularity score
+- **Weekly time window for trending** — `"week"` gives more stable results than `"day"` for a personal tracker
+- **Movies and TV combined** — both trending endpoints are called and results are interleaved by popularity score
