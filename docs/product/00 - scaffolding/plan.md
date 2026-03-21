@@ -22,11 +22,12 @@ Run `npm install`.
 
 - `tsconfig.json` — project references to `tsconfig.app.json` and `tsconfig.node.json`
 - `tsconfig.app.json` — `strict: true`, `target: "ES2022"`, `module: "ESNext"`, `moduleResolution: "bundler"`, path alias `@/* → ./src/*`, `include: ["src/**/*"]`
-- `tsconfig.node.json` — covers `vite.config.ts`, `eslint.config.js`
+- `tsconfig.node.json` — covers `vite.config.ts`, `vitest.config.ts`, `eslint.config.js`
 
-### Step 3 — Vite configuration
+### Step 3 — Vite & Vitest configuration
 
 - [ ] Create `vite.config.ts` with `@vitejs/plugin-vue`, `@tailwindcss/vite` plugin, and `@` path alias → `./src`.
+- [ ] Create `vitest.config.ts` — references `vite.config.ts`, configures test environment.
 
 ### Step 4 — ESLint + Prettier
 
