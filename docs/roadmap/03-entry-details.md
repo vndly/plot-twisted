@@ -1,25 +1,14 @@
 # Entry Details
 
-* Properties
-  * Name
-  * Synopsis
-  * Image (or images)
-  * Type? (movie/tv)
-  * Year
-  * Languages
-  * Duration
-  * Genres
-  * Directors
-  * Writers
-  * Cast
-  * TMDB rating
-  * IMDB link (via `imdb_id`)
-  * Box office (revenue/budget from TMDB)
-  * Favorite?
-  * 5 star rating
-  * In watchlist / watched / none
-  * Streaming availability
-  * Watch trailer
+* Display title, synopsis, poster, and backdrop image for a movie or TV show
+* Show metadata: year, languages, duration (or season/episode count for TV), and genres
+* List directors, writers, and cast members
+* Display TMDB rating and link to the IMDB page via `imdb_id`
+* Show box office data (revenue and budget from TMDB)
+* Toggle favorite status and set a 1–5 star personal rating
+* Set watch status (watchlist, watched, or none)
+* Display streaming availability for the user's region
+* Play the official trailer inline
 * Share link — uses the Web Share API when available; falls back to copying the entry detail URL (`/movie/:id` or `/tv/:id`) to the clipboard. Displays a success toast on copy.
 * **Key components:** HeroBackdrop, MetadataPanel, CastCarousel, TrailerEmbed, StreamingBadges, RatingStars
 

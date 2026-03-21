@@ -74,6 +74,7 @@ Domain terminology used consistently across the codebase and documentation.
 | **Tab Toggle** | Horizontal text tabs for switching between content categories (e.g., Watchlist / Watched / Lists). | Active tab: white with underline. Inactive: muted gray. |
 | **Skeleton Loader** | A shimmer placeholder matching the exact layout shape of content being loaded. | Used instead of spinners. Animated with `animate-pulse` or custom shimmer. |
 | **Toast** | A small, non-blocking notification in the top-right corner. Auto-dismisses after ~4 seconds. | Types: error (red), success (green), info (teal). Includes "Retry" on API failures. |
+| **View Toggle** | A toggle control for switching between grid view (poster cards) and list view (compact rows). | Used on the Home screen. Preference persists in localStorage. |
 | **Filter Bar** | A row of controls for narrowing displayed entries by criteria (genre, year, etc.). | Used on Home and Library screens. |
 | **Sort Dropdown** | A control for changing the order of displayed entries (e.g., by popularity, date added). | Used on the Library screen. |
 

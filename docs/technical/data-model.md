@@ -43,7 +43,7 @@ User preferences. Persisted in localStorage.
 interface Settings {
   theme: "dark" | "light"
   language: string                  // ISO 639-1, e.g. "en"
-  defaultHomeSection: "trending" | "popular" | "search"
+  defaultHomeSection: "trending" | "popular" | "search"  // which section is scrolled-to on initial load
   preferredRegion: string           // ISO 3166-1, e.g. "US" — for streaming availability
 }
 ```

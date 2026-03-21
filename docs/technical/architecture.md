@@ -177,7 +177,9 @@ App.vue
         ├── / → HomeScreen
         │       ├── SearchBar → SearchResults → MovieCard[]
         │       ├── TrendingCarousel → MovieCard[]
-        │       └── PopularGrid → MovieCard[]
+        │       ├── PopularGrid → MovieCard[]
+        │       ├── FilterBar
+        │       └── ViewToggle
         │
         ├── /movie/:id, /tv/:id → EntryDetails
         │       ├── HeroBackdrop

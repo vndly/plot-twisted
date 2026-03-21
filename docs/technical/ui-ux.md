@@ -143,7 +143,7 @@ Horizontal row of text tabs (e.g., Library: Watchlist / Watched / Lists).
 - **Route transitions** — Soft opacity fade between views (200ms). No slide or complex page transitions.
 - **Card hover** — `transition-transform duration-200 ease-in-out`.
 - **Carousel** — Smooth slide or crossfade between hero banner items.
-- **Toast notifications** — Slide in from top-right, auto-dismiss after 3–5 seconds with fade-out.
+- **Toast notifications** — Slide in from top-right, auto-dismiss after ~4 seconds with fade-out.
 - **Modal/overlay** — Fade-in backdrop + slight scale-up for content (if modals are used).
 - **Tab switching** — Instant content swap, no transition.
 - **No bounce, spring, or parallax effects** — Keep it subtle and cinematic.
