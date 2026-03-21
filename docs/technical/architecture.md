@@ -94,10 +94,10 @@ Plain TypeScript with no Vue dependencies. Handles all external integration, imp
 ## Dependency Rules
 
 ```
-Presentation  →  Application  (only)
-Application   →  Domain + Infrastructure
-Infrastructure →  Domain  (only)
-Domain        →  nothing
+Presentation   →  Application (only)
+Application    →  Domain + Infrastructure
+Infrastructure →  Domain (only)
+Domain         →  nothing
 ```
 
 No layer may skip or reach across levels. Presentation never imports Infrastructure or Domain directly — it always goes through Application.
@@ -117,7 +117,7 @@ Media Provider API
 
 ```
 User clicks "Add to Watchlist"
-  → EntryDetails.vue calls useLibrary().addToWatchlist(id)   (Presentation → Application)
+  → EntryDetails.vue calls useLibrary().addToWatchlist(id)    (Presentation → Application)
     → movie.schema.ts validates the entry                     (Application → Domain)
       → storage.service.ts writes to localStorage             (Application → Infrastructure)
         → useLibrary() reactive state updates                 (Application)
