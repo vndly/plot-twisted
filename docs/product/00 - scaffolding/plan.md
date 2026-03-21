@@ -79,7 +79,7 @@ Empty directories get `.gitkeep` files until real files are added.
 
 ### Step 8 — env.d.ts
 
-- [ ] Create `src/env.d.ts` — declares `ImportMetaEnv` with `VITE_TMDB_TOKEN: string` for typed env access.
+- [ ] Create `src/env.d.ts` — declares `ImportMetaEnv` with `VITE_MEDIA_PROVIDER_TOKEN: string` for typed env access.
 
 ### Step 9 — Vue entry point
 

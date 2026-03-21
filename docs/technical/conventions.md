@@ -9,7 +9,7 @@
 ## 2. Data Access
 
 - **Application layer is the public API** — Presentation components fetch and mutate data exclusively through Application composables (`use*` functions). Components never import Infrastructure or Domain directly.
-- **Infrastructure is internal** — `tmdb.client.ts` and `storage.service.ts` handle HTTP and persistence. Only Application composables may call Infrastructure.
+- **Infrastructure is internal** — `provider.client.ts` and `storage.service.ts` handle HTTP and persistence. Only Application composables may call Infrastructure.
 - **Reactivity lives in Application** — Composables wrap Infrastructure calls with Vue reactivity (`ref`, `computed`, `watchEffect`) and expose loading/error state.
 - **Standard return shape** — Every composable returns `{ data, loading, error, refresh? }`. Presentation components can rely on this consistent interface.
 - **Layer import rules** — Presentation imports Application only. Application imports Domain and Infrastructure. Infrastructure imports Domain only. Domain has no app imports. No layer may skip or reach across levels.
@@ -69,7 +69,7 @@ See [Testing](./testing.md) for the full testing specification (runner, file str
 
 ## 9. Naming Conventions
 
-- **Files:** kebab-case (`movie-card.vue`, `use-movie.ts`). Domain and Infrastructure files use dot notation to encode the file's role: `<name>.<role>.ts` (e.g., `movie.schema.ts`, `movie.logic.ts`, `tmdb.client.ts`, `storage.service.ts`).
+- **Files:** kebab-case (`movie-card.vue`, `use-movie.ts`). Domain and Infrastructure files use dot notation to encode the file's role: `<name>.<role>.ts` (e.g., `movie.schema.ts`, `movie.logic.ts`, `provider.client.ts`, `storage.service.ts`).
 - **Components:** PascalCase in templates and imports (`<MovieCard />`)
 - **Composables:** camelCase prefixed with `use` (`useMovie`, `useLibrary`)
 - **Types/Interfaces:** PascalCase (`Movie`, `LibraryEntry`)
@@ -86,16 +86,16 @@ See [Testing](./testing.md) for the full testing specification (runner, file str
 
 Language handling has two separate layers:
 
-- **TMDB API responses** — All API calls pass the user's `Settings.language` value (ISO 639-1, e.g. `"en"`) as the `language` query parameter. TMDB accepts both ISO 639-1 (`"en"`) and locale codes (`"en-US"`); the app uses the shorter ISO 639-1 format. TMDB returns localized titles, overviews, and genre names for supported languages. If a translation is unavailable, TMDB falls back to English automatically.
+- **Media provider API responses** — All API calls pass the user's `Settings.language` value (ISO 639-1, e.g. `"en"`) as the `language` query parameter. The media provider accepts both ISO 639-1 (`"en"`) and locale codes (`"en-US"`); the app uses the shorter ISO 639-1 format. The media provider returns localized titles, overviews, and genre names for supported languages. If a translation is unavailable, the media provider falls back to English automatically.
 - **UI strings** — All interface text (labels, button text, empty-state messages, error messages) is hardcoded in English. There is no i18n library (e.g. vue-i18n) and no translation files. UI strings do not change when the user switches language in Settings.
 
-The language setting in Settings controls TMDB content language only. Changing it affects movie titles, synopses, and genre names returned by the API, but the app shell, navigation labels, and system messages remain in English.
+The language setting in Settings controls media provider content language only. Changing it affects movie titles, synopses, and genre names returned by the API, but the app shell, navigation labels, and system messages remain in English.
 
 ## 12. Image Handling
 
 ### Size Selection
 
-Use the smallest TMDB image size that looks sharp at the rendered dimensions. Larger sizes waste bandwidth without visible benefit.
+Use the smallest media provider image size that looks sharp at the rendered dimensions. Larger sizes waste bandwidth without visible benefit.
 
 | Context             | Image Type | Size   | Rationale                                      |
 | ------------------- | ---------- | ------ | ---------------------------------------------- |
@@ -111,7 +111,7 @@ Apply the native `loading="lazy"` attribute on all `<img>` elements below the fo
 
 ### Fallback Placeholders
 
-TMDB returns `null` for `poster_path`, `backdrop_path`, and `profile_path` when no image exists. The app must handle this gracefully:
+The API returns `null` for `poster_path`, `backdrop_path`, and `profile_path` when no image exists. The app must handle this gracefully:
 
 - **Posters** — Show a neutral placeholder (e.g. a film-frame icon on a dark surface) matching the 2:3 aspect ratio.
 - **Backdrops** — Show a solid dark gradient matching the app background. Do not render a broken image.

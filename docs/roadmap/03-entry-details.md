@@ -3,8 +3,8 @@
 * Display title, synopsis, poster, and backdrop image for a movie or TV show
 * Show metadata: year, languages, duration (or season/episode count for TV), and genres
 * List directors, writers, and cast members
-* Display TMDB rating and link to the IMDB page via `imdb_id`
-* Show box office data (revenue and budget from TMDB)
+* Display provider rating and link to the IMDB page via `imdb_id`
+* Show box office data (revenue and budget from the media provider)
 * Toggle favorite status and set a 1–5 star personal rating
 * Set watch status (watchlist, watched, or none)
 * Display streaming availability for the user's region

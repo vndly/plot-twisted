@@ -8,7 +8,7 @@
 ## Acceptance Criteria
 
 - [ ] `FilterBar` exposes genre multi-select, media type toggle, and year range inputs
-- [ ] Genre list is fetched from TMDB genre endpoints and cached for the session
+- [ ] Genre list is fetched from the media provider's genre endpoints and cached for the session
 - [ ] Filters compose (AND logic) — e.g., genre "Action" + type "Movie" shows only action movies
 - [ ] `ViewToggle` switches between grid and list layout; preference persists in localStorage
 - [ ] Clearing all filters restores the unfiltered view
@@ -17,4 +17,4 @@
 ## Key Decisions
 
 * **Client-side filtering** — trending/popular data sets are small enough (20 items per page) to filter in-memory without re-fetching
-* **Genre IDs from TMDB** — genre names are resolved via `/genre/movie/list` and `/genre/tv/list`, not hardcoded
+* **Genre IDs from the media provider** — genre names are resolved via `/genre/movie/list` and `/genre/tv/list`, not hardcoded

@@ -9,11 +9,11 @@ Domain terminology used consistently across the codebase and documentation.
 | Term | Definition | Notes |
 | :--- | :--- | :--- |
 | **Entry** | A movie or TV show — the generic term for any piece of content in the app. | Use "entry" when referring to content regardless of type. Use "movie" or "TV show" only when the distinction matters. |
-| **Movie** | A film. Identified by `mediaType: "movie"`. | TMDB field: `media_type: "movie"`. Uses `title` and `release_date`. |
-| **TV Show** | A television series. Identified by `mediaType: "tv"`. | TMDB field: `media_type: "tv"`. Uses `name` and `first_air_date` (not `title` / `release_date`). |
-| **Media Type** | The content kind: `"movie"` or `"tv"`. | Stored on `LibraryEntry.mediaType`. Returned by TMDB as `media_type` in multi-search results. |
-| **Genre** | A TMDB category such as "Action" or "Comedy", identified by numeric ID. | List endpoints return `genre_ids: number[]`; detail endpoints return full `Genre` objects with `id` and `name`. |
-| **Collection** | A TMDB grouping of related movies (e.g., a franchise). | Only applies to movies. Found in `MovieDetail.belongs_to_collection`. |
+| **Movie** | A film. Identified by `mediaType: "movie"`. | API field: `media_type: "movie"`. Uses `title` and `release_date`. |
+| **TV Show** | A television series. Identified by `mediaType: "tv"`. | API field: `media_type: "tv"`. Uses `name` and `first_air_date` (not `title` / `release_date`). |
+| **Media Type** | The content kind: `"movie"` or `"tv"`. | Stored on `LibraryEntry.mediaType`. Returned by the API as `media_type` in multi-search results. |
+| **Genre** | A media provider category such as "Action" or "Comedy", identified by numeric ID. | List endpoints return `genre_ids: number[]`; detail endpoints return full `Genre` objects with `id` and `name`. |
+| **Collection** | A media provider grouping of related movies (e.g., a franchise). | Only applies to movies. Found in `MovieDetail.belongs_to_collection`. |
 | **Episode** | A single installment of a TV show, belonging to a season. | Relevant in `TVShowDetail.next_episode_to_air`. |
 
 ---
@@ -22,12 +22,12 @@ Domain terminology used consistently across the codebase and documentation.
 
 | Term | Definition | Notes |
 | :--- | :--- | :--- |
-| **Library** | The user's personal collection of saved entries. Contains all entries the user has explicitly saved, regardless of watch status. | Stored in `localStorage` under the `library` key. Not a TMDB concept — purely local. |
-| **Library Entry** | A saved record in the user's library, holding status, rating, tags, notes, and watch dates for a single entry. | Type: `LibraryEntry`. Keyed by TMDB ID in localStorage. |
+| **Library** | The user's personal collection of saved entries. Contains all entries the user has explicitly saved, regardless of watch status. | Stored in `localStorage` under the `library` key. Not a media provider concept — purely local. |
+| **Library Entry** | A saved record in the user's library, holding status, rating, tags, notes, and watch dates for a single entry. | Type: `LibraryEntry`. Keyed by provider ID in localStorage. |
 | **Watch Status** | The state of a library entry: `"watchlist"`, `"watched"`, or `"none"`. | Field: `LibraryEntry.status`. Determines which tab the entry appears under in the Library screen. `"none"` entries remain in the library but do not appear in the Watchlist or Watched tabs — they are accessible via the entry's detail screen or by searching. |
 | **Watchlist** | Entries the user plans to watch. | `status: "watchlist"`. Displayed in the Library's "Watchlist" tab. |
 | **Watched** | Entries the user has already seen. | `status: "watched"`. Displayed in the Library's "Watched" tab. |
-| **Rating** | The user's 1–5 star score for an entry. `0` means unrated. | Field: `LibraryEntry.rating`. Not the same as TMDB's `vote_average` (0–10 scale). |
+| **Rating** | The user's 1–5 star score for an entry. `0` means unrated. | Field: `LibraryEntry.rating`. Not the same as the media provider's `vote_average` (0–10 scale). |
 | **Favorite** | A boolean flag on a library entry for quick-access filtering. | Field: `LibraryEntry.favorite`. |
 | **Custom List** | A user-created named grouping of library entries. | Type: `CustomList`. Keyed by UUID. Membership is tracked on the entry side via `LibraryEntry.lists`. |
 | **Tag** | A user-defined label attached to library entries (e.g., "horror", "90s"). | Field: `LibraryEntry.tags`. A global `tags` array in localStorage tracks all known tags. |
@@ -40,12 +40,12 @@ Domain terminology used consistently across the codebase and documentation.
 
 | Term | Definition | Notes |
 | :--- | :--- | :--- |
-| **Search** | Multi-search across movies and TV shows via TMDB's `/search/multi` endpoint. | Returns both movie and TV results; `"person"` results are discarded. |
-| **Trending** | Entries currently gaining popularity, fetched from TMDB's trending endpoints. | Configurable time window: `"day"` or `"week"`. Displayed in the Home screen's trending carousel. |
-| **Popular** | Entries with high overall popularity scores, fetched from TMDB's popular endpoints. | Displayed in the Home screen's popular grid. |
-| **Recommendations** | Entries suggested by TMDB based on similarity to a given entry. | Endpoint: `/movie/{id}/recommendations` or `/tv/{id}/recommendations`. Powers the Recommendations screen. The app fetches recommendations from multiple seed entries (up to 5, highest-rated first) and deduplicates results; see [Data Model](./technical/data-model.md) for aggregation logic. |
-| **Release Calendar** | A calendar view of upcoming movie theatrical releases. | Data source: TMDB `/movie/upcoming` endpoint, filterable by region. |
-| **Upcoming** | Movies with future theatrical release dates, as reported by TMDB. | Synonym for the data behind the Release Calendar. |
+| **Search** | Multi-search across movies and TV shows via the media provider's `/search/multi` endpoint. | Returns both movie and TV results; `"person"` results are discarded. |
+| **Trending** | Entries currently gaining popularity, fetched from the media provider's trending endpoints. | Configurable time window: `"day"` or `"week"`. Displayed in the Home screen's trending carousel. |
+| **Popular** | Entries with high overall popularity scores, fetched from the media provider's popular endpoints. | Displayed in the Home screen's popular grid. |
+| **Recommendations** | Entries suggested by the media provider based on similarity to a given entry. | Endpoint: `/movie/{id}/recommendations` or `/tv/{id}/recommendations`. Powers the Recommendations screen. The app fetches recommendations from multiple seed entries (up to 5, highest-rated first) and deduplicates results; see [Data Model](./technical/data-model.md) for aggregation logic. |
+| **Release Calendar** | A calendar view of upcoming movie theatrical releases. | Data source: the media provider's `/movie/upcoming` endpoint, filterable by region. |
+| **Upcoming** | Movies with future theatrical release dates, as reported by the media provider. | Synonym for the data behind the Release Calendar. |
 
 ---
 
@@ -56,7 +56,7 @@ Domain terminology used consistently across the codebase and documentation.
 | **Presentation Layer** | Layer 1 — Vue SFCs, views, and router. Renders UI and emits events. | Imports Application layer only. Never touches Infrastructure or Domain directly. |
 | **Application Layer** | Layer 2 — Vue composables orchestrating Domain and Infrastructure. Exposes reactive state to Presentation. | The only public API for data access. |
 | **Domain Layer** | Layer 3 — Zod schemas, TypeScript types, and pure business logic. Zero framework dependencies. | Importable by Application and Infrastructure. Has no app imports of its own. |
-| **Infrastructure Layer** | Layer 4 — TMDB API client and localStorage wrapper. Plain TypeScript with no Vue dependencies. | Imports Domain only. |
+| **Infrastructure Layer** | Layer 4 — Media provider API client and localStorage wrapper. Plain TypeScript with no Vue dependencies. | Imports Domain only. |
 | **Composable** | A `use`-prefixed function in the Application layer that wraps Infrastructure calls with Vue reactivity. | Examples: `useMovie()`, `useLibrary()`, `useSearch()`. |
 | **Standard Return Shape** | The consistent interface every composable exposes: `{ data, loading, error, refresh? }`. | Presentation components rely on this contract. |
 | **App Shell** | The root layout component: sidebar navigation on desktop, bottom navigation bar on mobile, plus the router outlet. | Component: `AppShell`. |
@@ -87,17 +87,17 @@ Domain terminology used consistently across the codebase and documentation.
 
 | Term | Definition | Notes |
 | :--- | :--- | :--- |
-| **TMDB** | The Movie Database — the external REST API providing all movie and TV show metadata, images, and discovery data. | Base URL: `https://api.themoviedb.org/3`. |
-| **Bearer Token** | The TMDB API read access token, passed via `Authorization: Bearer <token>`. | Obtained from the TMDB developer dashboard. Stored in environment config, never in localStorage. |
-| **Paginated Response** | TMDB's standard list wrapper: `{ page, results, total_pages, total_results }`. | Type: `PaginatedResponse<T>`. Returned by search, trending, popular, recommendations, and upcoming endpoints. |
-| **append_to_response** | A TMDB query parameter that fetches related data (credits, videos, providers) in a single API call instead of separate requests. | Used on detail endpoints. Value: comma-separated list (e.g., `credits,videos,watch/providers`). |
+| **Media Provider** | The external REST API providing all movie and TV show metadata, images, and discovery data. | See [API](./technical/api.md) for provider-specific details. |
+| **Bearer Token** | The media provider API read access token, passed via `Authorization: Bearer <token>`. | Obtained from the media provider's developer dashboard. Stored in environment config, never in localStorage. |
+| **Paginated Response** | The media provider's standard list wrapper: `{ page, results, total_pages, total_results }`. | Type: `PaginatedResponse<T>`. Returned by search, trending, popular, recommendations, and upcoming endpoints. |
+| **append_to_response** | A media provider API query parameter that fetches related data (credits, videos, providers) in a single API call instead of separate requests. | Used on detail endpoints. Value: comma-separated list (e.g., `credits,videos,watch/providers`). |
 | **Cast Member** | An actor/actress in a movie or show, with character name and billing order. | Type: `CastMember`. Found in `credits.cast`. |
 | **Crew Member** | A production team member such as a director or writer. | Type: `CrewMember`. Found in `credits.crew`. |
 | **Streaming Provider** | A service where a title is available to stream, rent, or buy (e.g., Netflix, Apple TV+). | Type: `StreamingProvider`. Found in `watch/providers` response, grouped by `flatrate`, `rent`, `buy`. |
 | **Content Rating** | An age/content classification for a TV show (e.g., "TV-MA", "TV-14"). | Type: `ContentRating`. Movies use `certification` from `release_dates` instead. |
 | **Certification** | An age/content classification for a movie (e.g., "PG-13", "R"). | Found in `release_dates.results[].release_dates[].certification`. TV shows use Content Rating instead. |
-| **Vote Average** | TMDB's community rating on a 0–10 scale. | Field: `vote_average`. Not the same as the user's 1–5 star Rating. |
-| **Genre List** | The TMDB endpoint that returns the full set of genre IDs and display names for a media type. | Endpoints: `/genre/movie/list` and `/genre/tv/list`. Used to resolve `genre_ids` (numeric) from list endpoints into human-readable genre names for the Filter Bar. Response type: `GenreListResponse`. |
+| **Vote Average** | The media provider's community rating on a 0–10 scale. | Field: `vote_average`. Not the same as the user's 1–5 star Rating. |
+| **Genre List** | The media provider endpoint that returns the full set of genre IDs and display names for a media type. | Endpoints: `/genre/movie/list` and `/genre/tv/list`. Used to resolve `genre_ids` (numeric) from list endpoints into human-readable genre names for the Filter Bar. Response type: `GenreListResponse`. |
 
 ---
 

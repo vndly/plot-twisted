@@ -13,20 +13,20 @@ npm install
 
 ## Environment Configuration
 
-The app requires a TMDB API access token to fetch movie and TV data.
+The app requires a media provider API access token to fetch movie and TV data.
 
 1. Create a free account at [themoviedb.org](https://www.themoviedb.org/signup).
-2. Go to **Settings → API** in your TMDB account dashboard.
+2. Go to **Settings → API** in your account dashboard.
 3. Copy the **API Read Access Token** (not the API Key).
 4. Create a `.env` file in the project root:
 
 ```env
-VITE_TMDB_TOKEN=your_tmdb_read_access_token_here
+VITE_MEDIA_PROVIDER_TOKEN=your_media_provider_read_access_token_here
 ```
 
 The `VITE_` prefix is required — Vite only exposes environment variables with this prefix to client-side code.
 
-`src/env.d.ts` declares `ImportMetaEnv` with `VITE_TMDB_TOKEN: string` so the token is typed when accessed via `import.meta.env.VITE_TMDB_TOKEN`.
+`src/env.d.ts` declares `ImportMetaEnv` with `VITE_MEDIA_PROVIDER_TOKEN: string` so the token is typed when accessed via `import.meta.env.VITE_MEDIA_PROVIDER_TOKEN`.
 
 ## TypeScript Configuration
 

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The app follows a **4-layer client-only architecture**. Each layer has a clear responsibility and strict dependency rules. There is no backend — all user data lives in localStorage, and all movie/show metadata comes from the TMDB API. Every data boundary (API responses, storage reads, user input) is validated with Zod schemas before use.
+The app follows a **4-layer client-only architecture**. Each layer has a clear responsibility and strict dependency rules. There is no backend — all user data lives in localStorage, and all movie/show metadata comes from the media provider API. Every data boundary (API responses, storage reads, user input) is validated with Zod schemas before use.
 
 ## Folder Structure
 
@@ -35,9 +35,9 @@ src/
 │   └── movie.logic.ts         # Example: pure functions (formatting, validation, business rules)
 │
 ├── infrastructure/            # LAYER 4: External integrations — API client, storage, config
-│   ├── tmdb.client.ts         # TMDB API client with auth and Zod response validation
+│   ├── provider.client.ts     # Media provider API client with auth and Zod response validation
 │   ├── storage.service.ts     # Typed localStorage wrapper with Zod validation and schema migration
-│   └── image.helper.ts        # buildImageUrl(path, size) — constructs full TMDB image URLs
+│   └── image.helper.ts        # buildImageUrl(path, size) — constructs full image URLs
 │
 └── assets/                    # Static files and Tailwind entry CSS
 ```
@@ -69,7 +69,7 @@ Vue 3 SFCs using `<script setup>` and Tailwind. Components call composables from
 Composables prefixed with `use` that orchestrate the Domain and Infrastructure layers using Vue reactivity (`ref`, `computed`, `watchEffect`). Each composable returns a standard shape: `{ data, loading, error, refresh? }`. This is the **only public API** that Presentation components use to read or mutate data.
 
 **Example flow** — when the UI calls `addToWatchlist(movieId)`, the composable:
-1. Asks Infrastructure to fetch movie details from TMDB.
+1. Asks Infrastructure to fetch movie details from the media provider.
 2. Passes that data to Domain to validate it against the Zod schema.
 3. Tells Infrastructure to save the validated entry to localStorage.
 
@@ -77,7 +77,7 @@ Composables prefixed with `use` that orchestrate the Domain and Infrastructure l
 
 Pure TypeScript with zero dependencies on Vue, Vite, or Web APIs. Contains:
 
-- **Constants** (`constants.ts`) — App-wide constants: `API_BASE_URL`, `IMAGE_BASE_URL`, `TMDB_IMAGE_SIZES`, `CURRENT_SCHEMA_VERSION`, `STORAGE_KEY`, `MAX_RETRY_ATTEMPTS`, `TOAST_DISMISS_MS`.
+- **Constants** (`constants.ts`) — App-wide constants: `API_BASE_URL`, `IMAGE_BASE_URL`, `IMAGE_SIZES`, `CURRENT_SCHEMA_VERSION`, `STORAGE_KEY`, `MAX_RETRY_ATTEMPTS`, `TOAST_DISMISS_MS`.
 - **Zod schemas** (`.schema.ts`) — Define the shape of all data at boundaries (API responses, localStorage entries, user input). TypeScript types are inferred from schemas with `z.infer<>`.
 - **Business logic** (`.logic.ts`) — Stateless pure functions: date/number formatting, validation rules, derived computations (e.g., `isHighRated(movie)` returns true if rating > 8.0).
 
@@ -87,9 +87,9 @@ Because this layer has no dependencies, it is trivially testable with Vitest.
 
 Plain TypeScript with no Vue dependencies. Handles all external integration, importing only from Domain for type definitions:
 
-- **`tmdb.client.ts`** — TMDB API client with Bearer token auth and Zod response validation.
+- **`provider.client.ts`** — Media provider API client with Bearer token auth and Zod response validation.
 - **`storage.service.ts`** — Typed localStorage wrapper with Zod validation on reads and schema migration between versions.
-- **`image.helper.ts`** — `buildImageUrl(path, size)` — returns a full TMDB image URL or `null` when no image path is available.
+- **`image.helper.ts`** — `buildImageUrl(path, size)` — returns a full image URL or `null` when no image path is available.
 
 ## Dependency Rules
 
@@ -107,8 +107,8 @@ No layer may skip or reach across levels. Presentation never imports Infrastruct
 ### Read path (API → screen)
 
 ```
-TMDB API
-  → tmdb.client.ts              # HTTP fetch + Zod validation (Infrastructure)
+Media Provider API
+  → provider.client.ts          # HTTP fetch + Zod validation (Infrastructure)
     → useMovie(id)              # Wraps in ref(), tracks loading/error (Application)
       → EntryDetails.vue        # Renders reactive data in template (Presentation)
 ```
@@ -157,20 +157,20 @@ Navigation guards on `/movie/:id` and `/tv/:id` reject non-numeric IDs and redir
 }
 ```
 
-**No API caching** — Every navigation or action that needs TMDB data makes a fresh API request. There is no response cache, no request deduplication, and no stale-while-revalidate layer. This keeps the data layer simple and avoids cache-invalidation bugs. TMDB's rate limit (≈40 requests per 10 seconds) is well above typical usage. The one exception is `useGenres()`, which caches genre lists in memory for the session to avoid redundant lookups (see [Data Model — useGenres()](./data-model.md#application-composables)).
+**No API caching** — Every navigation or action that needs media provider data makes a fresh API request. There is no response cache, no request deduplication, and no stale-while-revalidate layer. This keeps the data layer simple and avoids cache-invalidation bugs. The media provider's rate limit (≈40 requests per 10 seconds) is well above typical usage. The one exception is `useGenres()`, which caches genre lists in memory for the session to avoid redundant lookups (see [Data Model — useGenres()](./data-model.md#application-composables)).
 
 ### Deep Linking
 
 Every route is directly navigable via URL. Navigating to `/movie/550` or `/tv/1396` works the same whether the user clicks a card or pastes the URL into the browser:
 
 1. Vue Router matches the `:id` param and lazy-loads the detail view component.
-2. The view's composable (`useMovie(id)` or `useTVShow(id)`) fetches data from TMDB using the route param.
+2. The view's composable (`useMovie(id)` or `useTVShow(id)`) fetches data from the media provider using the route param.
 3. While loading, the view renders skeleton placeholders.
 4. On success, the view renders the full detail screen.
 
 **Error cases:**
 
-- **TMDB returns 404 (ID not found)** — The view shows a "not found" message with a link back to Home.
+- **The API returns 404 (ID not found)** — The view shows a "not found" message with a link back to Home.
 - **Network error** — Toast notification with a retry option; the view stays in its error state.
 - **Non-numeric ID (e.g. `/movie/abc`)** — A navigation guard rejects the route and redirects to Home.
 
@@ -240,5 +240,5 @@ All persistent data is validated with Zod on read to guard against corruption or
 Because the Domain and Application layers are cleanly separated:
 
 - **Domain tests** — Test Zod schemas and pure logic functions with zero overhead. No mocking required.
-- **Application tests** — Mock the Infrastructure layer to test composable orchestration logic without touching localStorage or the TMDB API.
+- **Application tests** — Mock the Infrastructure layer to test composable orchestration logic without touching localStorage or the media provider API.
 - **Infrastructure tests** — Use a real `storage.service.ts` instance backed by a fresh in-memory store to keep behavior close to production.

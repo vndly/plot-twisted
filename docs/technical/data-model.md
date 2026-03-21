@@ -1,20 +1,20 @@
 # Data Model
 
-All types are defined as Zod schemas in `src/domain/` with TypeScript types inferred via `z.infer<>`. For TMDB API response types, see [API](./api.md#response-types).
+All types are defined as Zod schemas in `src/domain/` with TypeScript types inferred via `z.infer<>`. For media provider API response types, see [API](./api.md#response-types).
 
 ## Constants
 
 `src/domain/constants.ts` defines app-wide constants used across layers:
 
-| Constant                 | Type     | Description                                           |
-| ------------------------ | -------- | ----------------------------------------------------- |
-| `API_BASE_URL`           | `string` | TMDB API base URL (`https://api.themoviedb.org/3`)    |
-| `IMAGE_BASE_URL`         | `string` | TMDB image base URL (`https://image.tmdb.org/t/p/`)   |
-| `TMDB_IMAGE_SIZES`       | `object` | Available image sizes per type (poster, backdrop, etc.)|
-| `CURRENT_SCHEMA_VERSION` | `number` | Current localStorage schema version                   |
-| `STORAGE_KEY`            | `string` | localStorage key for all persisted data               |
-| `MAX_RETRY_ATTEMPTS`     | `number` | Maximum retries for rate-limited API requests          |
-| `TOAST_DISMISS_MS`       | `number` | Auto-dismiss duration for toast notifications          |
+| Constant                 | Type     | Description                                                  |
+| ------------------------ | -------- | ------------------------------------------------------------ |
+| `API_BASE_URL`           | `string` | Media provider API base URL (`https://api.themoviedb.org/3`) |
+| `IMAGE_BASE_URL`         | `string` | Media provider image base URL                                |
+| `IMAGE_SIZES`            | `object` | Available image sizes per type (poster, backdrop, etc.)      |
+| `CURRENT_SCHEMA_VERSION` | `number` | Current localStorage schema version                          |
+| `STORAGE_KEY`            | `string` | localStorage key for all persisted data                      |
+| `MAX_RETRY_ATTEMPTS`     | `number` | Maximum retries for rate-limited API requests                |
+| `TOAST_DISMISS_MS`       | `number` | Auto-dismiss duration for toast notifications                |
 
 ## Models
 
@@ -24,7 +24,7 @@ User data for a saved movie or TV show. Stored in localStorage, validated with Z
 
 ```ts
 interface LibraryEntry {
-  id: number                        // TMDB ID
+  id: number                        // provider ID
   mediaType: "movie" | "tv"
   status: "watchlist" | "watched" | "none"
   rating: number                    // 0 (unrated) to 5
@@ -70,7 +70,7 @@ All user data is persisted in localStorage as JSON, keyed under a single top-lev
 {
   "schemaVersion": 1,
   "library": {
-    "[tmdb-id]": "LibraryEntry"
+    "[provider-id]": "LibraryEntry"
   },
   "lists": {
     "[list-uuid]": "CustomList"
@@ -81,7 +81,7 @@ All user data is persisted in localStorage as JSON, keyed under a single top-lev
 ```
 
 - **`schemaVersion`** — integer incremented on breaking changes. `storage.service.ts` checks this on startup and runs migration functions to transform old data shapes.
-- **`library`** — dictionary of `LibraryEntry` objects keyed by TMDB ID. Only entries the user has explicitly saved appear here.
+- **`library`** — dictionary of `LibraryEntry` objects keyed by provider ID. Only entries the user has explicitly saved appear here.
 - **`lists`** — dictionary of `CustomList` objects keyed by UUID. Membership is tracked on the entry side (`LibraryEntry.lists`).
 - **`tags`** — global tag list. Kept in sync with tags referenced by library entries.
 - **`settings`** — single `Settings` object. Defaults are applied if missing keys are detected during Zod validation.
@@ -136,8 +136,8 @@ Browsers typically enforce a 5–10 MB localStorage quota per origin. The app st
 ## Infrastructure
 
 - **`storage.service.ts`** — Typed localStorage wrapper with JSON serialization. Handles schema migration between versions. Validates all reads with Zod schemas.
-- **`tmdb.client.ts`** — API client for fetching movie/TV metadata. All responses are validated through Zod schemas before returning.
-- **`image.helper.ts`** — `buildImageUrl(path, size)` — returns a full TMDB image URL by combining `IMAGE_BASE_URL`, the requested size, and the relative path. Returns `null` when the path is `null` (no image available).
+- **`provider.client.ts`** — API client for fetching movie/TV metadata. All responses are validated through Zod schemas before returning.
+- **`image.helper.ts`** — `buildImageUrl(path, size)` — returns a full image URL by combining `IMAGE_BASE_URL`, the requested size, and the relative path. Returns `null` when the path is `null` (no image available).
 
 ## Application (Composables)
 
@@ -152,16 +152,16 @@ Composables are the public data-access layer for Presentation components. They o
 }
 ```
 
-- **`useMovie(id)`** — Fetches and exposes reactive movie data via `tmdb.client.ts`.
-- **`useTVShow(id)`** — Fetches and exposes reactive TV show data via `tmdb.client.ts`.
+- **`useMovie(id)`** — Fetches and exposes reactive movie data via `provider.client.ts`.
+- **`useTVShow(id)`** — Fetches and exposes reactive TV show data via `provider.client.ts`.
 - **`useLibrary()`** — Reads/writes library entries via `storage.service.ts`. Exposes watchlist, watched, favorites, etc.
-- **`useSearch(query)`** — Runs search queries via `tmdb.client.ts`, exposes reactive results.
-- **`useTrending()`** — Fetches trending titles via `tmdb.client.ts`.
-- **`usePopular()`** — Fetches popular titles via `tmdb.client.ts`.
-- **`useRecommendations()`** — Selects up to 5 seed entries from the user's library (highest-rated first) and fetches recommendations for each via `tmdb.client.ts`. Deduplicates results across seeds and excludes entries already in the library.
-- **`useUpcoming()`** — Fetches upcoming movie releases via `tmdb.client.ts`.
+- **`useSearch(query)`** — Runs search queries via `provider.client.ts`, exposes reactive results.
+- **`useTrending()`** — Fetches trending titles via `provider.client.ts`.
+- **`usePopular()`** — Fetches popular titles via `provider.client.ts`.
+- **`useRecommendations()`** — Selects up to 5 seed entries from the user's library (highest-rated first) and fetches recommendations for each via `provider.client.ts`. Deduplicates results across seeds and excludes entries already in the library.
+- **`useUpcoming()`** — Fetches upcoming movie releases via `provider.client.ts`.
 - **`useStats()`** — Computes viewing statistics from library data via `storage.service.ts`.
-- **`useGenres()`** — Fetches movie and TV genre lists from TMDB on first call and caches the result in memory for the session. Returns a lookup map of genre ID → name for resolving `genre_ids` in list responses. Subsequent calls return the cached data without additional API requests.
+- **`useGenres()`** — Fetches movie and TV genre lists from the media provider on first call and caches the result in memory for the session. Returns a lookup map of genre ID → name for resolving `genre_ids` in list responses. Subsequent calls return the cached data without additional API requests.
 - **`useSettings()`** — Reads/writes user preferences via `storage.service.ts`.
 - **`useLists()`** — Manages custom lists and list membership via `storage.service.ts`.
-- **`useRouteId()`** — Extracts and validates the numeric `:id` param from the current route. Used by both detail screens (`MovieDetailScreen`, `TVShowDetailScreen`) to get a typed TMDB ID.
+- **`useRouteId()`** — Extracts and validates the numeric `:id` param from the current route. Used by both detail screens (`MovieDetailScreen`, `TVShowDetailScreen`) to get a typed provider ID.

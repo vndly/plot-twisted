@@ -20,7 +20,7 @@ The project exists only as documentation — there is no source code, no build p
 ### Dependencies
 
 - Node.js and npm installed locally
-- TMDB API token for environment variable typing
+- Media provider API token for environment variable typing
 - Firebase project for hosting configuration
 
 ## Decisions
@@ -66,7 +66,7 @@ The project exists only as documentation — there is no source code, no build p
 | S-06 | Directory structure            | `src/` with `presentation/`, `application/`, `domain/`, `infrastructure/`, and `assets/`.        | P0       |
 | S-07 | Vue entry point                | `main.ts` and `App.vue` rendering a minimal dark screen. No router.                              | P0       |
 | S-08 | HTML entry                     | `index.html` with `#app` mount point and dark background to prevent flash.                       | P0       |
-| S-09 | Environment variable typing    | `env.d.ts` declaring `VITE_TMDB_TOKEN` for typed access via `import.meta.env`.                   | P1       |
+| S-09 | Environment variable typing    | `env.d.ts` declaring `VITE_MEDIA_PROVIDER_TOKEN` for typed access via `import.meta.env`.                   | P1       |
 | S-10 | Firebase hosting config        | `firebase.json` and `.firebaserc` with SPA rewrite and `dist` as public dir.                     | P1       |
 | S-11 | VS Code settings               | Format on save, ESLint auto-fix, Tailwind IntelliSense.                                          | P1       |
 

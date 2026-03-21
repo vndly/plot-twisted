@@ -89,7 +89,7 @@ The most-used component across Home, Recommendations, Library, and search result
 ### Hero Banner (Trending Carousel)
 
 - Full-width banner spanning the content area.
-- TMDB backdrop image as background (`w780` or `original` size).
+- Backdrop image as background (`w780` or `original` size).
 - Dark gradient overlay from bottom-left for text legibility.
 - Title: large bold white text (`text-2xl` to `text-3xl`), bottom-left.
 - "Watchlist +" button: teal accent, small pill.
@@ -123,7 +123,7 @@ Horizontal row of text tabs (e.g., Library: Watchlist / Watched / Lists).
 - **Synopsis** — Paragraph of body text below metadata.
 - **Info pairs** — Genre, Cast, Writer, Director displayed as bold label + normal value.
 - **Poster** — Positioned to the right of metadata on desktop. Standard poster image.
-- **TMDB rating badge** — "TMDB" label + `vote_average` score (e.g., "8.1/10"). Displayed as a small badge alongside the metadata.
+- **Provider rating badge** — provider label + `vote_average` score (e.g., "8.1/10"). Displayed as a small badge alongside the metadata.
 - **IMDb link** — Text link opening the IMDb page via the entry's `imdb_id` (e.g., `https://www.imdb.com/title/tt1234567`). Only shown when `imdb_id` is available.
 - **Watch Trailer** — Primary button with play icon.
 - **Gallery** — Horizontal row of thumbnail images at the bottom.
@@ -173,7 +173,7 @@ Custom lists are managed from the Library screen's "Lists" tab and from entry de
 
 - **Layout** — Vertical stack of setting groups, each as a labeled row with the control on the right. Dark surface cards with `rounded-lg` and `p-4` padding, separated by `space-y-4`.
 - **Theme Toggle** — Label "Theme" on the left, toggle switch on the right. Switch uses teal accent when active (dark mode). Toggling applies the theme immediately.
-- **Language Select** — Label "Content Language" on the left, dropdown on the right showing the current ISO 639-1 language name (e.g., "English"). Selecting a language updates `Settings.language` and re-fetches TMDB content on next navigation.
+- **Language Select** — Label "Content Language" on the left, dropdown on the right showing the current ISO 639-1 language name (e.g., "English"). Selecting a language updates `Settings.language` and re-fetches media provider content on next navigation.
 - **Region Select** — Label "Region" on the left, dropdown on the right showing the current region name (e.g., "United States"). Controls streaming availability and release calendar filtering.
 - **Home Section Select** — Label "Default Home Section" on the left, dropdown with options: Trending, Popular, Search. Controls which section is scrolled-to on initial Home screen load.
 - **Data Export** — Label "Export Data" on the left, primary teal button "Export JSON" on the right. Exports the full localStorage payload as a downloadable `.json` file.

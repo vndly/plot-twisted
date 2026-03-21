@@ -15,4 +15,4 @@
 ## Key Decisions
 
 * **Seed selection: top-rated over recent** — highly rated entries are better taste signals than recency
-* **Deduplication is client-side** — API may return the same movie from multiple seeds; filter by TMDB ID before rendering
+* **Deduplication is client-side** — API may return the same movie from multiple seeds; filter by provider ID before rendering

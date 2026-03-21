@@ -42,7 +42,7 @@ Export produces a single JSON file containing the full user data set (no cached 
 The user chooses one of two strategies before importing:
 
 - **Merge** — Existing data is kept as the base. Imported data is layered on top:
-  - **Library entries** — Added by TMDB ID. If a duplicate exists, the user is prompted to keep the existing entry or replace it.
+  - **Library entries** — Added by provider ID. If a duplicate exists, the user is prompted to keep the existing entry or replace it.
   - **Custom lists** — Added by UUID. If a list with the same UUID exists, the imported version replaces it.
   - **Tags** — Union-merged (existing tags are kept, new tags are appended).
   - **Settings** — Existing settings are kept; imported settings are ignored.

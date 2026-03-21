@@ -31,7 +31,7 @@ tests/
 │   └── movie.logic.test.ts       # Tests for pure functions
 │
 ├── infrastructure/
-│   ├── tmdb.client.test.ts       # Tests for API client
+│   ├── provider.client.test.ts   # Tests for API client
 │   └── storage.service.test.ts   # Tests for storage + migration
 │
 ├── application/

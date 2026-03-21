@@ -15,5 +15,5 @@
 
 ## Key Decisions
 
-* **Movies only** — TMDB's `/movie/upcoming` has no TV equivalent; TV release tracking is out of scope
+* **Movies only** — The media provider's `/movie/upcoming` has no TV equivalent; TV release tracking is out of scope
 * **Region from Settings** — the `region` parameter comes from the user's preferred region configured in phase 11
