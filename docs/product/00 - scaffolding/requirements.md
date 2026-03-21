@@ -67,7 +67,7 @@ The project exists only as documentation — there is no source code, no build p
 | S-07 | Vue entry point                | `main.ts` and `App.vue` rendering a minimal dark screen. No router.                              | P0       |
 | S-08 | HTML entry                     | `index.html` with `#app` mount point and dark background to prevent flash.                       | P0       |
 | S-09 | Environment variable typing    | `env.d.ts` declaring `VITE_MEDIA_PROVIDER_TOKEN` for typed access via `import.meta.env`.                   | P1       |
-| S-10 | Firebase hosting config        | `firebase.json` and `.firebaserc` with SPA rewrite and `dist` as public dir.                     | P1       |
+| S-10 | Firebase hosting config        | `firebase.json` and `.firebaserc` (project: `plot-twisted`) with SPA rewrite and `dist` as public dir. | P1       |
 | S-11 | VS Code settings               | Format on save, ESLint auto-fix, Tailwind IntelliSense.                                          | P1       |
 
 ## Non-Functional Requirements
