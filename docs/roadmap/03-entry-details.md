@@ -9,7 +9,7 @@
 * Set watch status (watchlist, watched, or none)
 * Display streaming availability for the user's region
 * Play the official trailer inline
-* Share link — uses the Web Share API when available; falls back to copying the entry detail URL (`/movie/:id` or `/tv/:id`) to the clipboard. Displays a success toast on copy.
+* Share link — uses the Web Share API when available; falls back to copying the entry detail URL (`/movie/:id` or `/show/:id`) to the clipboard. Displays a success toast on copy.
 * **Key components:** HeroBackdrop, MetadataPanel, CastCarousel, TrailerEmbed, StreamingBadges, RatingStars
 
 ## Acceptance Criteria

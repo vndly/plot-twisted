@@ -136,7 +136,7 @@ Browsers typically enforce a 5–10 MB localStorage quota per origin. The app st
 ## Infrastructure
 
 - **`storage.service.ts`** — Typed localStorage wrapper with JSON serialization. Handles schema migration between versions. Validates all reads with Zod schemas.
-- **`provider.client.ts`** — API client for fetching movie/TV metadata. All responses are validated through Zod schemas before returning.
+- **`provider.client.ts`** — API client for fetching movie/show metadata. All responses are validated through Zod schemas before returning.
 - **`image.helper.ts`** — `buildImageUrl(path, size)` — returns a full image URL by combining `IMAGE_BASE_URL`, the requested size, and the relative path. Returns `null` when the path is `null` (no image available).
 
 ## Application (Composables)

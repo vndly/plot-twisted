@@ -66,7 +66,7 @@ Design specification for the app's interface. All styling uses Tailwind utility 
 | `/library`         | Library         | Bookmark icon |
 | `/settings`        | Settings        | Gear/cog icon |
 
-`/movie/:id`, `/tv/:id`, and `/stats` are not in the nav — accessed via card clicks and internal links. Stats is reached via a "View Stats" link on the Library screen (visible only when the user has at least one watched entry).
+`/movie/:id`, `/show/:id`, and `/stats` are not in the nav — accessed via card clicks and internal links. Stats is reached via a "View Stats" link on the Library screen (visible only when the user has at least one watched entry).
 
 ### Search Bar
 
@@ -181,7 +181,7 @@ Custom lists are managed from the Library screen's "Lists" tab and from entry de
 
 ## 6. Interaction Patterns
 
-- **Card hover** — Subtle scale-up (`scale-105`) with `transition-transform duration-200`. Entire card is clickable, navigates to `/movie/:id` or `/tv/:id`.
+- **Card hover** — Subtle scale-up (`scale-105`) with `transition-transform duration-200`. Entire card is clickable, navigates to `/movie/:id` or `/show/:id`.
 - **Nav item hover** — Text brightens to white. Active item stays teal-accented.
 - **Button hover** — Slightly lighter background shade. No movement or scale.
 - **Button active/pressed** — Slightly darker background shade.

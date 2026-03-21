@@ -18,7 +18,7 @@
 
 - [ ] `TabToggle` switches between Watchlist, Watched, and Lists tabs
 - [ ] `EntryGrid` displays saved entries as `MovieCard` items in a responsive grid
-- [ ] Tapping a card navigates to `/movie/:id` or `/tv/:id`
+- [ ] Tapping a card navigates to `/movie/:id` or `/show/:id`
 - [ ] Empty state shown per tab when no entries exist (with contextual message and CTA)
 - [ ] Users can create a new custom list with a trimmed, non-empty name
 - [ ] Users can rename and delete existing custom lists

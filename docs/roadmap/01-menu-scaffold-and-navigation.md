@@ -1,7 +1,7 @@
 # Menu Scaffold and Navigation
 
 * App shell with sidebar on desktop, bottom navigation bar on mobile
-* Route structure: `/`, `/movie/:id`, `/tv/:id`, `/library`, `/stats`, `/recommendations`, `/calendar`, `/settings`
+* Route structure: `/`, `/movie/:id`, `/show/:id`, `/library`, `/stats`, `/recommendations`, `/calendar`, `/settings`
 * Active route is visually highlighted in both sidebar and bottom nav
 * Navigation remains visible on all screens (no full-page takeovers)
 

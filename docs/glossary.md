@@ -72,7 +72,7 @@ Domain terminology used consistently across the codebase and documentation.
 | :--- | :--- | :--- |
 | **Movie Card** | The primary card component displaying a poster, title, year, and rating badge. Used across Home, Recommendations, Library, and search results. | Component: `MovieCard`. Poster aspect ratio is 2:3. |
 | **Hero Banner** | A full-width backdrop image with title overlay, used in the trending carousel on the Home screen. | Includes gradient overlay, "Watchlist +" button, and dot pagination. |
-| **Entry Details** | The detail view for a single movie or TV show, showing full metadata, cast, trailer, and streaming availability. | Route: `/movie/:id` or `/tv/:id`. |
+| **Entry Details** | The detail view for a single movie or TV show, showing full metadata, cast, trailer, and streaming availability. | Route: `/movie/:id` or `/show/:id`. |
 | **Tab Toggle** | Horizontal text tabs for switching between content categories (e.g., Watchlist / Watched / Lists). | Active tab: white with underline. Inactive: muted gray. |
 | **Skeleton Loader** | A shimmer placeholder matching the exact layout shape of content being loaded. | Used instead of spinners. Animated with `animate-pulse` or custom shimmer. |
 | **Toast** | A small, non-blocking notification in the top-right corner. Auto-dismisses after ~4 seconds. | Types: error (red), success (green), info (teal). Includes "Retry" on API failures. |

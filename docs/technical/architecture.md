@@ -16,7 +16,7 @@ src/
 │   │   ├── layout/            # App shell, navigation, shared layout wrappers
 │   │   ├── common/            # Reusable UI pieces (cards, search bar, filters)
 │   │   ├── home/              # Home screen, search results, trending/popular
-│   │   ├── details/           # Movie/TV detail view and subcomponents
+│   │   ├── details/           # Movie/show detail view and subcomponents
 │   │   ├── library/           # Watchlist, watched, custom lists
 │   │   ├── stats/             # Charts and analytics
 │   │   ├── recommendations/   # Recommendation views
@@ -32,7 +32,9 @@ src/
 ├── domain/                    # LAYER 3: Business rules — Zod schemas, types, pure logic (zero framework deps)
 │   ├── constants.ts           # App-wide constants (API URLs, storage key, retry limits, etc.)
 │   ├── movie.schema.ts        # Example: Zod schemas & inferred types for movies
-│   └── movie.logic.ts         # Example: pure functions (formatting, validation, business rules)
+│   ├── show.schema.ts         # Example: Zod schemas & inferred types for shows
+│   ├── movie.logic.ts         # Example: pure functions (formatting, validation, business rules)
+│   └── show.logic.ts          # Example: pure functions (formatting, validation, business rules)
 │
 ├── infrastructure/            # LAYER 4: External integrations — API client, storage, config
 │   ├── provider.client.ts     # Media provider API client with auth and Zod response validation
@@ -132,7 +134,7 @@ Routes are defined in `src/presentation/router.ts` using Vue Router with `create
 | ------------------- | ---------------- | -------------------------------- |
 | `/`                 | Home             | Search bar, trending, popular    |
 | `/movie/:id`        | Movie details    | Full movie info, actions         |
-| `/tv/:id`           | TV show details  | Full show info, actions          |
+| `/show/:id`         | TV show details  | Full show info, actions          |
 | `/library`          | Library          | Watchlist, watched, custom lists |
 | `/stats`            | Stats            | Viewing history analytics        |
 | `/recommendations`  | Recommendations  | Personalized suggestions         |
@@ -141,7 +143,7 @@ Routes are defined in `src/presentation/router.ts` using Vue Router with `create
 
 A catch-all route `/:pathMatch(.*)*` redirects unknown paths to `/`.
 
-Navigation guards on `/movie/:id` and `/tv/:id` reject non-numeric IDs and redirect to `/`.
+Navigation guards on `/movie/:id` and `/show/:id` reject non-numeric IDs and redirect to `/`.
 
 **Navigation:** Sidebar on desktop, bottom navigation bar on mobile. Both link to the same routes.
 
@@ -161,7 +163,7 @@ Navigation guards on `/movie/:id` and `/tv/:id` reject non-numeric IDs and redir
 
 ### Deep Linking
 
-Every route is directly navigable via URL. Navigating to `/movie/550` or `/tv/1396` works the same whether the user clicks a card or pastes the URL into the browser:
+Every route is directly navigable via URL. Navigating to `/movie/550` or `/show/1396` works the same whether the user clicks a card or pastes the URL into the browser:
 
 1. Vue Router matches the `:id` param and lazy-loads the detail view component.
 2. The view's composable (`useMovie(id)` or `useTVShow(id)`) fetches data from the media provider using the route param.
@@ -189,7 +191,7 @@ App.vue
         │       ├── FilterBar
         │       └── ViewToggle
         │
-        ├── /movie/:id, /tv/:id → EntryDetails
+        ├── /movie/:id, /show/:id → EntryDetails
         │       ├── HeroBackdrop
         │       ├── MetadataPanel
         │       ├── CastCarousel

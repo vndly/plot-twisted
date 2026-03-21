@@ -2,7 +2,7 @@
 
 * Search for movies and TV shows via `GET /search/multi`
 * Display results as `MovieCard` items in a responsive grid
-* Tapping a card navigates to `/movie/:id` or `/tv/:id`
+* Tapping a card navigates to `/movie/:id` or `/show/:id`
 * **Key components:** SearchBar, MovieCard
 
 ## Acceptance Criteria
