@@ -72,6 +72,45 @@ All user data is persisted in localStorage as JSON, keyed under a single top-lev
 - **`tags`** — global tag list. Kept in sync with tags referenced by library entries.
 - **`settings`** — single `Settings` object. Defaults are applied if missing keys are detected during Zod validation.
 
+## Schema Migration
+
+`storage.service.ts` runs schema migrations on startup to keep localStorage data compatible with the latest code.
+
+### How It Works
+
+1. On app load, `storage.service.ts` reads the `schemaVersion` field from localStorage.
+2. If the stored version is lower than the current version expected by the code, it runs each migration function in sequence (e.g., v1→v2, then v2→v3).
+3. After all migrations complete, `schemaVersion` is updated to the current version and the migrated data is written back.
+
+### Adding a New Migration
+
+1. Increment the `CURRENT_SCHEMA_VERSION` constant in `storage.service.ts`.
+2. Add a migration function named `migrateVxToVy` that receives the old data shape and returns the new one.
+3. Register the function in the `migrations` map keyed by the target version number.
+
+```ts
+// Example: adding a "color" field to CustomList in version 2
+const migrations: Record<number, (data: unknown) => unknown> = {
+  2: migrateV1ToV2,
+}
+
+function migrateV1ToV2(data: SchemaV1): SchemaV2 {
+  const lists = Object.fromEntries(
+    Object.entries(data.lists).map(([id, list]) => [
+      id,
+      { ...list, color: null },
+    ])
+  )
+  return { ...data, lists, schemaVersion: 2 }
+}
+```
+
+### Version Bump Rules
+
+- **Increment `schemaVersion`** when a change alters the shape of persisted data in a way that old code cannot read (added required fields, renamed keys, changed value types).
+- **Do not increment** for additive optional fields where Zod's `.optional()` or `.default()` handles the missing value gracefully on read.
+- Each migration must be idempotent — running it twice on the same data produces the same result.
+
 ## Infrastructure
 
 - **`storage.service.ts`** — Typed localStorage wrapper with JSON serialization. Handles schema migration between versions. Validates all reads with Zod schemas.
