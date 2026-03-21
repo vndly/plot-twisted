@@ -51,7 +51,6 @@ The project exists only as documentation — there is no source code, no build p
 - Routing (added with the first feature)
 - Any UI beyond a blank dark screen
 - API client or data layer implementation
-- Tests or test framework setup
 - CI/CD pipeline
 
 ## Functional Requirements
