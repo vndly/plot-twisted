@@ -86,7 +86,6 @@ Plain TypeScript with no Vue dependencies. Handles all external integration, imp
 
 - **`tmdb.client.ts`** — TMDB API client with Bearer token auth, Zod response validation, and circuit breaker for rate limits.
 - **`storage.service.ts`** — Typed localStorage wrapper with Zod validation on reads and schema migration between versions.
-- **Cache layer** — localStorage-backed response cache with TTL to reduce redundant API calls.
 
 ## Dependency Rules
 
@@ -182,9 +181,9 @@ No external state library (no Pinia/Vuex). State is managed across three tiers:
 | --------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------- |
 | **Component-local**   | UI toggles, form inputs, modal open/close      | `ref()` / `computed()` inside `<script setup>`                                    |
 | **Application-shared** | Library entries, search results, trending data | `ref()` inside composables, shared across components                              |
-| **Persistent**        | User library, lists, tags, settings, API cache | localStorage via `storage.service.ts` (see [Data Model](./data-model.md))         |
+| **Persistent**        | User library, lists, tags, settings            | localStorage via `storage.service.ts` (see [Data Model](./data-model.md))         |
 
-API responses are cached in localStorage with a TTL to avoid redundant requests. All persistent data is validated with Zod on read to guard against corruption or schema drift.
+All persistent data is validated with Zod on read to guard against corruption or schema drift.
 
 ## Testing
 

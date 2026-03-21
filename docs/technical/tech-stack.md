@@ -19,7 +19,7 @@
 
 - **Firebase Hosting** — Free tier covers a personal project, with CDN and automatic SSL.
 - **localStorage** — All user data stays on-device — no backend, no auth, no server costs. Accessed through a typed `storage.service.ts` wrapper in the Infrastructure layer with Zod validation.
-- **TMDB REST API** — Comprehensive, free-tier API for metadata, images, trending, and search. Responses cached in localStorage with a TTL.
+- **TMDB REST API** — Comprehensive, free-tier API for metadata, images, trending, and search.
 
 ## Browser Support
 

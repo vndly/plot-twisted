@@ -9,7 +9,7 @@
 ## 2. Data Access
 
 - **Application layer is the public API** — Presentation components fetch and mutate data exclusively through Application composables (`use*` functions). Components never import Infrastructure or Domain directly.
-- **Infrastructure is internal** — `tmdb.client.ts` and `storage.service.ts` handle HTTP, caching, and persistence. Only Application composables may call Infrastructure.
+- **Infrastructure is internal** — `tmdb.client.ts` and `storage.service.ts` handle HTTP and persistence. Only Application composables may call Infrastructure.
 - **Reactivity lives in Application** — Composables wrap Infrastructure calls with Vue reactivity (`ref`, `computed`, `watchEffect`) and expose loading/error state.
 - **Standard return shape** — Every composable returns `{ data, loading, error, refresh? }`. Presentation components can rely on this consistent interface.
 - **Layer import rules** — Presentation imports Application only. Application imports Domain and Infrastructure. Infrastructure imports Domain only. Domain has no app imports. No layer may skip or reach across levels.
@@ -52,7 +52,7 @@ Every `.vue` file follows this block order:
 - **Components:** PascalCase in templates and imports (`<MovieCard />`)
 - **Composables:** camelCase prefixed with `use` (`useMovie`, `useLibrary`)
 - **Types/Interfaces:** PascalCase (`Movie`, `LibraryEntry`)
-- **Constants:** UPPER_SNAKE_CASE (`API_BASE_URL`, `CACHE_TTL`)
+- **Constants:** UPPER_SNAKE_CASE (`API_BASE_URL`, `MAX_SEARCH_RESULTS`)
 - **Variables/functions:** camelCase (`getMovie`, `isLoading`)
 
 ## 9. Responsive Design

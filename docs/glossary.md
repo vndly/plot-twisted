@@ -56,7 +56,7 @@ Domain terminology used consistently across the codebase and documentation.
 | **Presentation Layer** | Layer 1 — Vue SFCs, views, and router. Renders UI and emits events. | Imports Application layer only. Never touches Infrastructure or Domain directly. |
 | **Application Layer** | Layer 2 — Vue composables orchestrating Domain and Infrastructure. Exposes reactive state to Presentation. | The only public API for data access. |
 | **Domain Layer** | Layer 3 — Zod schemas, TypeScript types, and pure business logic. Zero framework dependencies. | Importable by Application and Infrastructure. Has no app imports of its own. |
-| **Infrastructure Layer** | Layer 4 — TMDB API client, localStorage wrapper, and cache. Plain TypeScript with no Vue dependencies. | Imports Domain only. |
+| **Infrastructure Layer** | Layer 4 — TMDB API client and localStorage wrapper. Plain TypeScript with no Vue dependencies. | Imports Domain only. |
 | **Composable** | A `use`-prefixed function in the Application layer that wraps Infrastructure calls with Vue reactivity. | Examples: `useMovie()`, `useLibrary()`, `useSearch()`. |
 | **Standard Return Shape** | The consistent interface every composable exposes: `{ data, loading, error, refresh? }`. | Presentation components rely on this contract. |
 | **App Shell** | The root layout component: sidebar navigation on desktop, bottom navigation bar on mobile, plus the router outlet. | Component: `AppShell`. |
@@ -103,7 +103,6 @@ Domain terminology used consistently across the codebase and documentation.
 | **localStorage** | The browser storage mechanism where all user data persists. No backend or server-side storage. | All access goes through `storage.service.ts`. Raw `localStorage` calls outside the service are prohibited. |
 | **Schema Version** | An integer tracking breaking changes in the localStorage data shape. | Field: `schemaVersion` in the top-level localStorage object. Incremented on breaking changes. |
 | **Schema Migration** | The process of transforming old localStorage data to match a new schema version on app startup. | Handled by `storage.service.ts`. |
-| **TTL** | Time-to-live — the expiration duration for cached API responses in localStorage. | Reduces redundant TMDB API calls. |
 | **Circuit Breaker** | A pattern in `tmdb.client.ts` that stops making API calls after repeated failures or rate-limit hits, preventing request floods. | Protects against TMDB's ~40 requests per 10 seconds rate limit. |
 | **Zod Schema** | A runtime validation definition that also infers the corresponding TypeScript type via `z.infer<>`. | Used at every data boundary: API responses, localStorage reads, and user input. |
 | **Settings** | User preferences stored in localStorage: theme, language, default home section, and preferred region. | Type: `Settings`. Defaults applied if missing keys are detected during Zod validation. |
