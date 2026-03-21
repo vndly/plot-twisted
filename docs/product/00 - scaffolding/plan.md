@@ -119,3 +119,5 @@ Empty directories get `.gitkeep` files until real files are added.
   - `npm run test` — test suite runs (no tests yet, exits clean)
   - `npm run type-check` — zero TS errors
   - `npm run format:check` — zero formatting issues
+  - HMR — edit `src/App.vue`, browser reflects the change without full reload
+  - Firebase SPA rewrite — `firebase.json` contains a `** → /index.html` rewrite rule
