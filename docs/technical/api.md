@@ -38,7 +38,7 @@ Common sizes: `w92`, `w154`, `w185`, `w342`, `w500`, `w780`, `original`.
 
 ## Response Types
 
-All response types are defined as Zod schemas in `src/types/` with TypeScript types inferred via `z.infer<>`.
+All response types are defined as Zod schemas in `src/domain/` with TypeScript types inferred via `z.infer<>`.
 
 ### PaginatedResponse
 

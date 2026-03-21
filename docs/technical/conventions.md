@@ -8,11 +8,11 @@
 
 ## 2. Data Access
 
-- **Composables are the public API** — Components fetch and mutate data exclusively through composables (`use*` functions). Components never import or call services directly.
-- **Services are internal** — `ApiService` and `StorageService` handle HTTP, caching, and persistence. Only composables may call services.
-- **Reactivity lives in composables** — Composables wrap service calls with Vue reactivity (`ref`, `computed`, `watchEffect`) and expose loading/error state.
-- **Standard return shape** — Every composable returns `{ data, loading, error, refresh? }`. Components can rely on this consistent interface.
-- **Layer import rules** — Components import composables only. Composables import services and types only. Services import types and utils only. Types and utils have no app imports. No layer may skip or reach across levels.
+- **Application layer is the public API** — Presentation components fetch and mutate data exclusively through Application composables (`use*` functions). Components never import Infrastructure or Domain directly.
+- **Infrastructure is internal** — `tmdb.client.ts` and `storage.service.ts` handle HTTP, caching, and persistence. Only Application composables may call Infrastructure.
+- **Reactivity lives in Application** — Composables wrap Infrastructure calls with Vue reactivity (`ref`, `computed`, `watchEffect`) and expose loading/error state.
+- **Standard return shape** — Every composable returns `{ data, loading, error, refresh? }`. Presentation components can rely on this consistent interface.
+- **Layer import rules** — Presentation imports Application only. Application imports Domain and Infrastructure. Infrastructure imports Domain only. Domain has no app imports. No layer may skip or reach across levels.
 
 ## 3. Validation
 
@@ -38,8 +38,8 @@ Every `.vue` file follows this block order:
 ## 6. Testing
 
 - **Test file naming** — `*.test.ts` (or `*.test.vue` for component tests), co-located next to the source file they test.
-- **What to test** — Composables (data flow, loading/error states), services (API calls, storage reads/writes, validation), and utils (pure functions). Components only need tests for non-trivial interaction logic.
-- **No mocking localStorage** — Tests use a real `StorageService` instance backed by a fresh in-memory store to keep behavior close to production.
+- **What to test** — Application composables (data flow, loading/error states), Infrastructure (API calls, storage reads/writes, validation), and Domain (schemas, pure functions). Presentation components only need tests for non-trivial interaction logic.
+- **No mocking localStorage** — Tests use a real `storage.service.ts` instance backed by a fresh in-memory store to keep behavior close to production.
 - **Arrange-Act-Assert** — Every test follows the AAA pattern with clear separation between setup, execution, and assertions.
 
 ## 7. Documentation

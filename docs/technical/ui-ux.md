@@ -31,10 +31,10 @@ Design specification for the movie tracker interface. All styling uses Tailwind 
 | Breakpoint            | Columns | Context                       |
 | --------------------- | ------- | ----------------------------- |
 | Base (desktop)        | 5–6     | Wide desktop                  |
-| `max-xl` (< 1280px)  | 4–5     | Standard desktop              |
-| `max-lg` (< 1024px)  | 3–4     | Sidebar appears, multi-column |
-| `max-md` (< 768px)   | 2–3     | Bottom nav, narrower layout   |
-| `max-sm` (< 640px)   | 2       | Single-column mobile layout   |
+| `max-xl` (< 1280px)   | 4–5     | Standard desktop              |
+| `max-lg` (< 1024px)   | 3–4     | Sidebar appears, multi-column |
+| `max-md` (< 768px)    | 2–3     | Bottom nav, narrower layout   |
+| `max-sm` (< 640px)    | 2       | Single-column mobile layout   |
 
 - **Spacing** — `space-y-6` or `space-y-8` between major sections. `gap-4` between grid cards.
 - **Responsive behavior** — Desktop-first. Base styles target desktop; Tailwind breakpoints override for smaller screens. Below `md`: sidebar hidden, bottom nav bar visible, single-column layout. `md` and above: sidebar visible, multi-column grids.
@@ -207,5 +207,5 @@ Full-screen centered layout: "Something went wrong" heading, supporting text, an
 ## 12. Theme Support
 
 - **Default** — Dark theme (the cinematic aesthetic described above).
-- **Light theme** — Planned but secondary. Not detailed in mockups. Will invert the color palette when implemented.
+- **Light theme** — Planned but secondary. Will invert the color palette when implemented.
 - **Implementation** — Tailwind class-based dark mode strategy. Theme preference stored in `Settings.theme` via `StorageService`. Toggle available in Settings screen.

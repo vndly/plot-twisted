@@ -1,6 +1,6 @@
 # Data Model
 
-All types will be defined as Zod schemas in `src/types/` with TypeScript types inferred via `z.infer<>`. For TMDB API response types, see [API](./api.md#response-types).
+All types will be defined as Zod schemas in `src/domain/` with TypeScript types inferred via `z.infer<>`. For TMDB API response types, see [API](./api.md#response-types).
 
 ## Models
 
@@ -50,7 +50,7 @@ interface Settings {
 
 ## localStorage Schema
 
-All user data is persisted in localStorage as JSON, keyed under a single top-level namespace. `StorageService` owns all reads and writes — raw `localStorage` access outside the service is prohibited.
+All user data is persisted in localStorage as JSON, keyed under a single top-level namespace. `storage.service.ts` owns all reads and writes — raw `localStorage` access outside the service is prohibited.
 
 ```json
 {
@@ -66,20 +66,20 @@ All user data is persisted in localStorage as JSON, keyed under a single top-lev
 }
 ```
 
-- **`schemaVersion`** — integer incremented on breaking changes. `StorageService` checks this on startup and runs migration functions to transform old data shapes.
+- **`schemaVersion`** — integer incremented on breaking changes. `storage.service.ts` checks this on startup and runs migration functions to transform old data shapes.
 - **`library`** — dictionary of `LibraryEntry` objects keyed by TMDB ID. Only entries the user has explicitly saved appear here.
 - **`lists`** — dictionary of `CustomList` objects keyed by UUID. Membership is tracked on the entry side (`LibraryEntry.lists`).
 - **`tags`** — global tag list. Kept in sync with tags referenced by library entries.
 - **`settings`** — single `Settings` object. Defaults are applied if missing keys are detected during Zod validation.
 
-## Services
+## Infrastructure
 
-- **`StorageService`** — Typed localStorage wrapper with JSON serialization. Handles schema migration between versions. Validates all reads with Zod schemas.
-- **`ApiService`** — API client for fetching movie/TV metadata. Implements circuit breaker pattern. All responses are validated through Zod schemas before returning.
+- **`storage.service.ts`** — Typed localStorage wrapper with JSON serialization. Handles schema migration between versions. Validates all reads with Zod schemas.
+- **`tmdb.client.ts`** — API client for fetching movie/TV metadata. Implements circuit breaker pattern. All responses are validated through Zod schemas before returning.
 
-## Composables
+## Application (Composables)
 
-Composables are the public data-access layer for components. They wrap services with Vue reactivity and expose a standard return shape:
+Composables are the public data-access layer for Presentation components. They orchestrate Domain and Infrastructure with Vue reactivity and expose a standard return shape:
 
 ```ts
 {
@@ -90,8 +90,8 @@ Composables are the public data-access layer for components. They wrap services 
 }
 ```
 
-- **`useMovie(id)`** — Fetches and exposes reactive movie data via `ApiService`.
-- **`useTVShow(id)`** — Fetches and exposes reactive TV show data via `ApiService`.
-- **`useLibrary()`** — Reads/writes library entries via `StorageService`. Exposes watchlist, watched, favorites, etc.
-- **`useSearch(query)`** — Runs search queries via `ApiService`, exposes reactive results.
-- **`useTrending()`** — Fetches trending titles via `ApiService`.
+- **`useMovie(id)`** — Fetches and exposes reactive movie data via `tmdb.client.ts`.
+- **`useTVShow(id)`** — Fetches and exposes reactive TV show data via `tmdb.client.ts`.
+- **`useLibrary()`** — Reads/writes library entries via `storage.service.ts`. Exposes watchlist, watched, favorites, etc.
+- **`useSearch(query)`** — Runs search queries via `tmdb.client.ts`, exposes reactive results.
+- **`useTrending()`** — Fetches trending titles via `tmdb.client.ts`.
