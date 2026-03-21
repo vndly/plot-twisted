@@ -63,6 +63,7 @@ Domain terminology used consistently across the codebase and documentation.
 | **App Shell** | The root layout component: sidebar navigation on desktop, bottom navigation bar on mobile, plus the router outlet. | Component: `AppShell`. |
 | **Error Boundary** | A global catch-all that renders a "Something went wrong" fallback when an unhandled error occurs. | Wraps the App Shell in `App.vue`. |
 | **HMR** | Hot Module Replacement — a Vite development feature that applies code changes in the browser instantly without a full page reload, preserving application state. | Enabled automatically by `vite dev`. Not present in production builds. |
+| **SFC** | Single File Component — a Vue file (`.vue`) that co-locates a component's template, script, and styles in a single file. | All Presentation layer components use SFCs. |
 | **SPA** | Single Page Application — a web app that loads a single HTML page and dynamically updates content via client-side routing, avoiding full page reloads. | The app is deployed as an SPA. Firebase/hosting config uses SPA rewrite rules to direct all routes to `index.html`. |
 
 ---

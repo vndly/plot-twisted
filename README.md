@@ -7,7 +7,3 @@
 
 Add the deploy script in package.json
 Remove references to firebase deploy --only hosting
-
-SFC
-HMR
-SPA
