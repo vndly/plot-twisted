@@ -63,9 +63,9 @@ Requirements must be consistent with the project's technical reference docs. Fla
 
 - **Architecture**: Proposed components, files, or data flows must respect the layer boundaries in `docs/technical/architecture.md`. Flag requirements that imply cross-layer imports or misplaced files.
 - **Security**: Requirements introducing new user inputs, external integrations, storage keys, or API token handling must align with the defenses in `docs/technical/security.md`. Flag requirements that expand the attack surface without documenting mitigations.
-- **UI/UX**: Requirements describing visual behavior must follow `docs/technical/ui-ux.md` — Tailwind-only styling, correct theme tokens, skeleton loaders (not spinners), desktop-first responsive approach. Flag deviations with no justification.
-- **Data model**: Requirements that add or modify persisted data must match the schemas in `docs/technical/data-model.md`. Breaking shape changes require a `schemaVersion` bump. Flag schema mismatches.
+- **UI/UX**: Requirements describing visual behavior must follow `docs/technical/ui-ux.md`. Flag deviations with no justification.
+- **Data model**: Requirements that add or modify persisted data must match the schemas in `docs/technical/data-model.md`. Flag schema mismatches.
 - **API**: Requirements referencing external API calls must use the endpoints, parameters, and error-handling behavior documented in `docs/technical/api.md`. Flag undocumented endpoint usage.
-- **Conventions**: Requirements must not contradict the coding conventions in `docs/technical/conventions.md` — error handling patterns, data access layer rules, validation approach, guardrails, naming conventions, i18n behavior, and image handling. Flag requirements that assume different patterns without justification.
-- **Testing**: Requirements specifying test strategies, coverage expectations, or mocking approaches must align with `docs/technical/testing.md`. Flag requirements that contradict the defined test runner, file structure, layer mocking strategy, or coverage expectations.
+- **Conventions**: Requirements must not contradict the coding conventions in `docs/technical/conventions.md`. Flag requirements that assume different patterns without justification.
+- **Testing**: Requirements specifying test strategies, coverage expectations, or mocking approaches must align with `docs/technical/testing.md`. Flag contradictions with the defined testing patterns.
 - **Tech stack**: Requirements must only assume technologies listed in `docs/technical/tech-stack.md`, or explicitly justify new ones.
