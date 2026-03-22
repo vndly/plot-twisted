@@ -213,19 +213,19 @@ X critical | Y warnings | Z suggestions — across N files.
 
 [Issues that will cause implementation failures, architectural violations, or major gaps.]
 
-- **[file.md: Section Name]** Category — Description of the issue. **Recommendation**: What to do about it.
+- **#N [file.md: Section Name]** Category — Description of the issue. **Recommendation**: What to do about it.
 
 ### Warnings
 
 [Issues that could lead to problems, ambiguities, or inconsistencies.]
 
-- **[file.md: Section Name]** Category — Description. **Recommendation**: Fix.
+- **#N [file.md: Section Name]** Category — Description. **Recommendation**: Fix.
 
 ### Suggestions
 
 [Improvements that would raise quality but aren't blocking.]
 
-- **[file.md: Section Name]** Category — Description. **Recommendation**: Fix.
+- **#N [file.md: Section Name]** Category — Description. **Recommendation**: Fix.
 
 ## Missing Coverage
 
@@ -254,6 +254,7 @@ X critical | Y warnings | Z suggestions — across N files.
 
 ### Report Rules
 
+- **Numbered findings** — assign each finding a sequential number (`#1`, `#2`, `#3`, …) across all severity levels (Critical first, then Warnings, then Suggestions).
 - **Report only** — do not modify any files.
 - Be specific — cite the exact text and the reference doc or code that contradicts it.
 - Every finding must have a recommendation. Do not flag something without saying what to do.
