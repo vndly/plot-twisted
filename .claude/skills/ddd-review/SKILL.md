@@ -36,7 +36,7 @@ Use the Agent tool to spawn subagents in parallel to collect all necessary conte
 
 **Subagent B — Target folder**: Read all files in the user-provided folder.
 
-**Subagent C — Project context**: Read the target folder's `requirements.md` to extract its dependency list. Then list all sibling feature folders in `docs/product/`, but only read the `requirements.md` of folders that are declared as dependencies. Return a brief summary of each relevant feature — not the full content — to avoid filling the context window.
+**Subagent C — Project context**: Read the target folder's `requirements.md` to extract its dependency list. Then list all sibling feature folders in `docs/product/` and, for each sibling folder, read only the `Scope` and `Functional Requirements` sections of its `requirements.md`. Return a brief summary of each sibling feature (title, scope boundaries, and requirement IDs) — not the full content — to avoid filling the context window. Mark which siblings are declared dependencies.
 
 After all subagents return, proceed to the review phase.
 
@@ -61,9 +61,9 @@ After all subagents return, proceed to the review phase.
   - UI/UX Specs *(functional/bug-fix only)*
   - Risks & Assumptions *(functional/bug-fix only)*
   - Acceptance Criteria
-- **Functional requirements**: Each has an ID, description, and priority. Requirements must be specific enough that two developers would implement the same behavior from the description alone.
+- **Functional requirements**: Each has an ID, description, and priority. IDs must be unique — flag any duplicates. Requirements must be specific enough that two developers would implement the same behavior from the description alone.
 - **Non-functional requirements**: Must include a measurable threshold (e.g., "loads in < 200ms" not "should be fast"). Flag any requirement that lacks a concrete metric.
-- **Acceptance criteria**: Cover all functional requirements. Each criterion must reference the requirement ID it validates (e.g., `[F-01]`). Flag any criterion that cannot be traced to a requirement, and any requirement with no corresponding criterion. Each criterion is testable — meaning it can be verified with a concrete pass/fail check without subjective judgment. If not, flag it and propose a testable rewrite.
+- **Acceptance criteria**: Cover all functional requirements and all measurable non-functional requirements. Each criterion must reference the requirement ID it validates (e.g., `[F-01]`). Flag any criterion that cannot be traced to a requirement, and any requirement (functional or non-functional) with no corresponding criterion. Each criterion is testable — meaning it can be verified with a concrete pass/fail check without subjective judgment. If not, flag it and propose a testable rewrite.
 - **Scope**: Boundaries are explicit. Nothing in "In scope" contradicts "Out of scope". No implicit scope (things that seem assumed but not stated).
 - **Dependencies**: All listed and accurate. No unlisted dependencies implied by the requirements.
 - **Decisions**: If present, verify each row has a non-empty rationale. Choices must not contradict the technical reference docs (architecture, tech-stack, conventions). Flag decisions that duplicate or contradict decisions in dependency features.
@@ -116,11 +116,14 @@ Perform these checks across all files:
 - **Performance considerations**: Are potential bottlenecks (large lists, frequent re-renders, heavy queries) addressed?
 - **Migration & rollback**: If the feature introduces schema changes, API breaking changes, or data migrations, verify there is a backwards compatibility or rollback plan. Skip for features with no data/API impact.
 - **Scope creep detection**: Flag anything that introduces unnecessary complexity for the stated goal.
+- **Internal cross-references**: Verify that requirement IDs referenced in other files (`plan.md`, `scenarios.md`, `acceptance criteria`) actually exist in `requirements.md`. Flag any dangling references.
+- **Acceptance criteria ↔ scenarios traceability**: Every acceptance criterion should have at least one corresponding scenario in `scenarios.md`, and every scenario should map to at least one acceptance criterion. Flag gaps in either direction.
+- **Plan ↔ scenarios alignment**: Plan steps that produce user-visible behavior should have corresponding scenario coverage. Scenarios that assume functionality not addressed by any plan step should be flagged.
 - **Typos and grammar**: Catch spelling mistakes, grammatical errors, and formatting issues.
 
 ### 3.3 Challenge & Improve
 
-Go beyond finding issues — actively challenge the documentation. Limit this section to the **5 most impactful** suggestions, prioritized by potential effect on implementation quality.
+Go beyond finding issues — actively challenge the documentation. Prioritize by potential effect on implementation quality and include **up to 5** of the most impactful suggestions — fewer is fine if the documentation is strong.
 
 These outputs are non-blocking and go into the "Ideas & Suggestions" section of the report (not into Findings):
 
