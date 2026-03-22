@@ -26,7 +26,15 @@
 ### Coverage
 
 - **Completeness against requirements**: Cross-reference the sibling `requirements.md` — every `SHALL`/`MUST` statement has at least one matching scenario.
-- **Edge cases**: Error paths, empty states, boundary values, invalid inputs, concurrent operations — are these covered?
+- **Edge cases**: Error paths, empty states, boundary values, invalid inputs, concurrent operations — are these covered? Ensure scenarios cover positive, negative, boundary, and edge cases across dimensions such as:
+    - Multiple locales
+    - Online/offline/bad network
+    - Multiple user roles
+    - Portrait/landscape
+    - Light/dark mode
+    - Multiple screen resolutions
+    - Responsive behaviors
+    - Large datasets
 - **Negative scenarios**: "What should NOT happen" cases are included.
 - **Error message specificity**: `THEN` steps for error paths assert the specific message or error type shown to the user, not just "an error is shown" or "an error occurs."
 - **Async state coverage**: For features involving network requests or async operations, scenarios cover all three states: loading (skeleton/spinner visible), success (data rendered), and error (error toast or fallback UI displayed).

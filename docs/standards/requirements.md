@@ -21,6 +21,11 @@ Examples:
 - "The task list displays all tasks belonging to the current user, sorted by due date ascending" (specific, testable)
 - "The task list should work well" (too vague)
 
+Acceptance criteria are the contract between the specification and the implementation. They should:
+- Focus on what needs to be done, not how it should be implemented.
+- Define the specific behaviors and outcomes the software must provide.
+- Consider edge cases: empty data, concurrent updates, missing dependencies.
+
 ## Review Checks
 
 - **Frontmatter**: All fields present and valid:
