@@ -8,7 +8,5 @@
 4. **[Data Model](./data-model.md)**: Core data structures, schemas, and relationships.
 5. **[Conventions](./conventions.md)**: Coding standards, naming rules, and best practices.
 6. **[UI & UX](./ui-ux.md)**: User interface design guidelines and experience principles.
-7. **[Setup](./setup.md)**: Prerequisites, installation, environment configuration, and dev commands.
-8. **[Deployment](./deployment.md)**: Firebase Hosting setup, build, and deploy workflow.
-9. **[Testing](./testing.md)**: Test runner, coverage expectations, and test file structure.
-10. **[Security](./security.md)**: Media provider token exposure, XSS prevention, and localStorage trust model.
+7. **[Testing](./testing.md)**: Test runner, coverage expectations, and test file structure.
+8. **[Security](./security.md)**: Media provider token exposure, XSS prevention, and localStorage trust model.
