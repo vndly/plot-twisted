@@ -1,5 +1,7 @@
 # requirements.md
 
+Requirements define specific, testable conditions that a feature must satisfy. It's a behavior-oriented artifact written in natural language that expresses software functionality. A requirement answers: **What** + **Why** + **Success**.
+
 ## Review Checks
 
 - **Frontmatter**: All fields present and valid:
