@@ -69,9 +69,9 @@ Must contain two subsections: **In Scope** and **Out of Scope**. Boundaries must
 
 Presented as a table with columns `ID | Requirement | Description | Priority`.
 
+- **ID**: Must be unique within the document and use a feature-specific prefix. Flag duplicates or missing prefixes.
 - **Requirement**: A short label or name.
 - **Description**: The full specification — specific enough that two developers would implement the same behavior from the description alone.
-- **ID**: Must be unique within the document and use a feature-specific prefix (e.g., `S-01` for Setup, `SC-01` for Scaffolding). Flag duplicates or missing prefixes.
 - **Priority**: Allowed values are `P0` (must have), `P1` (should have), `P2` (nice to have). Flag missing or non-standard priorities.
 
 #### Non-Functional Requirements
@@ -93,7 +93,7 @@ Visual and interaction specifications for user-facing features. May include layo
 
 #### Acceptance Criteria
 
-The contract between the specification and the implementation. Acceptance criteria define the specific behaviors and outcomes the software must provide, focusing on *what* needs to be done, not *how*.
+The contract between the specification and the implementation. Acceptance criteria define the specific behaviors and outcomes the software must provide, focusing on _what_ needs to be done, not _how_.
 
 - Each criterion is a markdown checkbox (`- [ ]`) describing a single verifiable outcome.
 - Must be testable with a concrete pass/fail check — no subjective judgment. Flag untestable criteria and propose a rewrite.
