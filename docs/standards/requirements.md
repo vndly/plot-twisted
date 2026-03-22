@@ -44,7 +44,7 @@ Examples:
   - UI/UX Specs
   - Risks & Assumptions
   - Acceptance Criteria (see detailed rules below)
-- **Functional requirements**: Each has an ID, description, and priority. IDs must be unique — flag any duplicates. Priority allowed values are `P0` (must have), `P1` (should have), `P2` (nice to have). Flag any missing or non-standard priority. Requirements must be specific enough that two developers would implement the same behavior from the description alone.
+- **Functional requirements**: Presented as a table with columns `ID | Requirement | Description | Priority`. `Requirement` is a short label/name; `Description` is the full specification. IDs must be unique within the document and use a feature-specific prefix (e.g., `S-01` for Setup, `SC-01` for Scaffolding) — flag any duplicates or missing prefixes. Priority allowed values are `P0` (must have), `P1` (should have), `P2` (nice to have). Flag any missing or non-standard priority. Requirements must be specific enough that two developers would implement the same behavior from the description alone.
 - **Non-functional requirements**: Must be organized into named subsections that group related concerns (e.g., Responsive Design, Performance, Accessibility, Testing). Each subsection contains bullet points with concrete, measurable thresholds (e.g., "loads in < 200ms" not "should be fast"). Flag any requirement that lacks a concrete metric or any flat list of NFRs without subsection grouping.
 - **Requirement quality**: Every functional and non-functional requirement must be:
   - **Unambiguous**: Only one possible interpretation. Flag vague terms (e.g., "appropriate", "quickly", "properly") and propose a specific rewrite.
