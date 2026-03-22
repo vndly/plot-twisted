@@ -44,15 +44,26 @@ Examples:
   - UI/UX Specs
   - Risks & Assumptions
   - Acceptance Criteria (see detailed rules below)
-- **Functional requirements**: Each has an ID, description, and priority. IDs must be unique — flag any duplicates. Requirements must be specific enough that two developers would implement the same behavior from the description alone.
-- **Non-functional requirements**: Must include a measurable threshold (e.g., "loads in < 200ms" not "should be fast"). Flag any requirement that lacks a concrete metric.
+- **Functional requirements**: Each has an ID, description, and priority. IDs must be unique — flag any duplicates. Priority allowed values are `P0` (must have), `P1` (should have), `P2` (nice to have). Flag any missing or non-standard priority. Requirements must be specific enough that two developers would implement the same behavior from the description alone.
+- **Non-functional requirements**: Must be organized into named subsections that group related concerns (e.g., Responsive Design, Performance, Accessibility, Testing). Each subsection contains bullet points with concrete, measurable thresholds (e.g., "loads in < 200ms" not "should be fast"). Flag any requirement that lacks a concrete metric or any flat list of NFRs without subsection grouping.
 - **Requirement quality**: Every functional and non-functional requirement must be:
   - **Unambiguous**: Only one possible interpretation. Flag vague terms (e.g., "appropriate", "quickly", "properly") and propose a specific rewrite.
   - **Complete**: Covers inputs, outputs, error conditions, and edge cases relevant to its scope. Flag any requirement that omits details another developer would need to implement the same behavior.
   - **Consistent**: No contradictions with other requirements in the same document or in dependency features. Flag any conflicts.
   - **Verifiable**: Can be confirmed with a concrete pass/fail check. Flag any requirement that relies on subjective judgment and propose a measurable rewrite.
-- **Acceptance criteria**: Acceptance criteria are the contract between the specification and the implementation. They should focus on what needs to be done (not how), define the specific behaviors and outcomes the software must provide, and consider edge cases (empty data, concurrent updates, missing dependencies). Cover all functional requirements and all measurable non-functional requirements. Each criterion must reference the requirement ID it validates (e.g., `[F-01]`). Flag any criterion that cannot be traced to a requirement, and any requirement (functional or non-functional) with no corresponding criterion. Each criterion is testable — meaning it can be verified with a concrete pass/fail check without subjective judgment. If not, flag it and propose a testable rewrite.
+- **Acceptance criteria**: Acceptance criteria are the contract between the specification and the implementation. They should focus on what needs to be done (not how), define the specific behaviors and outcomes the software must provide, and consider edge cases (empty data, concurrent updates, missing dependencies). Cover all functional requirements and all measurable non-functional requirements. Each criterion is a markdown checkbox (`- [ ]`) describing a single verifiable outcome. Criteria must be testable — meaning they can be verified with a concrete pass/fail check without subjective judgment. If not, flag it and propose a testable rewrite. Flag any requirement (functional or non-functional) with no corresponding criterion.
 - **Scope**: Boundaries are explicit. Nothing in "In scope" contradicts "Out of scope". No implicit scope (things that seem assumed but not stated).
 - **Dependencies**: All listed and accurate. No unlisted dependencies implied by the requirements.
-- **Decisions**: If present, verify each row has a non-empty rationale. Choices must not contradict the technical reference docs (architecture, tech-stack, conventions). Flag decisions that duplicate or contradict decisions in dependency features.
+- **Decisions**: If present, must be a table with columns `Decision | Choice | Rationale`. Verify each row has a non-empty rationale. Choices must not contradict the technical reference docs (architecture, tech-stack, conventions). Flag decisions that duplicate or contradict decisions in dependency features.
 - **Unexpected sections**: If `requirements.md` contains sections not in the expected list above, flag them as a Warning — they may indicate scope creep or content that belongs in a different file.
+
+## Standards Compliance
+
+Requirements must be consistent with the project's technical reference docs. Flag any requirement that contradicts or ignores these sources:
+
+- **Architecture**: Proposed components, files, or data flows must respect the layer boundaries in `docs/technical/architecture.md`. Flag requirements that imply cross-layer imports or misplaced files.
+- **Security**: Requirements introducing new user inputs, external integrations, storage keys, or API token handling must align with the defenses in `docs/technical/security.md`. Flag requirements that expand the attack surface without documenting mitigations.
+- **UI/UX**: Requirements describing visual behavior must follow `docs/technical/ui-ux.md` — Tailwind-only styling, correct theme tokens, skeleton loaders (not spinners), desktop-first responsive approach. Flag deviations with no justification.
+- **Data model**: Requirements that add or modify persisted data must match the schemas in `docs/technical/data-model.md`. Breaking shape changes require a `schemaVersion` bump. Flag schema mismatches.
+- **API**: Requirements referencing external API calls must use the endpoints, parameters, and error-handling behavior documented in `docs/technical/api.md`. Flag undocumented endpoint usage.
+- **Tech stack**: Requirements must only assume technologies listed in `docs/technical/tech-stack.md`, or explicitly justify new ones.
