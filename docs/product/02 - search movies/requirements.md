@@ -1,5 +1,5 @@
 ---
-id: R-001
+id: R-02
 title: Search movies
 status: released
 type: functional
