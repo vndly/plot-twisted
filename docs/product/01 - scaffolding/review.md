@@ -8,15 +8,11 @@
 
 The documentation is thorough and well-structured — requirements are detailed, the plan is phased logically, and scenarios cover most functional requirements. However, one critical architectural contradiction (test file location) must be resolved before implementation, along with several warnings around missing transition CSS, translation accuracy, and traceability gaps.
 
-1 critical | 16 warnings | 12 suggestions — across 4 files.
+0 critical | 16 warnings | 12 suggestions — across 4 files.
 
-**Verdict**: Needs Revision — one critical finding (test file location contradicts project conventions and testing docs) must be resolved before implementation.
+**Verdict**: Acceptable — no critical findings remain. Warnings and suggestions should be addressed during implementation.
 
 ## Findings
-
-### Critical
-
-- **[requirements.md + plan.md: Decisions / Testing / Phase 9]** Convention compliance — The Decisions table chooses co-located `*.test.ts` files next to source. Plan Phase 9 follows this with paths like `src/presentation/composables/use-toast.test.ts`. However, `docs/technical/conventions.md` (section 7) and `docs/technical/testing.md` both mandate a dedicated `tests/` folder at the project root mirroring `src/`. The `testing.md` specifies `include: ["tests/**/*.test.ts"]` in vitest config — if someone aligns vitest to the docs, co-located tests would not be discovered. **Recommendation**: Either (a) update requirements.md and plan.md to use the `tests/` folder convention, or (b) update conventions.md, testing.md, and vitest.config.ts to adopt co-location. The decision must be made once and applied everywhere — not just noted as a contradiction.
 
 ### Warnings
 
@@ -85,8 +81,6 @@ The documentation is thorough and well-structured — requirements are detailed,
 - **vitest.config.ts updates** (globals, include, setupFiles) are not planned despite being required by testing.md.
 
 ## Open Questions
-
-- **[requirements.md: Decisions]** — Is the co-located test convention a permanent project-wide change, or specific to this phase? If permanent, conventions.md and testing.md need updating. If temporary, what triggers the migration to the `tests/` folder?
 
 - **[requirements.md: SC-21]** — Does `bg-surface` already exist in the Tailwind theme from Phase 00? If not, it needs to be added alongside `--color-success` and `--color-error`.
 

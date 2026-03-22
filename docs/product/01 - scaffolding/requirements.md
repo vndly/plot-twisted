@@ -34,7 +34,7 @@ The project has a fully configured build pipeline and tooling (phase 00) but ren
 | Transition CSS in main.css | Global CSS exception                     | Vue `<Transition>` requires class-based CSS. Centralizing in `main.css` avoids duplication. Acknowledged exception to the "Tailwind only" rule.               |
 | Home route matching        | Exact match only                         | Prevents the Home nav item from appearing active on every route.                                                                                              |
 | Testing approach           | Unit + component tests (Vitest + jsdom)  | Vitest already configured with jsdom. Unit tests for composables and router logic; component tests for UI components using `@vue/test-utils`.                 |
-| Test file convention       | Co-located `*.test.ts` files             | Tests live next to the source files they cover (e.g., `use-toast.test.ts` beside `use-toast.ts`). Keeps related code together and simplifies imports.        |
+| Test file convention       | Dedicated `tests/` folder                | Tests live in a root `tests/` folder mirroring `src/` structure, per conventions §7 and testing.md. Keeps source tree clean and aligns with vitest config.   |
 
 ## Scope
 
@@ -130,7 +130,7 @@ The project has a fully configured build pipeline and tooling (phase 00) but ren
 
 - **Framework:** Vitest with jsdom environment (already configured).
 - **Test types:** Unit tests for composables and router logic; component tests for Vue components using `@vue/test-utils`.
-- **File naming:** `*.test.ts` files co-located next to the source file they cover.
+- **File naming:** `*.test.ts` files in a dedicated `tests/` folder at the project root, mirroring the `src/` directory structure.
 - **Coverage target:** All composables and all components introduced in this phase must have tests.
 - **CI integration:** `npm run test` must pass with zero failures as part of the `npm run check` pipeline.
 

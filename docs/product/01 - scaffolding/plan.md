@@ -258,7 +258,7 @@ Each view follows the same pattern: `<script setup>` imports `EmptyState`, the l
 
 ### Step 21 — Router unit tests
 
-- [ ] Create `src/presentation/router.test.ts`:
+- [ ] Create `tests/presentation/router.test.ts`:
 
 - All 5 named routes exist with correct paths and names
 - Catch-all `/:pathMatch(.*)*` route exists and redirects to `/`
@@ -267,7 +267,7 @@ Each view follows the same pattern: `<script setup>` imports `EmptyState`, the l
 
 ### Step 22 — Composable unit tests
 
-- [ ] Create `src/presentation/composables/use-toast.test.ts`:
+- [ ] Create `tests/presentation/composables/use-toast.test.ts`:
 
 - `addToast()` adds a toast to the queue with a unique id
 - `removeToast(id)` removes the toast from the queue
@@ -275,7 +275,7 @@ Each view follows the same pattern: `<script setup>` imports `EmptyState`, the l
 - Toast types: `'error'`, `'success'`, `'info'`
 - Optional action object is preserved on the toast
 
-- [ ] Create `src/presentation/composables/use-modal.test.ts`:
+- [ ] Create `tests/presentation/composables/use-modal.test.ts`:
 
 - `open(props)` sets `isOpen` to true and stores props
 - `close()` sets `isOpen` to false and clears props
@@ -283,46 +283,46 @@ Each view follows the same pattern: `<script setup>` imports `EmptyState`, the l
 
 ### Step 23 — UI primitive component tests
 
-- [ ] Create `src/presentation/components/common/empty-state.test.ts`:
+- [ ] Create `tests/presentation/components/common/empty-state.test.ts`:
 
 - Renders title and description text
 - Renders icon when provided
 - Does not render icon when omitted
 
-- [ ] Create `src/presentation/components/common/skeleton-loader.test.ts`:
+- [ ] Create `tests/presentation/components/common/skeleton-loader.test.ts`:
 
 - Renders with default dimensions
 - Applies custom `width`, `height`, and `rounded` props
 
-- [ ] Create `src/presentation/components/common/toast-container.test.ts`:
+- [ ] Create `tests/presentation/components/common/toast-container.test.ts`:
 
 - Renders nothing when toast queue is empty
 - Renders toast items when toasts exist
 - Each toast shows message, dismiss button, and type-colored border
 - Optional action button renders when toast has an action
 
-- [ ] Create `src/presentation/components/common/modal-dialog.test.ts`:
+- [ ] Create `tests/presentation/components/common/modal-dialog.test.ts`:
 
 - Does not render when `isOpen` is false
 - Renders title, body, confirm, and cancel buttons when open
 - Calls `close()` on backdrop click
 - Calls `close()` on Escape key
 
-- [ ] Create `src/presentation/components/error/error-boundary.test.ts`:
+- [ ] Create `tests/presentation/components/error/error-boundary.test.ts`:
 
 - Renders slot content in normal state
 - Shows fallback UI with error title, description, and reload button when an error is captured
 
 ### Step 24 — Navigation component tests
 
-- [ ] Create `src/presentation/components/layout/sidebar-nav.test.ts`:
+- [ ] Create `tests/presentation/components/layout/sidebar-nav.test.ts`:
 
 - Renders all 5 nav items with correct icons and translated labels
 - Active route item has teal accent classes (`border-accent`, `bg-accent/10`)
 - Inactive items have muted classes (`text-slate-400`)
 - Home route uses exact match (`route.path === '/'`)
 
-- [ ] Create `src/presentation/components/layout/bottom-nav.test.ts`:
+- [ ] Create `tests/presentation/components/layout/bottom-nav.test.ts`:
 
 - Renders all 5 nav items with icons and labels
 - Active route item has teal accent styling
@@ -330,7 +330,7 @@ Each view follows the same pattern: `<script setup>` imports `EmptyState`, the l
 
 ### Step 25 — Placeholder view tests
 
-- [ ] Create one test file per view in `src/presentation/views/`:
+- [ ] Create one test file per view in `tests/presentation/views/`:
 
 | Test File                  | Verifies                                                          |
 | :------------------------- | :---------------------------------------------------------------- |
