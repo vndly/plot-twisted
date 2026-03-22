@@ -1,7 +1,7 @@
 ---
 id: R-01
 title: App Scaffolding
-status: todo
+status: draft
 type: infrastructure
 importance: critical
 tags: [routing, layout, navigation, ui-primitives, dx]

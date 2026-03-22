@@ -37,6 +37,8 @@ After all subagents return, proceed to the review phase.
 #### requirements.md
 
 - **Frontmatter**: All fields present and valid (`id`, `title`, `status`, `type`, `importance`, `tags`).
+  - Allowed `status` values: `draft`, `review`, `approved`, `in_development`, `under_test`, `released`.
+  - Allowed `importance` values: `low`, `medium`, `high`, `critical`.
 - **Sections**: All expected sections present — Intent, Context & Background (Problem Statement, User Stories, Personas, Dependencies), Scope (In/Out), Functional Requirements, Non-Functional Requirements, Constraints, UI/UX Specs, Risks & Assumptions, Acceptance Criteria.
 - **Functional requirements**: Each has an ID, description, and priority. Requirements are specific, measurable, and unambiguous.
 - **Non-functional requirements**: Are measurable and realistic (e.g., "loads in < 200ms" not "should be fast").

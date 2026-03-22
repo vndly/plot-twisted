@@ -1,7 +1,7 @@
 ---
 id: R-00
 title: Project Setup
-status: done
+status: released
 type: infrastructure
 importance: critical
 tags: [tooling, config, dx, build]
