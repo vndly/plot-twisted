@@ -12,7 +12,7 @@
 ## Completeness
 
 - **Traceability**: Every functional requirement from `requirements.md` maps to at least one step. Flag any requirement with no corresponding step, and any step that introduces work outside the defined scope.
-- **Verification & testing**: Plan must end with a verification phase listing concrete, runnable pass/fail checks (e.g., `npm run test`, `npm run build`). Flag if missing or if checks are vague (e.g., "verify it works"). Plan must include a testing phase with test files mapped to the components or logic they validate. Test approach must follow patterns defined in `docs/technical/testing.md`. Flag if testing is absent or deferred without justification.
+- **Verification & testing**: Plan must end with a verification phase listing concrete, runnable pass/fail checks (e.g., `npm run test`, `npm run build`). Flag if missing or if checks are vague (e.g., "verify it works"). Plan must include a testing phase with test files mapped to the components or logic they validate. Flag if testing is absent or deferred without justification.
 - **Dependency management**: Steps that install packages must specify version ranges. Flag any dependency added without a version constraint.
 - **Rollback safety**: Destructive steps (replacing files, changing config, data migrations) must note a rollback path or be flagged as irreversible.
 
