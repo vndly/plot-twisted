@@ -56,18 +56,7 @@ For each file found in the target folder (from the list validated in step 1), sp
 
 ### Common checks
 
-Every per-file subagent must perform these checks in addition to its file-specific checks:
-
-- **Glossary alignment**: Terms match definitions in `docs/reference/glossary.md` (from Subagent A). Flag terms used but not defined.
-- **Convention compliance**: Naming, file structure, and patterns follow `docs/technical/conventions.md`.
-- **Architecture alignment**: Proposed structure fits within `docs/technical/architecture.md`. No architectural violations.
-- **Tech stack compliance**: Only uses technologies listed in `docs/technical/tech-stack.md`, or explicitly justifies new ones.
-- **Security surface**: New user inputs, external integrations, or data flows have security implications addressed per `docs/technical/security.md`. Skip if the referenced technical doc does not exist in Subagent A's output.
-- **UI/UX alignment**: If UI changes are proposed, they follow `docs/technical/ui-ux.md` guidelines. Skip if the doc does not exist.
-- **Testing alignment**: Test approach follows `docs/technical/testing.md` patterns. Skip if the doc does not exist.
-- **Typos and grammar**: Catch spelling mistakes, grammatical errors, and formatting issues.
-- **Scope creep detection**: Flag anything that introduces unnecessary complexity for the stated goal.
-- **Performance considerations**: Are potential bottlenecks (large lists, frequent re-renders, heavy queries) addressed?
+Read from `docs/standards/common.md`. Every per-file subagent must perform these checks in addition to its file-specific checks.
 
 ### File-specific instructions
 
