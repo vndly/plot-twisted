@@ -34,20 +34,49 @@ Use the Agent tool to spawn subagents in parallel to collect all necessary conte
 
 **Subagent A — Reference docs**: Read all files in `docs/technical/`.
 
-**Subagent B — Target folder**: Read all files in the user-provided folder.
+**Subagent B — Project context**: Read the target folder's `requirements.md` to extract its dependency list. Then list all sibling feature folders in `docs/product/` and, for each sibling folder, read only the `Scope` and `Functional Requirements` sections of its `requirements.md`. Return a brief summary of each sibling feature (title, scope boundaries, and requirement IDs) — not the full content — to avoid filling the context window. Mark which siblings are declared dependencies.
 
-**Subagent C — Project context**: Read the target folder's `requirements.md` to extract its dependency list. Then list all sibling feature folders in `docs/product/` and, for each sibling folder, read only the `Scope` and `Functional Requirements` sections of its `requirements.md`. Return a brief summary of each sibling feature (title, scope boundaries, and requirement IDs) — not the full content — to avoid filling the context window. Mark which siblings are declared dependencies.
+After both subagents return, proceed to the per-file review phase.
 
-After all subagents return, proceed to the review phase.
+## 3. Per-File Review
 
-## 3. Review
+For each file found in the target folder (from the list validated in step 1), spawn a dedicated review subagent. Run all subagents **in parallel** using the Agent tool.
 
-### 3.1 Per-File Review
+### What each subagent receives
+
+- The **file path** to review (the subagent reads the file itself)
+- The **reference docs** output from Subagent A
+- The **project context** output from Subagent B
+- The **file-specific review instructions** and **common checks** from this section
+
+### What each subagent returns
+
+1. **Findings**: A list of issues. Each finding has: severity (`Critical`, `Warning`, or `Suggestion`), file name, section name, category, description, and recommendation.
+2. **Structured extract**: Key data points from the file (defined per file type below). The cross-cutting subagent in step 4 uses these extracts for multi-file checks.
+
+### Common checks
+
+Every per-file subagent must perform these checks in addition to its file-specific checks:
+
+- **Glossary alignment**: Terms match definitions in `docs/reference/glossary.md` (from Subagent A). Flag terms used but not defined.
+- **Convention compliance**: Naming, file structure, and patterns follow `docs/technical/conventions.md`.
+- **Architecture alignment**: Proposed structure fits within `docs/technical/architecture.md`. No architectural violations.
+- **Tech stack compliance**: Only uses technologies listed in `docs/technical/tech-stack.md`, or explicitly justifies new ones.
+- **Security surface**: New user inputs, external integrations, or data flows have security implications addressed per `docs/technical/security.md`. Skip if the referenced technical doc does not exist in Subagent A's output.
+- **UI/UX alignment**: If UI changes are proposed, they follow `docs/technical/ui-ux.md` guidelines. Skip if the doc does not exist.
+- **Testing alignment**: Test approach follows `docs/technical/testing.md` patterns. Skip if the doc does not exist.
+- **Typos and grammar**: Catch spelling mistakes, grammatical errors, and formatting issues.
+- **Scope creep detection**: Flag anything that introduces unnecessary complexity for the stated goal.
+- **Performance considerations**: Are potential bottlenecks (large lists, frequent re-renders, heavy queries) addressed?
+
+### File-specific instructions
 
 #### requirements.md
 
+**Review checks:**
+
 - **Frontmatter**: All fields present and valid:
-  - `id`: must be unique across all features (check against sibling summaries collected by Subagent C). Flag any duplicates.
+  - `id`: must be unique across all features (check against sibling summaries from Subagent B). Flag any duplicates.
   - `title`: non-empty string
   - `status`: allowed values are `draft`, `review`, `approved`, `in_development`, `under_test`, `released`.
   - `importance`: allowed values are `low`, `medium`, `high`, `critical`.
@@ -72,59 +101,134 @@ After all subagents return, proceed to the review phase.
 - **Decisions**: If present, verify each row has a non-empty rationale. Choices must not contradict the technical reference docs (architecture, tech-stack, conventions). Flag decisions that duplicate or contradict decisions in dependency features.
 - **Unexpected sections**: If `requirements.md` contains sections not in the expected list above, flag them as a Warning — they may indicate scope creep or content that belongs in a different file.
 
+**Structured extract to return:**
+
+- Feature ID and title (from frontmatter)
+- Feature status and type (from frontmatter)
+- All functional requirement IDs with descriptions and priorities
+- All non-functional requirement IDs with thresholds
+- All acceptance criteria with their referenced requirement IDs
+- Dependency list
+- Decisions (choice + rationale)
+- Scope boundaries (in scope / out of scope items)
+- Entity names and domain terms used
+
 #### plan.md
 
+**Review checks:**
+
 - **Structure**: Organized into phases with numbered steps and checkboxes.
-- **Completeness**: Every functional requirement has corresponding plan steps. Nothing in the plan goes beyond what requirements define.
 - **Ordering**: Steps are in a logical sequence. No step depends on something that hasn't happened yet.
 - **File impact map**: Referenced file paths are realistic — existing paths must actually exist, new paths must follow the naming and structure conventions in `docs/technical/conventions.md`.
 - **Feasibility**: Steps are actionable and concrete, not vague.
 
+> Completeness checks (every requirement has plan steps, plan stays within requirements scope) are performed by the cross-cutting subagent in step 4.
+
+**Structured extract to return:**
+
+- List of phases and steps (with any referenced requirement IDs)
+- Referenced file paths (new and existing)
+- Technologies/tools mentioned
+- Entity names and terms used
+
 #### scenarios.md
 
+**Review checks:**
+
 - **Format**: Correct Gherkin syntax — `Feature:`, `Scenario:` (or `Scenario Outline:`), `Background:` (if used), and `GIVEN`/`WHEN`/`THEN`/`AND`/`BUT` steps.
-- **Coverage**: Every functional requirement has at least one scenario. Flag requirements with no corresponding scenario.
 - **Edge cases**: Error paths, empty states, boundary values, invalid inputs, concurrent operations — are these covered?
 - **Testability**: Each scenario is specific enough to write an automated test from. No vague assertions.
 - **Negative scenarios**: "What should NOT happen" cases are included.
 
+> Coverage checks (every requirement has a scenario) are performed by the cross-cutting subagent in step 4.
+
+**Structured extract to return:**
+
+- List of scenario names with referenced requirement IDs
+- Entity names and terms used
+
 #### index.md
+
+**Review checks:**
 
 - Links to all sibling files in the folder.
 - Descriptions accurately reflect each file's content.
 - No broken links, no missing entries.
 
-#### Optional files (api.md, data-model.md, implementation.md)
+**Structured extract to return:**
 
-- If an optional file exists but is empty or a stub (e.g., only a heading with no content), flag it as a **Critical** finding — an empty file is misleading.
-- Cross-check against their counterparts in `docs/technical/`.
-- `api.md`: Endpoints follow patterns from `docs/technical/api.md`. Check: request/response schemas, example payloads, error responses, auth requirements, pagination, and headers.
-- `data-model.md`: Entities, fields, and relationships align with `docs/technical/data-model.md`. Check: indexes, constraints, validation rules. Migrations mentioned if schema changes.
-- `implementation.md`: If present, verify it aligns with the plan and requirements. No contradictions between implementation approach and architectural constraints.
+- List of links (target path and description text)
 
-### 3.2 Cross-Cutting Checks
+#### api.md
 
-Perform these checks across all files:
+**Review checks:**
+
+- If the file is empty or a stub (only headings with no content), flag as **Critical** — an empty file is misleading.
+- Endpoints follow patterns from `docs/technical/api.md`. Check: request/response schemas, example payloads, error responses, auth requirements, pagination, and headers.
+
+**Structured extract to return:**
+
+- List of endpoints (method, path, summary)
+- Entity names used
+- Technologies mentioned
+
+#### data-model.md
+
+**Review checks:**
+
+- If the file is empty or a stub, flag as **Critical**.
+- Entities, fields, and relationships align with `docs/technical/data-model.md`. Check: indexes, constraints, validation rules. Migrations mentioned if schema changes.
+
+**Structured extract to return:**
+
+- List of entities with fields and types
+- Relationships between entities
+- Terms used
+
+#### implementation.md
+
+**Review checks:**
+
+- If the file is empty or a stub, flag as **Critical**.
+
+> Alignment with plan and requirements is checked by the cross-cutting subagent in step 4.
+
+**Structured extract to return:**
+
+- Architecture decisions or approaches described
+- Technologies mentioned
+- Referenced requirement IDs
+- Entity names and terms used
+
+## 4. Cross-Cutting Review
+
+After all per-file subagents from step 3 complete, spawn a single **cross-cutting review subagent** using the Agent tool. This subagent performs checks that require information from multiple files.
+
+### What the subagent receives
+
+- The **structured extracts** from all per-file subagents (step 3)
+- The **reference docs** output from Subagent A (step 2)
+- The **project context** output from Subagent B (step 2)
+
+### What the subagent returns
+
+1. **Findings**: Issues found during cross-file checks (same format as per-file findings).
+2. **Ideas & suggestions**: Output from the Challenge & Improve review (section 4.2).
+
+### 4.1 Multi-File Checks
 
 - **Consistency**: Terms, entity names, and descriptions are consistent across all files in the folder. No file contradicts another.
-- **Glossary alignment**: Terms match definitions in `docs/reference/glossary.md`. Flag terms used but not defined.
-- **Convention compliance**: Naming, file structure, and patterns follow `docs/technical/conventions.md`.
-- **Architecture alignment**: Proposed structure fits within `docs/technical/architecture.md`. No architectural violations.
-- **Tech stack compliance**: Only uses technologies listed in `docs/technical/tech-stack.md`, or explicitly justifies new ones.
-- **Security surface**: New user inputs, external integrations, or data flows have security implications addressed per `docs/technical/security.md`. Skip if the referenced technical doc does not exist.
-- **UI/UX alignment**: If UI changes are proposed, they follow `docs/technical/ui-ux.md` guidelines. Skip if the referenced technical doc does not exist.
-- **Testing alignment**: Test approach follows `docs/technical/testing.md` patterns. Skip if the referenced technical doc does not exist.
-- **Cross-feature conflicts**: No overlap or contradiction with other features in `docs/product/`.
-- **Dependency impact**: If the feature touches existing modules, are ripple effects acknowledged?
-- **Performance considerations**: Are potential bottlenecks (large lists, frequent re-renders, heavy queries) addressed?
-- **Migration & rollback**: If the feature introduces schema changes, API breaking changes, or data migrations, verify there is a backwards compatibility or rollback plan. Skip for features with no data/API impact.
-- **Scope creep detection**: Flag anything that introduces unnecessary complexity for the stated goal.
-- **Internal cross-references**: Verify that requirement IDs referenced in other files (`plan.md`, `scenarios.md`, `acceptance criteria`) actually exist in `requirements.md`. Flag any dangling references.
+- **Internal cross-references**: Verify that requirement IDs referenced in other files (`plan.md`, `scenarios.md`, acceptance criteria) actually exist in `requirements.md`. Flag any dangling references.
+- **Plan completeness**: Every functional requirement has corresponding plan steps. Nothing in the plan goes beyond what requirements define.
+- **Scenarios coverage**: Every functional requirement has at least one scenario. Flag requirements with no corresponding scenario.
 - **Acceptance criteria ↔ scenarios traceability**: Every acceptance criterion should have at least one corresponding scenario in `scenarios.md`, and every scenario should map to at least one acceptance criterion. Flag gaps in either direction.
 - **Plan ↔ scenarios alignment**: Plan steps that produce user-visible behavior should have corresponding scenario coverage. Scenarios that assume functionality not addressed by any plan step should be flagged.
-- **Typos and grammar**: Catch spelling mistakes, grammatical errors, and formatting issues.
+- **Implementation alignment**: If `implementation.md` exists, verify it aligns with the plan and requirements. No contradictions between implementation approach and architectural constraints.
+- **Cross-feature conflicts**: No overlap or contradiction with other features in `docs/product/` (using project context from Subagent B).
+- **Dependency impact**: If the feature touches existing modules, are ripple effects acknowledged?
+- **Migration & rollback**: If the feature introduces schema changes, API breaking changes, or data migrations, verify there is a backwards compatibility or rollback plan. Skip for features with no data/API impact.
 
-### 3.3 Challenge & Improve
+### 4.2 Challenge & Improve
 
 Go beyond finding issues — actively challenge the documentation. Prioritize by potential effect on implementation quality and include **up to 5** of the most impactful suggestions — fewer is fine if the documentation is strong.
 
@@ -136,9 +240,9 @@ These outputs are non-blocking and go into the "Ideas & Suggestions" section of 
 - **Ask clarifying questions**: If something is ambiguous, list it as an open question rather than guessing intent.
 - **Missing edge cases**: Propose scenarios the author may have missed.
 
-## 4. Report
+## 5. Report
 
-Present the report directly in the conversation using this structure:
+Assemble the final report from all subagent outputs: merge findings from per-file subagents (step 3) and the cross-cutting subagent (step 4), deduplicate any overlapping findings, and present the report directly in the conversation using this structure:
 
 ### Report Structure
 
