@@ -2,6 +2,19 @@
 
 Requirements define specific, testable conditions that a feature must satisfy. It's a behavior-oriented artifact written in natural language that expresses software functionality. A requirement answers: **What** + **Why** + **Success**.
 
+## Writing Guidelines
+
+Requirements should describe:
+- Observable behavior users or downstream systems rely on
+- Inputs, outputs, and error conditions
+- External constraints (security, privacy, reliability, compatibility)
+- Scenarios that can be tested or explicitly validated
+- Business rules: cascading deletes, state transitions, resource limits
+
+A good requirement is testable and unambiguous:
+- "The task list displays all tasks belonging to the current user, sorted by due date ascending" (specific, testable)
+- "The task list should work well" (too vague)
+
 ## Review Checks
 
 - **Frontmatter**: All fields present and valid:
