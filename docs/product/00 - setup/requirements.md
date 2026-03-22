@@ -1,6 +1,6 @@
 ---
 id: R-000
-title: Project scaffolding
+title: Project Setup
 status: done
 type: infrastructure
 importance: critical
@@ -68,7 +68,7 @@ The project exists only as documentation — there is no source code, no build p
 | S-09 | Environment variable typing | `env.d.ts` declaring `VITE_MEDIA_PROVIDER_TOKEN` for typed access via `import.meta.env`.                                                                          | P1       |
 | S-10 | Firebase hosting config     | `firebase.json` and `.firebaserc` (project: `plot-twisted`) with SPA rewrite and `dist` as public dir.                                                            | P1       |
 | S-11 | VS Code settings            | Format on save, ESLint auto-fix, Tailwind IntelliSense.                                                                                                           | P1       |
-| S-12 | i18n scaffolding            | vue-i18n instance in `src/presentation/i18n/index.ts`, translation JSON files for en/es/fr in `locales/`, Vite plugin configured, plugin registered in `main.ts`. | P0       |
+| S-12 | i18n setup                  | vue-i18n instance in `src/presentation/i18n/index.ts`, translation JSON files for en/es/fr in `locales/`, Vite plugin configured, plugin registered in `main.ts`. | P0       |
 
 ## Non-Functional Requirements
 

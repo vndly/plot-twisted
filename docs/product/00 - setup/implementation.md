@@ -1,10 +1,10 @@
-# Implementation Details: Project Scaffolding
+# Implementation Details: Project Setup
 
 ---
 
 ## Overview
 
-All scaffolding was implemented as specified in the [plan](./plan.md), fulfilling every requirement in [requirements.md](./requirements.md). The project went from documentation-only to a fully functional Vue 3 development environment with strict tooling.
+All setup was implemented as specified in the [plan](./plan.md), fulfilling every requirement in [requirements.md](./requirements.md). The project went from documentation-only to a fully functional Vue 3 development environment with strict tooling.
 
 ---
 
@@ -135,7 +135,7 @@ Uses Tailwind v4's CSS-based configuration with `@import 'tailwindcss'` and a `@
 
 Declares `ImportMetaEnv` with `VITE_MEDIA_PROVIDER_TOKEN: string` for typed `import.meta.env` access.
 
-### i18n scaffolding
+### i18n setup
 
 - **`src/presentation/i18n/index.ts`** — creates a vue-i18n instance with `legacy: false`, default locale `en`, fallback `en`, messages for `en`, `es`, `fr`
 - **Locale files** — `en.json`, `es.json`, `fr.json` each contain `{ "app": { "title": "Plot Twisted" } }`

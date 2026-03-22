@@ -1,4 +1,4 @@
-# Implementation Plan: Project Scaffolding
+# Implementation Plan: Project Setup
 
 ---
 

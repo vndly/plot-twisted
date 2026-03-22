@@ -1,4 +1,4 @@
-# Verification Scenarios: Project Scaffolding
+# Verification Scenarios: Project Setup
 
 ### Requirement: Dev server
 
