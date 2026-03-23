@@ -1,1 +1,0 @@
-# Document Driven Development (DDD)

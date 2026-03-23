@@ -1,0 +1,179 @@
+# DDD Framework Feedback
+
+Comprehensive feedback on the Document Driven Development framework: assessment, comparisons, strengths, weaknesses, and improvement suggestions.
+
+## Overall Assessment
+
+Document Driven Development is a thoughtful and well-executed framework that addresses a real and growing problem: how to get consistently good results from AI coding agents. The core thesis — that the quality of AI-generated code is a function of the quality of the context it receives — is sound and increasingly validated by the experience of teams using LLM-based tools.
+
+The framework operationalizes this insight with a clear document pipeline, mechanical review standards, and AI skills that automate the tedious parts of the process. The implementation in this project is impressive: the standards files are genuinely rigorous, the review skill is architecturally sophisticated (parallel sub-agents for per-file review plus a cross-cutting sub-agent for multi-file consistency), and the real-world examples demonstrate that the framework works in practice.
+
+The framework is at its strongest when handling medium-to-large changes that benefit from structured thinking. Its main challenges are around handling small changes (where the process overhead may not be justified), managing document staleness after shipping, and closing the gap between validation scenarios and actual test execution.
+
+## Similar Frameworks
+
+### Spec-Driven Development
+
+DDD is essentially spec-driven development with two key additions: (a) the spec is decomposed into multiple typed documents with individual standards, and (b) AI skills automate generation and review. Traditional spec-driven development leaves the spec as a monolithic artifact and relies on human discipline for quality. DDD mechanizes the quality checks.
+
+### Behavior-Driven Development (BDD)
+
+DDD incorporates BDD directly via `scenarios.md` in Gherkin format. The difference is that in classical BDD, scenarios drive the implementation — developers write code to make scenarios pass. In DDD, scenarios are one input among several that the AI agent ingests. The scenarios serve more as a validation contract than as the primary driver. This is a reasonable adaptation for AI-assisted development, where the agent needs broader context than just GIVEN/WHEN/THEN.
+
+### Test-Driven Development (TDD)
+
+TDD's red-green-refactor cycle operates at the code level with rapid feedback loops. DDD operates at the document level with longer feedback loops but broader scope. They are complementary rather than competing: DDD could incorporate TDD within the implementation phase. Currently the framework does not prescribe how the AI agent writes tests during implementation, which is a gap (see Weaknesses).
+
+### Architecture Decision Records (ADRs)
+
+The Decisions table in `requirements.md` (Decision | Choice | Rationale) functions similarly to ADRs but is scoped to individual features rather than maintained as a global log. This means architectural decisions are scattered across feature folders. A developer asking "why did we choose X?" must know which feature's requirements to look in. A global ADR log would complement the per-feature decisions.
+
+### RFC-Driven Development
+
+RFC processes (used by Rust, React, Kubernetes) are designed for open-ended, multi-stakeholder architectural decisions with public comment periods. DDD's requirements phase serves a similar "think before you build" purpose but is lighter weight and more prescriptive in structure. RFC processes typically do not prescribe document types or review checklists — they rely on community review for quality. DDD's mechanical review is an advantage for smaller teams without a large reviewer pool.
+
+### Documentation-Driven Development (Tom Preston-Werner)
+
+Preston-Werner's original 2010 blog post proposed writing the README before the code to force developers to think about the user experience. DDD extends this idea dramatically: instead of one document (the README), there are six document types in a prescribed order with enforced standards. Preston-Werner's approach was a philosophy; DDD is an engineered system.
+
+### Amazon's Working Backwards
+
+Amazon writes a mock press release and FAQ before building a product. The intent is similar to DDD's requirements phase: force clarity of thinking before committing engineering resources. Amazon's approach is lighter (one narrative document vs. a structured pipeline) and targets product-market fit rather than implementation quality. DDD is more concerned with getting the code right than with validating whether the feature should exist.
+
+### Literate Programming (Knuth)
+
+Knuth interleaved prose and code in a single artifact. DDD keeps documents and code separate, using documents as inputs to code generation rather than co-locating them. The philosophy differs: Knuth wanted documentation to be the primary artifact that happened to produce executable code; DDD treats documents as a means to produce better AI-generated code.
+
+### Design by Contract (Meyer)
+
+Design by Contract specifies preconditions, postconditions, and invariants at the function level. DDD's acceptance criteria and Gherkin scenarios operate at a higher level of abstraction (feature behavior rather than function contracts). They serve similar purposes — defining the contract the implementation must satisfy — but at different granularities.
+
+## Strengths
+
+### 1. Rigorous Standards with Mechanical Enforcement
+
+The most impressive aspect of the framework. Each document type has a detailed checklist in the standards directory, and the review skill systematically applies these checks. This eliminates the "well, we should have caught that" problem common to human review processes.
+
+### 2. End-to-End Traceability
+
+Requirements trace to plan steps, scenarios, and acceptance criteria. The cross-cutting review explicitly checks these traces (plan completeness, scenario coverage, acceptance criteria traceability). This level of traceability is rare even in formal methodologies.
+
+### 3. Separation of Document Standards from Application Standards
+
+Keeping document standards (rules about how to write documents) separate from technical reference (rules about how to build the application) is a clean architectural choice. It means the framework itself can evolve independently from the application's technical constraints.
+
+### 4. The Two-Developer Test
+
+The standard that a requirement or plan step should be "specific enough that two developers would produce the same behavior" is an excellent operationalization of "unambiguous." It gives reviewers a concrete mental model for evaluating document quality.
+
+### 5. Cheap Iteration
+
+Catching problems in documents (which take minutes to revise) rather than in code (which takes hours to debug and refactor) is economically sound, especially when the "developer" is an AI agent that may produce large volumes of code from a single prompt.
+
+### 6. Common Checks as a Force Multiplier
+
+Applying common checks (glossary alignment, architecture compliance, link validation, staleness detection) to every document type means that baseline quality is enforced everywhere, not just in the documents the reviewer remembers to check.
+
+### 7. The Implementation Record as Post-Mortem
+
+Having the AI agent document what it actually built (vs. what was planned) creates a valuable feedback loop. Deviations from the plan are captured with justification, which is useful for both current review and future archaeology.
+
+## Weaknesses & Flaws
+
+### 1. No Mechanism for Mid-Implementation Changes
+
+The workflow assumes a linear progression: requirements are finalized, then the plan is generated, then code is written. Real development frequently surfaces requirement changes during implementation ("we said X, but while building it we realized Y is actually needed").
+
+The framework has no documented process for mid-implementation changes. Does the team stop, update requirements, re-review, regenerate the plan, and restart? That would be extremely costly. Does the team allow undocumented deviations? That undermines traceability. This is the framework's most significant gap.
+
+### 2. Document Staleness After Shipping
+
+Once a feature ships and moves to `product/`, there is no mechanism to keep its documents up to date as the codebase evolves. Feature B might change behavior documented in Feature A's requirements. The staleness detection check catches references to code that no longer exists, but it does not catch semantic drift where the code still exists but behaves differently. Over time, `product/` could become a graveyard of technically inaccurate but structurally valid documents.
+
+### 3. Heavy Process for Small Changes
+
+The minimum document set (requirements + plan + scenarios) is appropriate for features with dozens of functional requirements. But for a bug fix that changes one line, or a quick UI tweak, writing formal requirements with frontmatter, a phased plan, and Gherkin scenarios is disproportionate overhead. The framework does not distinguish between change sizes or provide a lightweight path for trivial changes.
+
+### 4. Testing Step is Underspecified
+
+The validation phase (testing against scenarios) is marked as experimental. The scenarios are in Gherkin format, which is inherently automatable (Cucumber, Playwright BDD), but the framework does not prescribe how to bridge scenarios to actual test execution. Meanwhile, the plan prescribes test files independently from the scenarios. This creates a disconnect between the validation contract (scenarios) and the actual verification (tests).
+
+### 5. No Versioning or Amendment Process
+
+Once a change moves to `product/`, the documents are treated as complete. If the team later modifies the feature, there is no process for amending existing documents vs. creating a new change request. This could lead to either stale documents in `product/` or a proliferation of small change requests that each partially supersede earlier documents.
+
+### 6. No Requirements-to-Code Verification
+
+The review skill checks documents against the technical reference. The code review skill checks code against the technical reference. But nothing bridges the two — no skill verifies that the code actually satisfies the documented requirements and scenarios. For example, the review skill cannot verify that a requirement like "toast auto-dismisses after 4 seconds" is actually implemented with a 4-second timeout.
+
+### 7. AI Agent as Single Point of Failure for Plan Generation
+
+The plan is generated by the AI agent from the requirements. If the agent misinterprets a requirement or generates a flawed plan, the team must catch this during review. The review skill checks structural quality (are steps specific enough?) rather than semantic correctness (does this step actually achieve the requirement?). The team is the last line of defense for semantic accuracy, which is appropriate but demands significant domain expertise from reviewers.
+
+## Improvement Suggestions
+
+### 1. Add a Lightweight Path for Small Changes
+
+Define a threshold (e.g., changes touching fewer than 3 files, bug fixes with a clear root cause) below which the full document pipeline is optional. A "quick change" template might require only a brief description, the files affected, and a single acceptance criterion. This preserves the spirit of documentation without the overhead.
+
+### 2. Define an Amendment Process
+
+When a shipped feature needs modification, the team should be able to either (a) create a new change request that references the original feature and documents only the delta, or (b) amend the existing `product/` documents in place with a changelog section. The amendment process should be documented and have its own standard.
+
+### 3. Bridge Scenarios to Test Execution
+
+Formalize the experimental testing step. Options include: requiring that plan test steps reference scenario IDs, generating test stubs from `scenarios.md` that developers fill in, or using a Gherkin-compatible test runner that maps scenarios to executable tests. The goal is to close the gap between the validation contract (scenarios) and actual verification (tests).
+
+### 4. Add a Requirements-to-Code Review Skill
+
+Create a skill that reads the feature's `requirements.md` and `scenarios.md`, then inspects the actual codebase to verify that documented behaviors are implemented. This would bridge the gap between document review and code review.
+
+### 5. Address Document Staleness Systematically
+
+Options include: a periodic "documentation health check" skill that re-runs reviews against shipped features, tagging each document with a "last verified" date, or treating `product/` as historical records (accurate at time of shipping) and maintaining current state separately in the technical reference.
+
+### 6. Consider a Global Decisions Log
+
+The Decisions table in `requirements.md` is feature-scoped, but architectural decisions often span features. A dedicated global decisions log (similar to ADRs) would provide a centralized record of cross-cutting decisions. This is distinct from the technical reference (which documents the current state) in that it documents the reasoning behind the current state.
+
+### 7. Formalize the Roadmap-to-Change Lifecycle
+
+The transition from `roadmap/` to `changes/` is not documented. When the team starts working on a roadmap item, do they create a change request that references it? Is the roadmap item updated? The lifecycle from roadmap to product should be explicit.
+
+### 8. Document the AI Agent's Working Context
+
+The framework implicitly assumes the AI agent reads all documents in the change folder plus the technical reference. This should be explicit: what exactly does the AI agent receive as context during each phase? If the context window is limited, which documents take priority? This becomes critical as the project grows and cumulative document size may exceed context limits.
+
+## Document Ordering
+
+The current ordering — requirements, then plan, then scenarios — is mostly sound, but there is a valid argument for generating scenarios before or alongside the plan.
+
+**Current order (requirements -> plan -> scenarios):** The plan is generated first, then scenarios. This means scenarios do not influence the plan. If scenario generation reveals edge cases the plan does not handle, the plan must be revised retroactively.
+
+**Alternative order (requirements -> scenarios -> plan):** Generating scenarios first would force the team to think about validation before implementation, more aligned with BDD and TDD principles. Edge cases discovered during scenario writing would be available when the plan is generated, potentially producing a more robust plan.
+
+**Practical note:** In the current workflow, both plan and scenarios are generated from requirements in the same step, so the ordering is somewhat moot — they are produced together. However, the review process should check that scenarios influenced the plan, not just that they are consistent with it.
+
+## Human-AI Collaboration Model
+
+The collaboration model is well-designed: humans own the requirements and all approval decisions; the AI handles generation and mechanical review. This avoids the failure mode of fully autonomous AI development (where the AI builds the wrong thing) while leveraging AI for the tasks it does well (applying standards consistently, generating comprehensive scenarios, reviewing against checklists).
+
+One concern: the framework relies heavily on the team's ability to review AI-generated documents and catch semantic errors. As documents become more complex, this review burden grows. The standards and review skills help, but they cannot substitute for domain understanding. Teams adopting this framework should invest in document review skills as a core competency.
+
+## Scalability Concerns
+
+### Document Volume
+
+As the project grows, `product/` will accumulate many feature folders. Navigation and cross-referencing become harder. The index files help, but searching for "where did we decide X?" across dozens of feature folders is cumbersome. A search-friendly format or cross-referencing tool would help.
+
+### Context Window Limits
+
+The AI agent's ability to ingest all documents depends on context window size. A project with 50 features, each with 6 documents, produces 300+ documents. Not all of these fit in a single context window. The framework should document a prioritization strategy (e.g., always include the change folder + technical reference; include product documents only when referenced as dependencies).
+
+### Standards Maintenance
+
+As standards evolve, previously shipped features may not conform to current standards. Re-reviewing old documents against new standards could generate noise. The framework should clarify whether standards are versioned or whether `product/` documents are expected to conform to the standards that were current when they shipped.
+
+### Multi-Person Teams
+
+The framework is currently optimized for a single developer working with an AI agent. In a multi-person team, document ownership, review assignments, and conflict resolution need additional process. Who reviews the requirements? Can two team members work on overlapping changes simultaneously? These questions are not yet addressed.
