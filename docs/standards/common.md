@@ -11,6 +11,9 @@ Every documentation file must be reviewed against these checks in addition to it
 - **Security surface**: New user inputs, external integrations, or data flows have security implications addressed per `docs/technical/security.md`.
 - **UI/UX alignment**: If UI changes are proposed, they follow `docs/technical/ui-ux.md` guidelines.
 - **Testing alignment**: Test approach follows `docs/technical/testing.md` patterns.
+- **Link validation**: All internal links to other docs and anchor headings must resolve. Flag broken or dead links.
+- **Code reference accuracy**: File paths, function names, CLI commands, and environment variables mentioned in the doc must exist in the codebase. Flag references that don't match reality.
+- **Staleness detection**: Flag references to features, code patterns, or files that no longer exist in the codebase.
 - **Typos and grammar**: Catch spelling mistakes, grammatical errors, and formatting issues.
 - **Scope creep detection**: Flag anything that introduces unnecessary complexity for the stated goal.
 - **Performance considerations**: Are potential bottlenecks (large lists, frequent re-renders, heavy queries) addressed?
