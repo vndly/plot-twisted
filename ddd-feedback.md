@@ -13,14 +13,6 @@ The minimum document set (requirements + plan + scenarios) is appropriate for fe
 
 Define a threshold (e.g., changes touching fewer than 3 files, bug fixes with a clear root cause) below which the full document pipeline is optional. A "quick change" template might require only a brief description, the files affected, and a single acceptance criterion. This preserves the spirit of documentation without the overhead.
 
-## Document Ordering
-
-The current ordering — requirements, then plan, then scenarios — is mostly sound, but there is a valid argument for generating scenarios before or alongside the plan.
-
-**Alternative order (requirements -> scenarios -> plan):** Generating scenarios first would force the team to think about validation before implementation, more aligned with BDD and TDD principles. Edge cases discovered during scenario writing would be available when the plan is generated, potentially producing a more robust plan.
-
-**Practical note:** In the current workflow, both plan and scenarios are generated from requirements in the same step, so the ordering is somewhat moot — they are produced together. However, the review process should check that scenarios influenced the plan, not just that they are consistent with it.
-
 ## Human-AI Collaboration Model
 
 The collaboration model is well-designed: humans own the requirements and all approval decisions; the AI handles generation and mechanical review. This avoids the failure mode of fully autonomous AI development (where the AI builds the wrong thing) while leveraging AI for the tasks it does well (applying standards consistently, generating comprehensive scenarios, reviewing against checklists).
