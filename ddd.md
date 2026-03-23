@@ -42,11 +42,11 @@ A phased, step-by-step implementation plan that the AI agent will follow to writ
 - **Purpose**: Break the requirements into concrete, ordered implementation steps. Each step should be specific enough that two developers (or agents) following the plan independently would produce the same result.
 - **When produced**: After requirements are reviewed and approved.
 - **Who produces it**: The AI agent, from the requirements. The team reviews and refines.
-- **Key sections**: Phases with numbered steps and checkboxes, file paths, dependencies between steps, verification phase, testing phase. The testing phase should specify that tests are written before implementation code (test-first), mapping each test file to the scenario IDs it covers.
+- **Key sections**: Phases with numbered steps and checkboxes, file paths, dependencies between steps, verification phase, testing phase. The testing phase should specify that tests are written before implementation code (test-first), mapping each test file to the scenario IDs it covers and the test layer it operates at (as defined by the project's testing standards). A single scenario may require coverage across multiple layers — for example, `SC-04-01` might need a Domain test for input validation, an Infrastructure test for persistence, and an Application test for orchestration.
 
 #### 3. Scenarios (`scenarios.md`)
 
-Validation scenarios in Gherkin format that define the observable behaviors the implementation must satisfy. Scenarios are the single source of truth for *what* to test; the plan's testing phase defines *how* by mapping test files back to scenario IDs.
+Validation scenarios in Gherkin format that define the observable behaviors the implementation must satisfy. Scenarios are the single source of truth for *what* to test; the plan's testing phase defines *how* by mapping test files back to scenario IDs with their test layer.
 
 - **Purpose**: Define the contract between requirements and implementation in a testable format. Cover happy paths, error paths, edge cases, and boundary values.
 - **When produced**: After requirements are reviewed, typically alongside the plan.
@@ -117,7 +117,7 @@ The DDD workflow has five phases. Each phase has clear inputs, outputs, and qual
 
 ### Phase D: Validation
 
-9. **Validate** — The team verifies that all scenarios in `scenarios.md` are covered by passing tests. The plan's testing phase maps each test file to the scenario IDs it covers, ensuring every scenario has a corresponding test and every test traces back to the validation contract. Tests that verify implementation details (e.g., schema parsing, migration logic) are marked as such rather than linked to scenarios. Since tests were written during implementation, this phase focuses on confirming completeness — not writing new tests.
+9. **Validate** — The team verifies that all scenarios in `scenarios.md` are covered by passing tests. The plan's testing phase maps each test file to the scenario IDs it covers along with the test layer, ensuring every scenario has appropriate coverage across the required layers and every test traces back to the validation contract. Tests that verify implementation details (e.g., schema parsing, migration logic) are marked as such rather than linked to scenarios. Since tests were written during implementation, this phase focuses on confirming completeness — not writing new tests.
 
 ### Phase E: Completion
 
