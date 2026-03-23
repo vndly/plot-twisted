@@ -4,22 +4,6 @@ Its main challenges are around handling small changes (where the process overhea
 
 DDD could incorporate TDD within the implementation phase. Currently the framework does not prescribe how the AI agent writes tests during implementation, which is a gap.
 
-### Documentation-Driven Development (Tom Preston-Werner)
-
-Preston-Werner's original 2010 blog post proposed writing the README before the code to force developers to think about the user experience. DDD extends this idea dramatically: instead of one document (the README), there are six document types in a prescribed order with enforced standards. Preston-Werner's approach was a philosophy; DDD is an engineered system.
-
-### Amazon's Working Backwards
-
-Amazon writes a mock press release and FAQ before building a product. The intent is similar to DDD's requirements phase: force clarity of thinking before committing engineering resources. Amazon's approach is lighter (one narrative document vs. a structured pipeline) and targets product-market fit rather than implementation quality. DDD is more concerned with getting the code right than with validating whether the feature should exist.
-
-### Literate Programming (Knuth)
-
-Knuth interleaved prose and code in a single artifact. DDD keeps documents and code separate, using documents as inputs to code generation rather than co-locating them. The philosophy differs: Knuth wanted documentation to be the primary artifact that happened to produce executable code; DDD treats documents as a means to produce better AI-generated code.
-
-### Design by Contract (Meyer)
-
-Design by Contract specifies preconditions, postconditions, and invariants at the function level. DDD's acceptance criteria and Gherkin scenarios operate at a higher level of abstraction (feature behavior rather than function contracts). They serve similar purposes — defining the contract the implementation must satisfy — but at different granularities.
-
 ## Strengths
 
 ### 1. Rigorous Standards with Mechanical Enforcement
