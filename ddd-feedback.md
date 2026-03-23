@@ -13,14 +13,6 @@ The minimum document set (requirements + plan + scenarios) is appropriate for fe
 
 Define a threshold (e.g., changes touching fewer than 3 files, bug fixes with a clear root cause) below which the full document pipeline is optional. A "quick change" template might require only a brief description, the files affected, and a single acceptance criterion. This preserves the spirit of documentation without the overhead.
 
-### 5. Formalize the Roadmap-to-Change Lifecycle
-
-The transition from `roadmap/` to `changes/` is not documented. When the team starts working on a roadmap item, do they create a change request that references it? Is the roadmap item updated? The lifecycle from roadmap to product should be explicit.
-
-### 6. Document the AI Agent's Working Context
-
-The framework implicitly assumes the AI agent reads all documents in the change folder plus the technical reference. This should be explicit: what exactly does the AI agent receive as context during each phase? If the context window is limited, which documents take priority? This becomes critical as the project grows and cumulative document size may exceed context limits.
-
 ## Document Ordering
 
 The current ordering — requirements, then plan, then scenarios — is mostly sound, but there is a valid argument for generating scenarios before or alongside the plan.
