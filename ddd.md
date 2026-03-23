@@ -46,7 +46,7 @@ A phased, step-by-step implementation plan that the AI agent will follow to writ
 
 #### 3. Scenarios (`scenarios.md`)
 
-Validation scenarios in Gherkin format (GIVEN/WHEN/THEN) that define the observable behaviors the implementation must satisfy.
+Validation scenarios in Gherkin format that define the observable behaviors the implementation must satisfy.
 
 - **Purpose**: Define the contract between requirements and implementation in a testable format. Cover happy paths, error paths, edge cases, and boundary values.
 - **When produced**: After requirements are reviewed, typically alongside the plan.
@@ -80,16 +80,14 @@ Post-implementation record documenting what was actually built, including files 
 
 DDD organizes documents into directories that reflect the lifecycle of a change.
 
-| Directory    | Purpose                                                                                                                                                           |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `changes/`   | In-progress change requests. Each subdirectory contains the document set for an active change.                                                                    |
-| `product/`   | Completed changes. Moved here from `changes/` when the team accepts the implementation.                                                                           |
-| `standards/` | Review checklists for each document type, plus common checks applied to all documents. These are rules about documents, not about the application.                |
-| `technical/` | Application-level rules: architecture, conventions, API design, data model, security, UI/UX, testing. These are rules about the application, not about documents. |
-| `reference/` | Project context: product vision, glossary, setup guide, deployment instructions. Useful for onboarding and for the AI agent to understand the project.            |
-| `roadmap/`   | Future changes not yet started. Items move to `changes/` when work begins.                                                                                        |
-
-The separation between `standards/` (rules about documents) and `technical/` (rules about the application) is deliberate. Standards govern how documents are written and reviewed. Technical docs govern how the application is built. They evolve independently.
+| Directory    | Purpose                                                                                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `roadmap/`   | Future changes not yet started. Each item is a high-level description of a planned feature or improvement, ordered by priority.                        |
+| `changes/`   | In-progress change requests. When the team decides to start working on a roadmap item, it moves here and the team begins creating its document set.    |
+| `product/`   | Completed changes. Moved here from `changes/` when the team accepts the implementation.                                                                |
+| `standards/` | Review checklists for each document type. These govern how documents are written and reviewed.                                                         |
+| `technical/` | Application-level rules. These govern how the application is built.                                                                                    |
+| `reference/` | Project context: product vision, glossary, setup guide, deployment instructions. Useful for onboarding and for the AI agent to understand the project. |
 
 ## Workflow
 
