@@ -2,6 +2,8 @@
 
 Design specification for the app's interface. All styling uses Tailwind utility classes and the theme config — no inline styles or separate CSS files.
 
+> **AI assistance**: Always use the `frontend-design` skill when making UI/UX changes to the app.
+
 ## 1. Visual Identity
 
 - **Aesthetic** — Dark cinematic feel. Immersive backgrounds, hero imagery, and rich media. The app should feel like a movie theater, not a spreadsheet.
