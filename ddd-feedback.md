@@ -1,20 +1,8 @@
 # DDD Framework Feedback
 
-Comprehensive feedback on the Document Driven Development framework: assessment, comparisons, strengths, weaknesses, and improvement suggestions.
-
-## Overall Assessment
-
-Document Driven Development is a thoughtful and well-executed framework that addresses a real and growing problem: how to get consistently good results from AI coding agents. The core thesis — that the quality of AI-generated code is a function of the quality of the context it receives — is sound and increasingly validated by the experience of teams using LLM-based tools.
-
-The framework operationalizes this insight with a clear document pipeline, mechanical review standards, and AI skills that automate the tedious parts of the process. The implementation in this project is impressive: the standards files are genuinely rigorous, the review skill is architecturally sophisticated (parallel sub-agents for per-file review plus a cross-cutting sub-agent for multi-file consistency), and the real-world examples demonstrate that the framework works in practice.
-
-The framework is at its strongest when handling medium-to-large changes that benefit from structured thinking. Its main challenges are around handling small changes (where the process overhead may not be justified), managing document staleness after shipping, and closing the gap between validation scenarios and actual test execution.
+Its main challenges are around handling small changes (where the process overhead may not be justified), managing document staleness after shipping, and closing the gap between validation scenarios and actual test execution.
 
 ## Similar Frameworks
-
-### Spec-Driven Development
-
-DDD is essentially spec-driven development with two key additions: (a) the spec is decomposed into multiple typed documents with individual standards, and (b) AI skills automate generation and review. Traditional spec-driven development leaves the spec as a monolithic artifact and relies on human discipline for quality. DDD mechanizes the quality checks.
 
 ### Behavior-Driven Development (BDD)
 

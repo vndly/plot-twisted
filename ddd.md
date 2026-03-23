@@ -146,7 +146,7 @@ Seven principles guide the framework:
 
 ## Tooling
 
-DDD is tool-agnostic in principle but benefits greatly from AI-powered automation. The current implementation uses skills to automate four key functions:
+DDD is tool-agnostic in principle but benefits greatly from AI-powered automation. The current implementation uses skills to automate the tedious parts of the process across four key functions:
 
 - **Document creation** — An AI skill acts as a technical writer, helping the team draft and structure documents according to standards.
 - **Document review** — A review skill spawns parallel sub-agents to check each document against common and file-specific standards, then performs cross-cutting checks for multi-document consistency.
