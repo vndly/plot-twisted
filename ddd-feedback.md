@@ -13,12 +13,6 @@ The minimum document set (requirements + plan + scenarios) is appropriate for fe
 
 Define a threshold (e.g., changes touching fewer than 3 files, bug fixes with a clear root cause) below which the full document pipeline is optional. A "quick change" template might require only a brief description, the files affected, and a single acceptance criterion. This preserves the spirit of documentation without the overhead.
 
-## Human-AI Collaboration Model
-
-The collaboration model is well-designed: humans own the requirements and all approval decisions; the AI handles generation and mechanical review. This avoids the failure mode of fully autonomous AI development (where the AI builds the wrong thing) while leveraging AI for the tasks it does well (applying standards consistently, generating comprehensive scenarios, reviewing against checklists).
-
-One concern: the framework relies heavily on the team's ability to review AI-generated documents and catch semantic errors. As documents become more complex, this review burden grows. The standards and review skills help, but they cannot substitute for domain understanding. Teams adopting this framework should invest in document review skills as a core competency.
-
 ## Scalability Concerns
 
 ### Document Volume
