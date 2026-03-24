@@ -1,7 +1,6 @@
 # Plot Twisted
 
 - What actual ui/ux are we going to use?
-- Move ddd.md to Google Docs
 
 Commands
 
