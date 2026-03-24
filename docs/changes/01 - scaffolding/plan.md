@@ -329,12 +329,12 @@ Each view follows the same pattern: `<script setup>` imports `EmptyState`, the l
 
 - [ ] Create one test file per view in `tests/presentation/views/`:
 
-| Test File                  | Verifies                                                          |
-| :------------------------- | :---------------------------------------------------------------- |
-| `home-screen.test.ts`      | Renders `<EmptyState>` with `Home` icon and `page.home.title`         |
-| `calendar-screen.test.ts`  | Renders `<EmptyState>` with `CalendarDays` icon and `page.calendar.title` |
-| `library-screen.test.ts`   | Renders `<EmptyState>` with `BookMarked` icon and `page.library.title`    |
-| `settings-screen.test.ts`  | Renders `<EmptyState>` with `Settings` icon and `page.settings.title`     |
+| Test File                 | Verifies                                                                  |
+| :------------------------ | :------------------------------------------------------------------------ |
+| `home-screen.test.ts`     | Renders `<EmptyState>` with `Home` icon and `page.home.title`             |
+| `calendar-screen.test.ts` | Renders `<EmptyState>` with `CalendarDays` icon and `page.calendar.title` |
+| `library-screen.test.ts`  | Renders `<EmptyState>` with `BookMarked` icon and `page.library.title`    |
+| `settings-screen.test.ts` | Renders `<EmptyState>` with `Settings` icon and `page.settings.title`     |
 
 ---
 

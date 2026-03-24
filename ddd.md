@@ -46,7 +46,7 @@ A phased, step-by-step implementation plan that the AI agent will follow to writ
 
 #### 3. Scenarios (`scenarios.md`)
 
-Validation scenarios in Gherkin format that define the observable behaviors the implementation must satisfy. Scenarios are the single source of truth for *what* to test; the plan's testing phase defines *how* by mapping test files back to scenario IDs with their test layer.
+Validation scenarios in Gherkin format that define the observable behaviors the implementation must satisfy. Scenarios are the single source of truth for _what_ to test; the plan's testing phase defines _how_ by mapping test files back to scenario IDs with their test layer.
 
 - **Purpose**: Define the contract between requirements and implementation in a testable format. Cover happy paths, error paths, edge cases, and boundary values.
 - **When produced**: After requirements are reviewed, typically alongside the plan.
@@ -113,6 +113,7 @@ The DDD workflow has five phases. Each phase has clear inputs, outputs, and qual
    3. **Refactor** — Clean up the implementation while keeping all tests green.
 
    After implementation, the agent generates `implementation.md` documenting what was built.
+
 8. **Code review** — The team uses a code review skill to audit the changed files against the project's technical reference.
 
 ### Phase D: Validation
