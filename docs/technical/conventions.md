@@ -99,7 +99,7 @@ The app is fully internationalized. `Settings.language` (ISO 639-1, e.g. `"en"`)
 
 ### Library
 
-[vue-i18n v10](https://vue-i18n.intlify.dev/) in Composition API mode (`legacy: false`) with `@intlify/unplugin-vue-i18n` for Vite build-time message compilation. The Vite plugin pre-compiles translation JSON at build time, stripping the runtime message compiler from production bundles.
+[vue-i18n v11](https://vue-i18n.intlify.dev/) in Composition API mode (`legacy: false`) with `@intlify/unplugin-vue-i18n` for Vite build-time message compilation. The Vite plugin pre-compiles translation JSON at build time, stripping the runtime message compiler from production bundles.
 
 ### Translation Files
 

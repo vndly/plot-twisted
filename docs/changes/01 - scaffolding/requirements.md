@@ -75,24 +75,24 @@ The project has a fully configured build pipeline and tooling (phase 00) but ren
 
 | ID    | Requirement                | Description                                                                                                                                                                                                                                                                                                               | Priority |
 | :---- | :------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------- |
-| SC-01 | Vue Router setup           | `vue-router@^4` installed, `createWebHistory()`, router registered in `main.ts`. Routes defined in `src/presentation/router.ts`.                                                                                                                                                                                          | P0       |
+| SC-01 | Vue Router setup           | `vue-router@^4` installed; `@vue/test-utils@^2` installed as dev dependency. `createWebHistory()`, router registered in `main.ts`. Routes defined in `src/presentation/router.ts`.                                                                                                                                                                                          | P0       |
 | SC-02 | Route definitions          | 4 named routes (home `/`, calendar `/calendar`, library `/library`, settings `/settings`) plus catch-all `/:pathMatch(.*)*` redirecting to `/`.                                                                                                                                                                           | P0       |
 | SC-03 | Route lazy loading         | All 4 view components loaded via dynamic `import()` for code splitting.                                                                                                                                                                                                                                                   | P0       |
 | SC-04 | App shell layout           | Flexbox layout with fixed sidebar on the left and scrollable content area on the right. Sidebar hidden below `md`, bottom nav shown instead.                                                                                                                                                                              | P0       |
 | SC-05 | Desktop sidebar            | Fixed left panel (`w-56`, dark background), app title at top, 4 nav items as `<RouterLink>` elements with lucide icons and translated labels.                                                                                                                                                                             | P0       |
 | SC-06 | Mobile bottom nav          | Fixed bottom bar visible below `md` breakpoint. Same 4 nav items with icons. `z-10` stacking above content, below modals/toasts.                                                                                                                                                                                          | P0       |
-| SC-07 | Active route highlighting  | Active nav item highlighted with teal accent (left border + background tint in sidebar, teal icon/text in bottom nav). Home route uses exact matching.                                                                                                                                                                    | P0       |
+| SC-07 | Active route highlighting  | Active nav item highlighted with accent color (left border + background tint in sidebar, accent-colored icon/text in bottom nav). Home route uses exact matching.                                                                                                                                                                    | P0       |
 | SC-08 | Page header                | Sticky header at the top of the content area showing the current page name, translated via route `meta.titleKey`.                                                                                                                                                                                                         | P0       |
 | SC-09 | Route transitions          | `<Transition name="fade" mode="out-in">` wrapping `<RouterView>`. 200ms opacity fade between views. Respects `prefers-reduced-motion`.                                                                                                                                                                                    | P1       |
-| SC-10 | Document title             | `router.afterEach` guard sets `document.title` to `${t(meta.titleKey)} — Plot Twisted`.                                                                                                                                                                                                                                   | P1       |
+| SC-10 | Document title             | `router.afterEach` guard sets `document.title` to `${t(meta.titleKey)} — ${t('app.title')}`.                                                                                                                                                                                                                                   | P1       |
 | SC-11 | Scroll-to-top              | Router `scrollBehavior` returns `{ top: 0 }` on every navigation.                                                                                                                                                                                                                                                         | P1       |
 | SC-12 | i18n keys                  | Navigation labels (`nav.*`), page titles (`page.*.title`), empty state text (`common.empty.*`), error text (`common.error.*`), and toast labels (`toast.*`) added to en.json, es.json, fr.json.                                                                                                                           | P0       |
-| SC-13 | Toast notification system  | `useToast()` composable with module-level reactive state. `addToast(options)` pushes a toast with auto-dismiss (~4s). `removeToast(id)` removes it. Toast types: error (red), success (green), info (teal).                                                                                                               | P0       |
+| SC-13 | Toast notification system  | `useToast()` composable with module-level reactive state. `addToast(options)` pushes a toast (options: `{ message, type, action?: { label: string, handler: () => void } }`) with auto-dismiss after `TOAST_DISMISS_MS` (default 4000ms, from `src/domain/constants.ts`). `removeToast(id)` removes it. Toast types: error (error color), success (success color), info (accent color).                                                                                                               | P0       |
 | SC-14 | Toast container            | Fixed top-right container (`z-50`) rendering the toast queue with `<TransitionGroup>` (slide-in from right, fade-out). Each toast has dismiss button and optional action button.                                                                                                                                          | P0       |
 | SC-15 | Modal/dialog               | `useModal()` composable (single-instance). `modal-dialog.vue` with backdrop (`bg-black/50`), centered content card, title, optional body, confirm/cancel buttons. Closes on backdrop click and Escape key.                                                                                                                | P1       |
-| SC-16 | Empty state component      | Centered layout with optional lucide icon, title (white bold), description (muted), optional CTA. Props: `icon`, `title`, `description`.                                                                                                                                                                                  | P0       |
+| SC-16 | Empty state component      | Centered layout with optional lucide icon, title (white bold), description (muted), optional CTA. Props: `icon` (Component, optional), `title` (string), `description` (string, optional), `ctaLabel` (string, optional), `ctaAction` (() => void, optional).                                                                                                                                                                                  | P0       |
 | SC-17 | Skeleton loader            | Reusable shimmer placeholder. Props: `width`, `height`, `rounded`. Renders a div with `animate-pulse bg-surface`.                                                                                                                                                                                                         | P1       |
-| SC-18 | Error boundary             | `onErrorCaptured` wrapper component. Normal state: renders slot. Error state: centered fallback with translated heading, description, and reload button.                                                                                                                                                                  | P0       |
+| SC-18 | Error boundary             | `onErrorCaptured` wrapper component. Normal state: renders slot. Error state: centered fallback with translated heading, description, and reload button (calls `window.location.reload()`).                                                                                                                                                                  | P0       |
 | SC-19 | Global error handler       | `app.config.errorHandler` in `main.ts` logs errors and dispatches an error toast via `useToast()`.                                                                                                                                                                                                                        | P0       |
 | SC-20 | Placeholder views          | 4 view components (one per route), each rendering `<EmptyState>` with the page's lucide icon and translated title.                                                                                                                                                                                                        | P0       |
 | SC-21 | Tailwind theme additions   | Add `--color-success: #22c55e` and `--color-error: #ef4444` to the `@theme` block for toast type accents.                                                                                                                                                                                                                 | P1       |
@@ -120,7 +120,7 @@ The project has a fully configured build pipeline and tooling (phase 00) but ren
 
 ### Architecture Compliance
 
-- **Layer boundaries:** All new files live in `src/presentation/` (components, composables, views, router). No application/domain/infrastructure changes.
+- **Layer boundaries:** All new files live in `src/presentation/` (components, composables, views, router). No application/domain/infrastructure changes. Note: toast and modal composables live in `src/presentation/composables/` rather than `src/application/` because they manage UI-only state with no domain or infrastructure dependencies.
 - **i18n mandatory:** All user-facing strings use `$t()` or `useI18n()`.
 - **SFC block order:** `<script setup>` then `<template>` then `<style>` (rare).
 - **File naming:** kebab-case for all component and composable files.
@@ -128,7 +128,7 @@ The project has a fully configured build pipeline and tooling (phase 00) but ren
 
 ### Testing
 
-- **Framework:** Vitest with jsdom environment (already configured).
+- **Framework:** Vitest with jsdom environment. Additional configuration required this phase: `globals: true`, `include`, `setupFiles`, and `tests/setup.ts`.
 - **Test types:** Unit tests for composables and router logic; component tests for Vue components using `@vue/test-utils`.
 - **File naming:** `*.test.ts` files in a dedicated `tests/` folder at the project root, mirroring the `src/` directory structure.
 - **Coverage target:** All composables and all components introduced in this phase must have tests.
@@ -139,16 +139,16 @@ The project has a fully configured build pipeline and tooling (phase 00) but ren
 - Page content: default (`z-0`)
 - Bottom nav: `z-10`
 - Toast container: `z-50`
-- Modal backdrop: `z-50`
+- Modal backdrop: `z-40`
 
 ## Acceptance Criteria
 
 - [ ] `npm run dev` starts and renders the app shell with sidebar navigation (desktop)
 - [ ] Resizing below 768px hides sidebar and shows bottom navigation bar
 - [ ] Clicking each of the 4 nav items navigates to the corresponding placeholder view
-- [ ] Active nav item is highlighted with teal accent in both sidebar and bottom nav
+- [ ] Active nav item is highlighted with accent color in both sidebar and bottom nav
 - [ ] Page header displays the translated name of the current page
-- [ ] Document title updates to `"{Page Name} — Plot Twisted"` on navigation
+- [ ] Document title updates to `"{Page Name} — {App Name}"` pattern on navigation (using i18n for both parts)
 - [ ] Route transitions fade in/out at 200ms
 - [ ] Navigating to `/nonexistent` redirects to `/`
 - [ ] Page scrolls to top on every route change
@@ -162,7 +162,22 @@ The project has a fully configured build pipeline and tooling (phase 00) but ren
 - [ ] All UI primitive components (EmptyState, SkeletonLoader, ErrorBoundary, ToastContainer, ModalDialog) have component tests
 - [ ] Sidebar and BottomNav components have component tests covering rendering and active state
 - [ ] Each placeholder view has a component test
-- [ ] `npm run type-check` reports zero TypeScript errors
-- [ ] `npm run lint` reports zero ESLint errors
-- [ ] `npm run format:check` reports zero formatting issues
-- [ ] `npm run build` produces a successful production build
+- [ ] Tailwind theme includes `--color-success` and `--color-error` custom colors in `main.css` `@theme` block (SC-21)
+- [ ] en.json, es.json, and fr.json contain all required i18n key namespaces: `nav.*`, `page.*.title`, `common.empty.*`, `common.error.*`, `toast.*` (SC-12)
+- [ ] Opening a second modal replaces the first — single-instance behavior (SC-15)
+- [ ] `npm run check` passes — full pipeline (format, lint:fix, type-check, test, build)
+
+## Risks & Assumptions
+
+### Risks
+
+- **Firebase SPA fallback:** `createWebHistory()` requires the server to return `index.html` for all routes. If Firebase SPA rewrite is not configured, direct navigation or page refresh on any non-root route will 404. **Mitigation:** Verify Firebase `hosting.rewrites` configuration from Phase 00.
+- **Vitest config gap:** The existing `vitest.config.ts` only sets `environment: 'jsdom'`. Missing settings (`globals`, `include`, `setupFiles`) must be added before tests will run correctly. **Mitigation:** Addressed as the first step in the implementation plan.
+- **Transition duration cap enforcement:** The NFR caps transitions at 300ms, but toast enter (slide from right) may feel rushed at 200ms. **Mitigation:** Toast transitions use up to 300ms; verify UX during manual testing.
+
+### Assumptions
+
+- Phase 00 (Setup) is complete and all listed dependencies are installed and working.
+- The `@theme` block in `main.css` supports custom color additions without conflicts.
+- `vue-i18n` global instance is accessible via `i18n.global.t()` outside component `setup()` for the global error handler and router guard.
+- `app.title` i18n key already exists in locale files from Phase 00.
