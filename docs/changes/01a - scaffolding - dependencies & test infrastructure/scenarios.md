@@ -10,13 +10,13 @@ The project SHALL have `vue-router@^4` as a runtime dependency and `@vue/test-ut
 
 #### Scenario: SC-01-01 — vue-router listed in dependencies
 
-GIVEN Phase 00 (Setup) is complete AND `vue-router@^4` has been installed
+GIVEN Phase 00 (Setup) is complete
 WHEN I inspect `package.json`
 THEN `vue-router` is listed under `dependencies` with a version satisfying `^4`
 
 #### Scenario: SC-01-02 — @vue/test-utils listed in devDependencies
 
-GIVEN Phase 00 (Setup) is complete AND `@vue/test-utils@^2` has been installed
+GIVEN Phase 00 (Setup) is complete
 WHEN I inspect `package.json`
 THEN `@vue/test-utils` is listed under `devDependencies` with a version satisfying `^2`
 
@@ -24,31 +24,33 @@ THEN `@vue/test-utils` is listed under `devDependencies` with a version satisfyi
 
 ### Requirement: SC-27 — Vitest configuration
 
-The Vitest configuration SHALL be updated with `globals: true`, correct file inclusion, and setup file reference.
+The Vitest configuration SHALL be updated with `globals: true`, correct file inclusion, setup file reference, and the existing `environment: 'jsdom'` setting preserved.
 
-Background:
-  GIVEN `vitest.config.ts` has been updated
-  WHEN I inspect the `test` block in the config
+#### Scenario Outline: SC-27-01 — Vitest config properties set correctly
 
-#### Scenario: SC-27-01 — Vitest globals enabled
+GIVEN `vitest.config.ts` has been updated
+WHEN I inspect the `test` block in the config
+THEN `<property>` is set to `<value>`
 
-THEN `globals` is set to `true`
+Examples:
+  | property   | value                    |
+  | globals    | true                     |
+  | include    | ["tests/**/*.test.ts"]   |
+  | setupFiles | ["./tests/setup.ts"]     |
 
-#### Scenario: SC-27-02 — Test file inclusion pattern
+#### Scenario: SC-27-02 — jsdom environment preserved
 
-THEN `include` is set to `["tests/**/*.test.ts"]`
+GIVEN `vitest.config.ts` has been updated
+WHEN I inspect the `test` block in the config
+THEN `environment` remains set to `'jsdom'`
 
-#### Scenario: SC-27-03 — Setup file configured
-
-THEN `setupFiles` is set to `["./tests/setup.ts"]`
-
-#### Scenario: SC-27-05 — Test runner starts without errors
+#### Scenario: SC-27-03 — Test runner starts without errors
 
 GIVEN all Phase 01a (Dependencies & Test Infrastructure) steps are complete
 WHEN I run `npm run test`
 THEN the Vitest runner starts and exits without configuration errors
 
-#### Scenario: SC-27-06 — Full CI check passes
+#### Scenario: SC-27-04 — Full CI check passes
 
 GIVEN all Phase 01a (Dependencies & Test Infrastructure) steps are complete
 WHEN I run `npm run check`
@@ -73,10 +75,12 @@ THEN localStorage is empty at the start of each test
 #### Scenario: SC-28-02 — TypeScript recognizes Vitest globals
 
 GIVEN `tests/setup.ts` includes `/// <reference types="vitest/globals" />`
-WHEN I open a `.test.ts` file in the editor
-THEN `describe`, `it`, `expect`, and `beforeEach` are recognized without explicit imports from `vitest`
+WHEN a `.test.ts` file uses `describe`, `it`, `expect`, and `beforeEach` without explicit imports from `vitest`
+THEN the file compiles with zero TypeScript errors
 
-#### Scenario: SC-28-03 — Missing setup file causes localStorage leaks
+#### Scenario: SC-28-03 — Without setup file, localStorage state leaks between tests (motivation)
+
+> This is a design-rationale scenario documenting why `tests/setup.ts` is needed. It is not a desired behavior to assert in CI, but rather motivation for SC-28-01. Implicitly validated by SC-27-01 (setupFiles configured) and SC-28-01 (localStorage cleared).
 
 GIVEN `vitest.config.ts` does NOT include `setupFiles: ["./tests/setup.ts"]`
 WHEN two tests run in sequence where the first writes to `localStorage` and the second reads from it

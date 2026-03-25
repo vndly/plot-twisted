@@ -20,10 +20,11 @@ Downstream scaffolding features (01b through 01k) need test infrastructure and r
 ### User Stories
 
 - As a developer working on phases 01b–01k, I need Vitest globals and `@vue/test-utils` available so I can write component and unit tests without additional setup.
+- As a developer working on phase 01d (Router), I need `vue-router` installed so I can configure routing without additional dependency setup.
 
 ### Dependencies
 
-- Phase 00 (Setup) complete — Vue 3, Vite, TypeScript, Tailwind v4, vue-i18n, lucide-vue-next all installed.
+- Phase 00 ([R-00](../../product/00%20-%20setup/requirements.md)) complete — Vue 3, Vite, TypeScript, Tailwind v4, vue-i18n, lucide-vue-next all installed.
 
 ## Decisions
 
@@ -61,11 +62,8 @@ Downstream scaffolding features (01b through 01k) need test infrastructure and r
 
 ### Testing
 
-- **Framework:** Vitest with jsdom environment. Additional configuration required this phase: `globals: true`, `include`, `setupFiles`, and `tests/setup.ts`.
-- **Test types:** This phase installs the infrastructure that enables unit tests (for composables and router logic) and component tests (using `@vue/test-utils`) in downstream phases. No tests are written in this phase.
-- **File naming:** `*.test.ts` files in a dedicated `tests/` folder at the project root, mirroring the `src/` directory structure.
-- **Coverage target:** Not applicable — no composables or components are introduced in this phase.
-- **CI integration (NFR-01a-01):** `npm run check` must pass with zero failures. This script applies auto-formatting and auto-linting before type-check, test, and build — it mutates files on disk rather than performing read-only verification.
+- **NFR-01a-01 (CI integration):** `npm run check` must pass with zero failures. This script applies auto-formatting and auto-linting before type-check, test, and build — it mutates files on disk rather than performing read-only verification.
+- **NFR-01a-02 (File naming):** All test files must use the `*.test.ts` naming convention under a dedicated `tests/` directory at the project root, mirroring the `src/` directory structure.
 
 ## Risks & Assumptions
 
@@ -77,8 +75,8 @@ Downstream scaffolding features (01b through 01k) need test infrastructure and r
 
 ### Risks
 
-- **`globals: true` may conflict with explicit Vitest imports:** If a downstream test file explicitly imports `describe`/`it`/`expect` from `vitest` while globals are enabled, TypeScript may flag duplicate declarations. Mitigation: project convention should mandate using globals without imports.
-- **TypeScript global type recognition:** Enabling `globals: true` in Vitest does not automatically make `describe`/`it`/`expect` visible to the TypeScript compiler. Mitigation: add `/// <reference types="vitest/globals" />` directive at the top of `tests/setup.ts` (specified in SC-28).
+- **`globals: true` may conflict with explicit Vitest imports:** If a downstream test file explicitly imports `describe`/`it`/`expect` from `vitest` while globals are enabled, TypeScript may flag duplicate declarations. Likelihood: Low. Impact: Medium (TypeScript compile errors in downstream tests). Mitigation: project convention should mandate using globals without imports; the code example in `docs/technical/testing.md` will be updated as part of this phase to remove the explicit import and align with this convention.
+- **TypeScript global type recognition:** Enabling `globals: true` in Vitest does not automatically make `describe`/`it`/`expect` visible to the TypeScript compiler. Likelihood: Low. Impact: High (all downstream test files would fail type-checking). Mitigation: add `/// <reference types="vitest/globals" />` directive at the top of `tests/setup.ts` (specified in SC-28).
 
 ## Acceptance Criteria
 
@@ -88,7 +86,7 @@ Downstream scaffolding features (01b through 01k) need test infrastructure and r
 - [ ] [SC-28] `tests/setup.ts` exists with `localStorage.clear()` in `beforeEach`
 - [ ] [SC-28] `tests/setup.ts` includes `/// <reference types="vitest/globals" />` for TypeScript global recognition
 - [ ] [SC-27] `npm run test` runs without config errors
-- [ ] [SC-27] `npm run check` passes with zero failures
+- [ ] [SC-27, NFR-01a-01] `npm run check` passes with zero failures (note: the `check` script runs `format` and `lint:fix` which may auto-fix files — this is inherited behavior from Phase 00, not introduced by this phase)
 
 ## Constraints
 
