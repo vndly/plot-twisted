@@ -66,7 +66,6 @@ See also [Conventions — Testing](./conventions.md#7-testing) for testing conve
 Every test follows the **Arrange-Act-Assert** pattern:
 
 ```ts
-import { describe, it, expect } from 'vitest'
 import { isHighRated } from '@/domain/movie.logic'
 
 describe('isHighRated', () => {

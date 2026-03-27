@@ -21,8 +21,8 @@ Add all i18n keys needed by the scaffolding phases (navigation labels, page titl
 
 ## Functional Requirements
 
-| ID    | Requirement | Description                                                                                                                                                                     | Priority |
-| :---- | :---------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------- |
+| ID    | Requirement | Description                                                                                                                                                                                     | Priority |
+| :---- | :---------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
 | SC-12 | i18n keys   | Navigation labels (`nav.*`), page titles (`page.*.title`), empty state text (`common.empty.*`), error text (`common.error.*`), and toast labels (`toast.*`) added to en.json, es.json, fr.json. | P0       |
 
 ## Non-Functional Requirements

@@ -21,9 +21,9 @@ Create the AppShell layout component that assembles all navigation, overlay, and
 
 ## Decisions
 
-| Decision                 | Choice                | Rationale                                                                                          |
-| :----------------------- | :-------------------- | :------------------------------------------------------------------------------------------------- |
-| Desktop-first responsive | `max-md:` breakpoints | Per conventions §10. Base styles target desktop; `max-md:` overrides adapt for mobile.             |
+| Decision                 | Choice                | Rationale                                                                              |
+| :----------------------- | :-------------------- | :------------------------------------------------------------------------------------- |
+| Desktop-first responsive | `max-md:` breakpoints | Per conventions §10. Base styles target desktop; `max-md:` overrides adapt for mobile. |
 
 ## Scope
 
@@ -33,10 +33,10 @@ Create the AppShell layout component that assembles all navigation, overlay, and
 
 ## Functional Requirements
 
-| ID    | Requirement       | Description                                                                                                                                    | Priority |
-| :---- | :---------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
-| SC-04 | App shell layout  | Flexbox layout with fixed sidebar on the left and scrollable content area on the right. Sidebar hidden below `md`, bottom nav shown instead.   | P0       |
-| SC-09 | Route transitions | `<Transition name="fade" mode="out-in">` wrapping `<RouterView>`. 200ms opacity fade between views. Respects `prefers-reduced-motion`.         | P1       |
+| ID    | Requirement       | Description                                                                                                                                  | Priority |
+| :---- | :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
+| SC-04 | App shell layout  | Flexbox layout with fixed sidebar on the left and scrollable content area on the right. Sidebar hidden below `md`, bottom nav shown instead. | P0       |
+| SC-09 | Route transitions | `<Transition name="fade" mode="out-in">` wrapping `<RouterView>`. 200ms opacity fade between views. Respects `prefers-reduced-motion`.       | P1       |
 
 ## Non-Functional Requirements
 

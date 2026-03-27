@@ -18,10 +18,10 @@ Configure Vue Router with 4 lazy-loaded routes, catch-all redirect, scroll-to-to
 
 ## Decisions
 
-| Decision            | Choice                 | Rationale                                                                                              |
-| :------------------ | :--------------------- | :----------------------------------------------------------------------------------------------------- |
-| Router history mode | `createWebHistory()`   | Clean URLs without hash fragments. Firebase SPA rewrite already handles fallback.                      |
-| Home route matching | Exact match only       | Prevents the Home nav item from appearing active on every route.                                       |
+| Decision            | Choice               | Rationale                                                                         |
+| :------------------ | :------------------- | :-------------------------------------------------------------------------------- |
+| Router history mode | `createWebHistory()` | Clean URLs without hash fragments. Firebase SPA rewrite already handles fallback. |
+| Home route matching | Exact match only     | Prevents the Home nav item from appearing active on every route.                  |
 
 ## Scope
 
@@ -31,14 +31,14 @@ Configure Vue Router with 4 lazy-loaded routes, catch-all redirect, scroll-to-to
 
 ## Functional Requirements
 
-| ID    | Requirement         | Description                                                                                                                                                                                                                                         | Priority |
-| :---- | :------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
-| SC-29 | Vue Router setup    | `vue-router@^4` installed; `@vue/test-utils@^2` installed as dev dependency. `createWebHistory()`, router registered in `main.ts`. Routes defined in `src/presentation/router.ts`. Note: the dependencies were installed in 01a.                     | P0       |
-| SC-02 | Route definitions   | 4 named routes (home `/`, calendar `/calendar`, library `/library`, settings `/settings`) plus catch-all `/:pathMatch(.*)*` redirecting to `/`.                                                                                                      | P0       |
-| SC-03 | Route lazy loading  | All 4 view components loaded via dynamic `import()` for code splitting.                                                                                                                                                                              | P0       |
-| SC-10 | Document title      | `router.afterEach` guard sets `document.title` to `${t(meta.titleKey)} — ${t('app.title')}`.                                                                                                                                                        | P1       |
-| SC-11 | Scroll-to-top       | Router `scrollBehavior` returns `{ top: 0 }` on every navigation.                                                                                                                                                                                    | P1       |
-| SC-22 | Router unit tests   | Tests for route definitions (4 named routes + catch-all), `scrollBehavior` returning `{ top: 0 }`, and `afterEach` guard setting `document.title`.                                                                                                   | P0       |
+| ID    | Requirement        | Description                                                                                                                                                                                                                      | Priority |
+| :---- | :----------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
+| SC-29 | Vue Router setup   | `vue-router@^4` installed; `@vue/test-utils@^2` installed as dev dependency. `createWebHistory()`, router registered in `main.ts`. Routes defined in `src/presentation/router.ts`. Note: the dependencies were installed in 01a. | P0       |
+| SC-02 | Route definitions  | 4 named routes (home `/`, calendar `/calendar`, library `/library`, settings `/settings`) plus catch-all `/:pathMatch(.*)*` redirecting to `/`.                                                                                  | P0       |
+| SC-03 | Route lazy loading | All 4 view components loaded via dynamic `import()` for code splitting.                                                                                                                                                          | P0       |
+| SC-10 | Document title     | `router.afterEach` guard sets `document.title` to `${t(meta.titleKey)} — ${t('app.title')}`.                                                                                                                                     | P1       |
+| SC-11 | Scroll-to-top      | Router `scrollBehavior` returns `{ top: 0 }` on every navigation.                                                                                                                                                                | P1       |
+| SC-22 | Router unit tests  | Tests for route definitions (4 named routes + catch-all), `scrollBehavior` returning `{ top: 0 }`, and `afterEach` guard setting `document.title`.                                                                               | P0       |
 
 ## Non-Functional Requirements
 

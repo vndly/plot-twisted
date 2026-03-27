@@ -17,8 +17,8 @@ Add Tailwind theme color tokens (success, error), all transition/animation CSS (
 
 ## Decisions
 
-| Decision                   | Choice               | Rationale                                                                                                                |
-| :------------------------- | :------------------- | :----------------------------------------------------------------------------------------------------------------------- |
+| Decision                   | Choice               | Rationale                                                                                                                                       |
+| :------------------------- | :------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Transition CSS in main.css | Global CSS exception | Vue `<Transition>` requires class-based CSS. Centralizing in `main.css` avoids duplication. Acknowledged exception to the "Tailwind only" rule. |
 
 ## Scope
@@ -32,10 +32,10 @@ Add Tailwind theme color tokens (success, error), all transition/animation CSS (
 
 ## Functional Requirements
 
-| ID    | Requirement              | Description                                                                                                                                                                     | Priority |
-| :---- | :----------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------- |
+| ID    | Requirement              | Description                                                                                                                                                                                                                                          | Priority |
+| :---- | :----------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
 | SC-21 | Tailwind theme additions | Add `--color-success: #22c55e` and `--color-error: #ef4444` to the `@theme` block for toast type accents. Note: these colors target the current dark theme only; light-theme counterparts will be added in the future theme-switching feature phase. | P1       |
-| SC-09 | Route transitions (CSS)  | `<Transition name="fade" mode="out-in">` wrapping `<RouterView>`. 200ms opacity fade between views. Respects `prefers-reduced-motion`. Note: this phase covers only the CSS definitions — the `<Transition>` wiring in the app shell is in 01k. | P1       |
+| SC-09 | Route transitions (CSS)  | `<Transition name="fade" mode="out-in">` wrapping `<RouterView>`. 200ms opacity fade between views. Respects `prefers-reduced-motion`. Note: this phase covers only the CSS definitions — the `<Transition>` wiring in the app shell is in 01k.      | P1       |
 
 > **Note:** `src/domain/constants.ts` is created in this phase with `TOAST_DISMISS_MS` only (additional constants defined in `data-model.md` will be added in their respective feature phases). This is an acknowledged architectural exception — a Domain layer file introduced during a Presentation-focused scaffolding phase.
 
