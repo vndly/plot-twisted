@@ -8,7 +8,7 @@
 
 Commands
 
-- /specify: TODO
+- /specify: DONE
 
 - /review: DONE
 

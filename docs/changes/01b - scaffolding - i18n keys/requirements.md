@@ -15,7 +15,7 @@ Add all i18n keys needed by the scaffolding phases (navigation labels, page titl
 
 ### Dependencies
 
-- Phase 00 (Setup) complete — vue-i18n installed, locale files exist with `app.title` key.
+- [Phase 00 (Setup)](../../product/00%20-%20setup/) complete — vue-i18n installed, locale files exist with `app.title` key.
 
 ## Decisions
 
@@ -28,24 +28,36 @@ Add all i18n keys needed by the scaffolding phases (navigation labels, page titl
 ### In Scope
 
 - Add `nav.*`, `page.*.title`, `common.empty.*`, `common.error.*`, `toast.*` keys to `en.json`, `es.json`, `fr.json`.
+- Verify that vue-i18n fallback to English works correctly for the scaffolded keys.
 
 ### Out of Scope
 
 - Vue component creation or modification.
-- vue-i18n instance configuration or locale switching logic.
+- vue-i18n instance configuration or locale switching logic (fallback verification for scaffolded keys is in scope).
 - i18n keys beyond the scaffolding namespaces listed above (e.g., `library.*`, `details.*`).
 
 ## Functional Requirements
 
-| ID    | Requirement | Description                                                                                                                                                                                                                                | Priority |
-| :---- | :---------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
-| SC-12 | i18n keys   | Navigation labels (`nav.*`), page titles (`page.*.title`), empty state text (`common.empty.*`), error text (`common.error.*`), and toast labels (`toast.*`) added to en.json, es.json, fr.json. See plan.md for the complete key manifest. | P0       |
+| ID    | Requirement | Description                                                                                                                                                                                                                                                                                                                                                                                                             | Priority |
+| :---- | :---------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
+| SC-12 | i18n keys   | Add 18 i18n keys across 5 namespaces to `en.json`, `es.json`, `fr.json`: **nav** — `home`, `recommendations`, `calendar`, `library`, `settings`; **page.\*.title** — `home`, `recommendations`, `calendar`, `library`, `settings`; **common.empty** — `title`, `description`; **common.error** — `title`, `description`, `reload`; **toast** — `error`, `dismiss`, `retry`. Existing `app.title` key must be preserved. | P0       |
 
 ## Non-Functional Requirements
 
 ### Key Structure Compliance
 
-- **camelCase nesting:** All key paths follow the camelCase nested structure defined in [conventions.md Section 11](../../technical/conventions.md#11-internationalization-i18n).
+- **camelCase nesting:** Every key segment in all locale JSON files must be a camelCase identifier (matching `^[a-z][a-zA-Z0-9]*$`). Verified by a unit test in `tests/presentation/i18n/locale-keys.test.ts` per [conventions.md Section 11](../../technical/conventions.md#11-internationalization-i18n).
+
+## Risks & Assumptions
+
+### Assumptions
+
+- Phase 00 (Setup) is complete: vue-i18n is installed, `src/presentation/i18n/index.ts` exists, and all three locale files contain the `app.title` key.
+- Spanish and French translations use standard UI terminology; native speaker review is deferred to a later phase.
+
+### Risks
+
+- **Translation accuracy** (low likelihood, low impact): Translations cannot be verified in context until downstream features (01i, 01j) render the keys in UI components. Mitigation: translations use standard, well-known UI terms.
 
 ## Acceptance Criteria
 
