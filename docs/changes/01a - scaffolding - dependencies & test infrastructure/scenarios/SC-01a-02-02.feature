@@ -1,0 +1,8 @@
+Feature: SC-01a-02 — Vitest configuration
+  The Vitest configuration SHALL be updated with `globals: true`, correct file inclusion,
+  setup file reference, and the existing `environment: 'jsdom'` setting preserved.
+
+  Scenario: SC-01a-02-02 — Test runner starts without errors
+    Given Phase 01a (Dependencies & Test Infrastructure) is complete
+    When I run `npm run test`
+    Then the Vitest runner starts and exits without configuration errors
