@@ -46,7 +46,7 @@ The `@` path alias (`@ → ./src`) is inherited from `vite.config.ts` via `merge
 
 > **Testing phase note:** No automated test files are produced in this phase because the scope is pure infrastructure with no testable application logic. Tests are deferred to downstream phases (01b–01k) that will use the infrastructure established here.
 
-> This phase has no user-facing scenarios. Verification confirms the infrastructure is correctly configured. See `scenarios.md` for scenario IDs.
+> This phase has no user-facing scenarios. Verification confirms the infrastructure is correctly configured. See [`scenarios/`](./scenarios/) for scenario IDs.
 
 ### Step 4 — Run verification checks (SC-01a-01, SC-01a-02, SC-01a-03)
 

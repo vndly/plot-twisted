@@ -14,3 +14,17 @@ Feature: SC-01a-02 — Vitest configuration
       | include     | ["tests/**/*.test.ts"] |
       | setupFiles  | ["./tests/setup.ts"]   |
       | environment | 'jsdom'                |
+
+  Scenario: SC-01a-02-02 — Test runner starts without errors
+    Given Phase 01a (Dependencies & Test Infrastructure) is complete
+    When I run `npm run test`
+    Then the Vitest runner starts and exits without configuration errors
+
+  Scenario: SC-01a-02-03 — Full CI check passes
+    Given Phase 01a (Dependencies & Test Infrastructure) is complete
+    When I run `npm run check`
+    Then format passes with zero failures
+    And lint passes with zero failures
+    And type-check passes with zero failures
+    And test passes with zero failures
+    And build passes with zero failures
