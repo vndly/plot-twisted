@@ -2,7 +2,6 @@
 
 - What actual ui/ux are we going to use?
 - What's the benefit of implementation.md?
-- One file per scenario
 - Add option to ignore an issue in the review command
 
 Commands

@@ -16,7 +16,7 @@ On-demand only, invoked via `/ddd-review <folder-path>` (path relative to projec
 ## Scope
 
 - Reviews a single feature, infrastructure, or bug-fix documentation folder against the project's technical reference (`docs/technical/`) and codebase.
-- After review, the user triages each finding interactively. Findings marked **Fix** are applied directly to the documentation files. Findings marked **Skip** are preserved in the final report.
+- After review, the user triages each finding interactively. Findings marked **Fix** are applied directly to the documentation files. Findings marked **Skip** are preserved in the final report. Findings marked **Ignore** are discarded entirely and excluded from the final report.
 
 ## 1. Initialization
 
@@ -279,10 +279,11 @@ Present each finding to the user for triage using `AskUserQuestion`, ordered by 
   - **Options**:
     1. **Fix** — "Apply the recommendation automatically"
     2. **Skip** — "Acknowledge but do not fix now"
-    3. **Discuss** — "I have questions or want to refine this"
+    3. **Ignore** — "Discard this finding entirely"
+    4. **Discuss** — "I have questions or want to refine this"
   - The built-in "Other" option is always available for custom input.
 - Continue presenting batches until all findings have been triaged.
-- After all findings are triaged, briefly summarize the decisions: how many marked Fix, Skip, and Discuss.
+- After all findings are triaged, briefly summarize the decisions: how many marked Fix, Skip, Ignore, and Discuss.
 
 ## 7. Discuss & Fix
 
@@ -294,7 +295,7 @@ For each finding the user marked **Discuss** (in finding order):
 
 - Present the finding in full (description, context, recommendation).
 - Actively engage in a conversation about it: ask clarifying questions, offer alternative approaches, or refine the recommendation based on the user's input.
-- At the end of the discussion, ask the user for a final decision on the finding: **Fix** (with the agreed-upon resolution), **Skip**, or provide a custom action.
+- At the end of the discussion, ask the user for a final decision on the finding: **Fix** (with the agreed-upon resolution), **Skip**, **Ignore**, or provide a custom action.
 
 ### 7.2 Fix
 
@@ -309,9 +310,10 @@ After all discussions are resolved, collect every finding marked **Fix** (both f
 Re-render the report from step 5, incorporating the triage and fix outcomes:
 
 - **Remove** all findings that were marked **Fix** (they have been resolved).
+- **Remove** all findings that were marked **Ignore** — these are fully discarded as if they were never found.
 - **Keep** all findings that were marked **Skip** — these remain in the report as a record of acknowledged-but-deferred issues.
-- **Move** any findings that were marked **Discuss** and then resolved to **Fix** out of the report (already resolved). If a discussed finding was ultimately **Skipped**, keep it in the report.
-- Add an **Open Discussion** section for any findings from Discuss that resulted in a custom action or open-ended outcome rather than a Fix or Skip.
+- **Move** any findings that were marked **Discuss** and then resolved to **Fix** or **Ignore** out of the report. If a discussed finding was ultimately **Skipped**, keep it in the report.
+- Add an **Open Discussion** section for any findings from Discuss that resulted in a custom action or open-ended outcome rather than a Fix, Skip, or Ignore.
 - Update the **Summary** counts and **Verdict** to reflect only the remaining (unresolved) findings.
 
 Present the final report using the Report Structure defined in step 5.
