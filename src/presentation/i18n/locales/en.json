@@ -1,5 +1,45 @@
 {
   "app": {
     "title": "Plot Twisted"
+  },
+  "nav": {
+    "home": "Home",
+    "recommendations": "Recommendations",
+    "calendar": "Calendar",
+    "library": "Library",
+    "settings": "Settings"
+  },
+  "page": {
+    "home": {
+      "title": "Home"
+    },
+    "recommendations": {
+      "title": "Recommendations"
+    },
+    "calendar": {
+      "title": "Calendar"
+    },
+    "library": {
+      "title": "Library"
+    },
+    "settings": {
+      "title": "Settings"
+    }
+  },
+  "common": {
+    "empty": {
+      "title": "Nothing here yet",
+      "description": "This page is under construction."
+    },
+    "error": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred.",
+      "reload": "Reload"
+    }
+  },
+  "toast": {
+    "error": "An error occurred",
+    "dismiss": "Dismiss",
+    "retry": "Retry"
   }
 }

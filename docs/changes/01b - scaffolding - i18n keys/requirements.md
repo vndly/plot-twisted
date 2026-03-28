@@ -1,7 +1,7 @@
 ---
 id: R-01b
 title: App Scaffolding — i18n Keys
-status: approved
+status: under_test
 type: infrastructure
 importance: critical
 tags: [i18n, localization]

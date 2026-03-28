@@ -8,7 +8,7 @@
 
 ### Step 1 — Write locale key parity test (covering: SC-12-03)
 
-- [ ] Create `tests/presentation/i18n/locale-keys.test.ts` (directory `tests/presentation/i18n/` does not exist yet and must be created):
+- [x] Create `tests/presentation/i18n/locale-keys.test.ts` (directory `tests/presentation/i18n/` does not exist yet and must be created):
   - Test that `en.json`, `es.json`, `fr.json` all exist and parse as valid JSON (covering: AC5)
   - Test that all three files contain identical key paths (covering: AC2)
   - Test that all translation values are non-empty strings (covering: AC3)
@@ -21,7 +21,7 @@
     - `toast.error`, `toast.dismiss`, `toast.retry`
   - Test that the existing `app.title` key is preserved with its original value (covering: AC4)
   - Test that every dot-separated segment of each key matches the camelCase pattern `^[a-z][a-zA-Z0-9]*$` (covering: AC6)
-- [ ] Run test to confirm failure before implementation
+- [x] Run test to confirm failure before implementation
 
 > Tests must follow the Arrange-Act-Assert (AAA) pattern per project conventions.
 
@@ -38,11 +38,11 @@
 
 ### Step 1 — Verify prerequisite
 
-- [ ] Confirm `app.title` key exists in all three locale files (`src/presentation/i18n/locales/en.json`, `es.json`, `fr.json`) from Phase 00. If missing, stop and complete Phase 00 first.
+- [x] Confirm `app.title` key exists in all three locale files (`src/presentation/i18n/locales/en.json`, `es.json`, `fr.json`) from Phase 00. If missing, stop and complete Phase 00 first.
 
 ### Step 2 — Update locale files
 
-- [ ] Add keys to `en.json`, `es.json`, `fr.json`. All three files must be updated atomically to maintain key path parity. Rollback: `git checkout -- src/presentation/i18n/locales/` restores all locale files to their prior state; `rm tests/presentation/i18n/locale-keys.test.ts` removes the test file.
+- [x] Add keys to `en.json`, `es.json`, `fr.json`. All three files must be updated atomically to maintain key path parity. Rollback: `git checkout -- src/presentation/i18n/locales/` restores all locale files to their prior state; `rm tests/presentation/i18n/locale-keys.test.ts` removes the test file.
 
 **Expected flat JSON structure (`en.json`):**
 
@@ -103,8 +103,8 @@
 
 ### Step 1 — Confirm test-first cycle and run build
 
-- [ ] Confirm that tests written in Phase 1 failed before Phase 2 implementation (expected: all tests fail since locale files were incomplete)
-- [ ] Run `npx vitest run tests/presentation/i18n/locale-keys.test.ts` — all tests now pass after Phase 2 implementation
-- [ ] Run `npx prettier --check src/presentation/i18n/locales/*.json` — formatting passes
-- [ ] Run `npx tsc --noEmit` — no type errors in the new test file
-- [ ] Run `npm run build` — build succeeds with no errors
+- [x] Confirm that tests written in Phase 1 failed before Phase 2 implementation (expected: all tests fail since locale files were incomplete)
+- [x] Run `npx vitest run tests/presentation/i18n/locale-keys.test.ts` — all tests now pass after Phase 2 implementation
+- [x] Run `npx prettier --check src/presentation/i18n/locales/*.json` — formatting passes
+- [x] Run `npx tsc --noEmit` — no type errors in the new test file
+- [x] Run `npm run build` — build succeeds with no errors

@@ -1,5 +1,45 @@
 {
   "app": {
     "title": "Plot Twisted"
+  },
+  "nav": {
+    "home": "Inicio",
+    "recommendations": "Recomendaciones",
+    "calendar": "Calendario",
+    "library": "Biblioteca",
+    "settings": "Ajustes"
+  },
+  "page": {
+    "home": {
+      "title": "Inicio"
+    },
+    "recommendations": {
+      "title": "Recomendaciones"
+    },
+    "calendar": {
+      "title": "Calendario"
+    },
+    "library": {
+      "title": "Biblioteca"
+    },
+    "settings": {
+      "title": "Ajustes"
+    }
+  },
+  "common": {
+    "empty": {
+      "title": "Nada aquí todavía",
+      "description": "Esta página está en construcción."
+    },
+    "error": {
+      "title": "Algo salió mal",
+      "description": "Ocurrió un error inesperado.",
+      "reload": "Recargar"
+    }
+  },
+  "toast": {
+    "error": "Ocurrió un error",
+    "dismiss": "Cerrar",
+    "retry": "Reintentar"
   }
 }
