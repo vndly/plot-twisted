@@ -136,7 +136,7 @@ Process phases in order. Within each phase, process steps sequentially. Do not p
    - Scenario IDs referenced by the step (for context on what behavior is being implemented).
 
 4. **Sanity check**: After implementation, perform a quick check relevant to what the step produced:
-   - If the step created or modified a TypeScript or Vue file: run type-checking to catch type errors early.
+   - If the step created or modified a TypeScript or Vue file: run `npm run type-check` to catch type errors early. If it fails, fix the errors before proceeding — do not defer to verification.
    - If the step created a test file: run the test file. If tests fail because the implementation does not exist yet (test-first), this is expected — log it and continue. If tests fail for other reasons, treat it as a step failure.
    - If the step installed dependencies: verify `package.json` was updated correctly.
 
@@ -315,3 +315,4 @@ Before running, inform the user:
 - **Atomic checkpoints**: After each step is marked `[x]` in `plan.md`, the project should be in a consistent state. It may have failing tests if following test-first order, but there should be no syntax errors or broken imports in non-test files.
 - **Respect test-first order**: If the plan defines tests before implementation, write tests first. Expected test failures for not-yet-implemented code are normal and must not trigger error handling.
 - **Format after completion**: When all implementation steps are complete (before verification), run `npm run format` to ensure consistent formatting across all created and modified files.
+- **Compilation gate**: After formatting (and before verification), run `npm run type-check`. If it fails, fix all type errors before proceeding to verification. This is mandatory regardless of whether the plan's verification phase includes a type-check step — the skill must never leave compilation errors in the codebase.
