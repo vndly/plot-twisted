@@ -19,7 +19,11 @@ Create the SkeletonLoader and EmptyState reusable UI primitives with their compo
 
 ## Decisions
 
-None specific to this sub-phase.
+| Decision                     | Choice                                         | Rationale                                                                                                                                                     |
+| :--------------------------- | :--------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| SkeletonLoader `aria-hidden` | Apply `aria-hidden="true"`                     | Intentional exception to ui-ux.md section 11 ("No ARIA beyond semantic HTML defaults"). Decorative shimmer placeholders should be hidden from screen readers. |
+| `rounded` prop type          | Accept raw Tailwind border-radius class string | Simpler API for an internal project — consumers already use Tailwind classes.                                                                                 |
+| String prop i18n             | Props receive pre-translated values            | Primitives stay translation-agnostic; consuming components call `$t()`.                                                                                       |
 
 ## Scope
 
@@ -36,11 +40,11 @@ None specific to this sub-phase.
 
 ## Functional Requirements
 
-| ID    | Requirement                  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Priority |
-| :---- | :--------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------- |
-| SC-16 | Empty state component        | Centered layout with optional lucide icon, title (white bold), description (muted), optional CTA button styled as a primary teal button (`bg-accent text-white rounded-md px-4 py-2`) per ui-ux.md section 9. Props: `icon` (Component, optional), `title` (string), `description` (string, optional), `ctaLabel` (string, optional), `ctaAction` (() => void, optional). All string props receive pre-translated values from the consuming component — this primitive does not call `$t()` internally. | P0       |
-| SC-17 | Skeleton loader              | Reusable shimmer placeholder. Props: `width` (string, default `'100%'`), `height` (string, default `'1rem'`), `rounded` (string, default `'rounded-md'`). Renders a div with `animate-pulse bg-surface`.                                                                                                                                                                                                                                                                                                | P1       |
-| SC-24 | UI primitive tests (partial) | Component tests for EmptyState (renders icon/title/description/CTA props) and SkeletonLoader (renders with width/height/rounded props). This feature covers scenarios SC-24-01 and SC-24-02; sibling features 01g and 01h cover the remaining SC-24 scenarios.                                                                                                                                                                                                                                          | P0       |
+| ID    | Requirement                  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Priority |
+| :---- | :--------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
+| SC-16 | Empty state component        | Centered layout with optional lucide icon, title (white bold), description (muted), optional CTA button styled as a primary teal button (`bg-accent text-white rounded-md px-4 py-2`) per ui-ux.md section 9. Props: `icon` (Vue `Component` type, optional), `title` (string), `description` (string, optional), `ctaLabel` (string, optional), `ctaAction` (() => void, optional). All string props receive pre-translated values from the consuming component — this primitive does not call `$t()` internally. | P0       |
+| SC-17 | Skeleton loader              | Reusable shimmer placeholder. Props: `width` (string, default `'100%'`), `height` (string, default `'1rem'`), `rounded` (string, default `'rounded-md'`). Renders a div with `animate-pulse bg-surface`.                                                                                                                                                                                                                                                                                                           | P1       |
+| SC-24 | UI primitive tests (partial) | Component tests for EmptyState (renders icon/title/description/CTA props) and SkeletonLoader (renders with width/height/rounded props). This feature covers scenarios SC-24-01 and SC-24-02; sibling features 01g and 01h cover the remaining SC-24 scenarios.                                                                                                                                                                                                                                                     | P0       |
 
 ## Non-Functional Requirements
 
@@ -51,7 +55,9 @@ None specific to this sub-phase.
 
 ### Accessibility
 
-- SkeletonLoader div uses `aria-hidden="true"` since it is purely decorative. Verifiable by inspecting rendered HTML.
+- SkeletonLoader div uses `aria-hidden="true"` since it is purely decorative (see Decisions). Verifiable by inspecting rendered HTML.
+- EmptyState CTA uses a native `<button>` element. Optional icon is treated as decorative (`aria-hidden="true"` on the icon wrapper). Verifiable by inspecting rendered HTML.
+- `animate-pulse` on SkeletonLoader is disabled when `prefers-reduced-motion: reduce` is active, handled by the existing CSS rule in `src/assets/main.css`. Verifiable by toggling the media query in dev tools.
 
 ## UI/UX Specs
 
@@ -65,7 +71,7 @@ Visual contracts per `docs/technical/ui-ux.md`:
 ### Assumptions
 
 - `animate-pulse` is sufficient for the shimmer effect (no custom keyframe needed).
-- The `bg-surface` theme color (`--color-surface`) is already defined in `src/assets/main.css` before this feature is implemented.
+- The `bg-surface` theme color (`--color-surface`) is already defined in `src/assets/main.css` (from base project setup) before this feature is implemented.
 - `@vue/test-utils` is available from prerequisite 01a.
 
 ## Acceptance Criteria
@@ -76,4 +82,6 @@ Visual contracts per `docs/technical/ui-ux.md`:
 - [ ] [SC-16] EmptyState renders only title when optional props are omitted
 - [ ] [SC-16] CTA button invokes `ctaAction` handler when clicked
 - [ ] [SC-24] Component tests for EmptyState pass
+- [ ] [SC-17] SkeletonLoader renders with `aria-hidden="true"`
+- [ ] [SC-17] SkeletonLoader renders with default width, height, and rounded when props are omitted
 - [ ] [SC-24] Component tests for SkeletonLoader pass
