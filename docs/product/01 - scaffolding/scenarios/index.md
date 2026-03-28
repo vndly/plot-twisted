@@ -21,5 +21,8 @@
 17. **[SC-12](./SC-12.feature)**: Modal composable behavior — open, close, single-instance replacement, and edge cases.
 18. **[SC-13](./SC-13.feature)**: Toast composable behavior — toast queue management, auto-dismiss, action buttons, and eviction.
 19. **[SC-23](./SC-23.feature)**: Composable unit tests — toast and modal state management verification.
+20. **[SC-16](./SC-16.feature)**: Empty state component rendering and props.
+21. **[SC-17](./SC-17.feature)**: Skeleton loader animation and dimensions.
+22. **[SC-24](./SC-24.feature)**: UI primitive component tests.
 
 > **i18n note:** Theme, transitions, and constants deliver CSS definitions and a numeric constant with no user-facing text. i18n coverage is not applicable for those scenarios.

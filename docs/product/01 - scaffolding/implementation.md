@@ -6,6 +6,8 @@ This implementation covers the foundational scaffolding layers for the applicati
 
 Configured Vue Router with 4 lazy-loaded routes, a catch-all redirect, scroll-to-top behavior, and i18n-based document title updates. The router uses `createWebHistory()` for clean URLs and is registered in `main.ts` after the i18n plugin. An `afterEach` guard sets `document.title` using the i18n instance's `t()` function, reading each route's `meta.titleKey` to produce translated page titles in the format `"Page Title — Plot Twisted"`. Placeholder view files were created in `src/presentation/views/` to satisfy Vite's import analysis during testing.
 
+Created two reusable UI primitives — `SkeletonLoader` and `EmptyState` — in the Presentation layer's `common/` directory, following a test-first approach. Both components are stateless, translation-agnostic primitives that receive all content via props.
+
 Implemented the `useToast` and `useModal` composables as module-level singleton reactive state managers for toast notifications and modal dialogs. Both composables live in `src/presentation/composables/` — a new directory in the Presentation layer for UI-only state composables that have no domain or infrastructure dependencies. The module-level pattern ensures both composables work outside Vue component `setup()`, which is required by the global error handler (01h). Unit tests were written test-first in `tests/presentation/composables/`, covering all functional requirements. Architecture and reference documentation was updated to reflect the new `composables/` directory and the distinction between Application-layer and Presentation-layer composables.
 
 ## Files Changed
@@ -26,6 +28,10 @@ Implemented the `useToast` and `useModal` composables as module-level singleton 
 - `src/presentation/composables/use-modal.ts` — Modal dialog composable with `open()`, `close()`, single-instance replacement, and callback storage.
 - `tests/presentation/composables/use-toast.test.ts` — 13 unit tests covering add, remove, auto-dismiss, eviction, timer cleanup, type variants, and ID uniqueness.
 - `tests/presentation/composables/use-modal.test.ts` — 8 unit tests covering open, close, replacement, callback storage, label storage, and no-op close.
+- `src/presentation/components/common/skeleton-loader.vue` — Shimmer placeholder with configurable `width`, `height`, and `rounded` props. Renders a single `<div>` with `animate-pulse bg-surface` and `aria-hidden="true"`.
+- `src/presentation/components/common/empty-state.vue` — Centered empty state layout with optional icon (dynamic `<component :is>`), required title, optional description, and optional CTA button. CTA renders only when both `ctaLabel` and `ctaAction` are provided.
+- `tests/presentation/components/common/skeleton-loader.test.ts` — 3 tests covering SC-17-01, SC-17-02, SC-17-03, and SC-24-02.
+- `tests/presentation/components/common/empty-state.test.ts` — 7 tests covering SC-16-01 through SC-16-06, SC-24-01, and the implementation-detail case (ctaAction without ctaLabel).
 
 ### Modified
 
@@ -60,6 +66,10 @@ Implemented the `useToast` and `useModal` composables as module-level singleton 
 - **`shallowRef` for modal props**: `use-modal.ts` uses `shallowRef` for the props ref because props are always replaced wholesale via `open()`, never mutated in place. This avoids unnecessary deep reactivity tracking.
 - **Timer map for cleanup**: `use-toast.ts` tracks auto-dismiss timers in a `Map<string, ReturnType<typeof setTimeout>>` keyed by toast ID, ensuring `removeToast()` and eviction both properly clear timers to prevent leaked timeouts.
 - **String IDs from incrementing counter**: Toast IDs use `String(nextId++)` for simplicity and uniqueness. The counter resets in `_resetForTesting()` for deterministic test behavior.
+- **SkeletonLoader dimensions via inline style**: Used `:style="{ width, height }"` for dimensions since these are arbitrary user-provided values, not Tailwind utility classes. The `rounded` prop is applied via `:class` since it receives Tailwind class strings.
+- **EmptyState CTA guard**: Button renders only when both `ctaLabel` and `ctaAction` are truthy (`v-if="ctaLabel && ctaAction"`), matching requirements that a label without an action or an action without a label should not show a button.
+- **Optional prop defaults**: All optional props default to `undefined` rather than empty strings or no-ops, keeping the component's conditional rendering clean with simple truthiness checks.
+- **Icon rendering**: Used Vue's dynamic `<component :is="icon">` for the icon prop, allowing consumers to pass any Vue component (e.g., lucide-vue-next icons).
 
 ## Deviations from Plan
 
@@ -127,6 +137,12 @@ Format (`prettier`), lint (`eslint`), and type-check (`vue-tsc`) all pass indivi
 - `tests/presentation/composables/use-modal.test.ts` — 8 tests covering: open/close (SC-23-04), replacement (SC-23-07), confirm callback (SC-23-05), cancel callback (SC-23-06), no-op close (SC-23-10), label storage (SC-12-05), and full props.
 - All 21 composable tests pass. Type checking (`tsc --noEmit`) and linting (`eslint`) report zero errors.
 
+### Skeleton & Empty State
+
+- **`skeleton-loader.test.ts`** (3 tests): Verifies specified dimensions with pulse animation and `aria-hidden`, custom `rounded` prop, and default prop values. Covers SC-17-01, SC-17-02, SC-17-03, SC-24-02.
+- **`empty-state.test.ts`** (7 tests): Verifies full props rendering (icon, title, description), title-only rendering, CTA button rendering with both props, no CTA without `ctaAction`, click handler invocation, empty title string, and no CTA without `ctaLabel`. Covers SC-16-01 through SC-16-06, SC-24-01.
+- All 55 tests across 7 test files pass. `npm run type-check`, `npm run lint`, and `npm run build` all pass.
+
 ## Verification Results
 
 - `npx vitest run` — PASS (5 files, 45 tests)
@@ -146,23 +162,26 @@ No new dependencies were added for the router phase. `vue-router` (^5.0.4) and `
 
 ## Requirement Coverage
 
-| Requirement                    | Implementation                                                                                         |
-| :----------------------------- | :----------------------------------------------------------------------------------------------------- |
-| SC-01c-21 (Theme additions)    | `--color-success` and `--color-error` added to `@theme` block in `src/assets/main.css:9-10`            |
-| SC-01c-09 (Fade transition)    | `.fade-*` classes at `src/assets/main.css:13-21`                                                       |
-| SC-01c-22 (Toast transition)   | `.toast-*` classes at `src/assets/main.css:23-37`                                                      |
-| SC-01c-23 (Modal transition)   | `.modal-*` classes at `src/assets/main.css:39-53`                                                      |
-| SC-01c-24 (Reduced-motion)     | `@media (prefers-reduced-motion: reduce)` block at `src/assets/main.css:55-68`                         |
-| SC-01c-25 (Domain constants)   | `TOAST_DISMISS_MS` exported from `src/domain/constants.ts:2`                                           |
-| SC-01d-29 (Vue Router setup)   | `createWebHistory()` in `src/presentation/router.ts`, registered in `src/main.ts`                      |
-| SC-01d-02 (Route definitions)  | 4 named routes + catch-all redirect in `src/presentation/router.ts`                                    |
-| SC-01d-03 (Route lazy loading) | Dynamic `import()` for all 4 route components                                                          |
-| SC-01d-10 (Document title)     | `afterEach` guard with i18n `t()` in `src/presentation/router.ts`                                      |
-| SC-01d-11 (Scroll-to-top)      | `scrollBehavior` returning `{ top: 0 }` in `src/presentation/router.ts`                                |
-| SC-01d-22 (Router unit tests)  | 16 tests in `tests/presentation/router.test.ts`                                                        |
-| SC-13 (Toast notification)     | `src/presentation/composables/use-toast.ts` with `addToast()`, `removeToast()`, auto-dismiss, eviction |
-| SC-12 (Modal/dialog)           | `src/presentation/composables/use-modal.ts` with `open()`, `close()`, single-instance replacement      |
-| SC-23 (Composable unit tests)  | 21 tests in `tests/presentation/composables/` (13 toast + 8 modal)                                     |
+| Requirement                         | Implementation                                                                                                     |
+| :---------------------------------- | :----------------------------------------------------------------------------------------------------------------- |
+| SC-01c-21 (Theme additions)         | `--color-success` and `--color-error` added to `@theme` block in `src/assets/main.css:9-10`                        |
+| SC-01c-09 (Fade transition)         | `.fade-*` classes at `src/assets/main.css:13-21`                                                                   |
+| SC-01c-22 (Toast transition)        | `.toast-*` classes at `src/assets/main.css:23-37`                                                                  |
+| SC-01c-23 (Modal transition)        | `.modal-*` classes at `src/assets/main.css:39-53`                                                                  |
+| SC-01c-24 (Reduced-motion)          | `@media (prefers-reduced-motion: reduce)` block at `src/assets/main.css:55-68`                                     |
+| SC-01c-25 (Domain constants)        | `TOAST_DISMISS_MS` exported from `src/domain/constants.ts:2`                                                       |
+| SC-01d-29 (Vue Router setup)        | `createWebHistory()` in `src/presentation/router.ts`, registered in `src/main.ts`                                  |
+| SC-01d-02 (Route definitions)       | 4 named routes + catch-all redirect in `src/presentation/router.ts`                                                |
+| SC-01d-03 (Route lazy loading)      | Dynamic `import()` for all 4 route components                                                                      |
+| SC-01d-10 (Document title)          | `afterEach` guard with i18n `t()` in `src/presentation/router.ts`                                                  |
+| SC-01d-11 (Scroll-to-top)           | `scrollBehavior` returning `{ top: 0 }` in `src/presentation/router.ts`                                            |
+| SC-01d-22 (Router unit tests)       | 16 tests in `tests/presentation/router.test.ts`                                                                    |
+| SC-13 (Toast notification)          | `src/presentation/composables/use-toast.ts` with `addToast()`, `removeToast()`, auto-dismiss, eviction             |
+| SC-12 (Modal/dialog)                | `src/presentation/composables/use-modal.ts` with `open()`, `close()`, single-instance replacement                  |
+| SC-23 (Composable unit tests)       | 21 tests in `tests/presentation/composables/` (13 toast + 8 modal)                                                 |
+| SC-16 (Empty state component)       | `empty-state.vue` — centered layout, optional icon/description/CTA, all string props pre-translated                |
+| SC-17 (Skeleton loader)             | `skeleton-loader.vue` — shimmer div with `animate-pulse bg-surface`, configurable dimensions, `aria-hidden="true"` |
+| SC-24 (UI primitive tests, partial) | `empty-state.test.ts` (SC-24-01) and `skeleton-loader.test.ts` (SC-24-02)                                          |
 
 ## Known Limitations
 
@@ -175,3 +194,5 @@ No new dependencies were added for the router phase. `vue-router` (^5.0.4) and `
 - View placeholder files are minimal stubs. They will be replaced by 01j with full implementations.
 - `npm run dev` will render placeholder divs when navigating to routes until 01j provides real views.
 - The `afterEach` title guard depends on `meta.titleKey` existing on each route. Routes added by future features must include this meta property to get document title updates.
+- Skeleton composition variants (card skeleton, hero skeleton, etc.) are out of scope — deferred to consuming features.
+- No responsive-specific skeleton behavior beyond standard Tailwind responsiveness.

@@ -20,6 +20,8 @@ tags:
     toast,
     modal,
     state,
+    components,
+    ui-primitives,
   ]
 ---
 
@@ -32,6 +34,8 @@ Add Tailwind theme color tokens (success, error), all transition/animation CSS (
 Configure Vue Router with 4 lazy-loaded routes, catch-all redirect, scroll-to-top, and i18n-based document title updates.
 
 Create the `useToast` and `useModal` composables — module-level singleton reactive state for toast notifications and modal dialogs — along with their unit tests.
+
+Create the SkeletonLoader and EmptyState reusable UI primitives with their component tests.
 
 ## Context & Background
 
@@ -85,6 +89,9 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 | Home route matching               | Exact match only                                          | Prevents the Home nav item from appearing active on every route.                                                                                                                                                      |
 | Composable state pattern          | Module-level singleton                                    | Toast and modal composables use module-level reactive state so they work both inside and outside component `setup()` (needed for the global error handler).                                                           |
 | Composable return shape           | Custom per composable                                     | The `{ data, loading, error, refresh? }` return convention applies to Application-layer composables wrapping async operations. Presentation-layer UI-state composables use a shape suited to their purpose.           |
+| SkeletonLoader `aria-hidden`      | Apply `aria-hidden="true"`                                | Intentional exception to ui-ux.md section 11 ("No ARIA beyond semantic HTML defaults"). Decorative shimmer placeholders should be hidden from screen readers.                                                         |
+| `rounded` prop type               | Accept raw Tailwind border-radius class string            | Simpler API for an internal project — consumers already use Tailwind classes.                                                                                                                                         |
+| String prop i18n                  | Props receive pre-translated values                       | Primitives stay translation-agnostic; consuming components call `$t()`.                                                                                                                                               |
 
 ## Scope
 
@@ -108,6 +115,8 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - Create `src/presentation/composables/use-toast.ts` and `use-modal.ts`.
 - Write unit tests for both composables.
 - Define `MAX_VISIBLE_TOASTS` constant in `src/domain/constants.ts`.
+- Create `src/presentation/components/common/skeleton-loader.vue` and `empty-state.vue`.
+- Write component tests for both SkeletonLoader and EmptyState.
 
 > **Note:** `nav.recommendations` and `page.recommendations.title` are included for forward compatibility with the Recommendations feature phase, even though no scaffolding sibling currently consumes them.
 
@@ -115,7 +124,7 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 
 ### Out of Scope
 
-- Vue component creation or modification.
+- Vue component creation beyond scaffolding UI primitives.
 - vue-i18n instance configuration or locale switching logic (fallback verification for scaffolded keys is in scope).
 - i18n keys beyond the scaffolding namespaces listed above (e.g., `library.*`, `details.*`).
 - Light-theme color variants (deferred to future theme-switching phase).
@@ -132,6 +141,9 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - Toast container component (`toast-container.vue`) — covered by 01g.
 - Modal dialog component (`modal-dialog.vue`) — covered by 01g.
 - Toast animations and transitions — covered by 01g.
+- Skeleton composition variants (card skeleton, hero skeleton, detail skeleton, grid skeleton) — deferred to consuming features.
+- i18n integration within SkeletonLoader/EmptyState primitives — consuming components pass pre-translated strings via props.
+- Responsive-specific skeleton behavior beyond standard Tailwind responsiveness.
 
 > All subsequent scaffolding features (01b through 01k) depend on the infrastructure established here.
 
@@ -161,6 +173,9 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 | SC-13 | Toast notification system | `useToast()` composable with module-level reactive state. `addToast(options)` pushes a toast (options: `{ message, type, action?: { label: string, handler: () => void } }`) with a generated unique ID (incrementing counter) and auto-dismiss after `TOAST_DISMISS_MS` (default 4000ms, from `src/domain/constants.ts`). `removeToast(id)` removes it and clears its auto-dismiss timer. Toast types: error (red), success (green), info (teal). Enforces a maximum of `MAX_VISIBLE_TOASTS` (5) simultaneous toasts; when exceeded, the oldest toast is evicted before the new one is added. | P0 |
 | SC-12 | Modal/dialog | `useModal()` composable (single-instance). `open(props)` sets visible true and stores props (shape: `{ title: string, content?: string, confirmLabel?: string, cancelLabel?: string, onConfirm?: () => void, onCancel?: () => void }`). `close()` sets visible false and clears props. Opening a new modal while one is active replaces the current modal. The composable stores callback references in props; invocation of callbacks is the consuming component's responsibility (see 01g). | P1 |
 | SC-23 | Composable unit tests | `useToast`: add/remove toast, auto-dismiss after timeout, toast types. `useModal`: open/close state, callback storage in props. | P0 |
+| SC-16 | Empty state component | Centered layout with optional lucide icon, title (white bold), description (muted), optional CTA button styled as a primary teal button (`bg-accent text-white rounded-md px-4 py-2`) per ui-ux.md section 9. Props: `icon` (Vue `Component` type, optional), `title` (string), `description` (string, optional), `ctaLabel` (string, optional), `ctaAction` (() => void, optional). All string props receive pre-translated values from the consuming component — this primitive does not call `$t()` internally. | P0 |
+| SC-17 | Skeleton loader | Reusable shimmer placeholder. Props: `width` (string, default `'100%'`), `height` (string, default `'1rem'`), `rounded` (string, default `'rounded-md'`). Renders a div with `animate-pulse bg-surface`. | P1 |
+| SC-24 | UI primitive tests (partial) | Component tests for EmptyState (renders icon/title/description/CTA props) and SkeletonLoader (renders with width/height/rounded props). This feature covers scenarios SC-24-01 and SC-24-02; sibling features 01g and 01h cover the remaining SC-24 scenarios. | P0 |
 
 > **Note:** `src/domain/constants.ts` is created in this phase with `TOAST_DISMISS_MS` only (additional constants will be added in their respective feature phases). See Decisions table for rationale.
 
@@ -189,12 +204,27 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 
 - **CSS centralization:** No CSS files other than `src/assets/main.css` shall exist in the project. All transition and animation styles are centralized in the single Tailwind entry point.
 - **Composable location:** Toast and modal composables live in `src/presentation/composables/` rather than `src/application/` because they manage UI-only state with no domain or infrastructure dependencies. This introduces a `composables/` subdirectory under `src/presentation/` not currently defined in `architecture.md` — both `architecture.md` and the glossary entry for "Composable" should be updated to acknowledge that purely UI-state composables may reside in the Presentation layer.
+- **SFC block order:** `<script setup>` then `<template>` then `<style>` (rare). Verifiable by linting SFC files.
+- **File naming:** kebab-case for all component files. Verifiable by checking file names match `[a-z0-9-]+\.vue`.
+
+### Accessibility
+
+- SkeletonLoader div uses `aria-hidden="true"` since it is purely decorative (see Decisions). Verifiable by inspecting rendered HTML.
+- EmptyState CTA uses a native `<button>` element. Optional icon is treated as decorative (`aria-hidden="true"` on the icon wrapper). Verifiable by inspecting rendered HTML.
+- `animate-pulse` on SkeletonLoader is disabled when `prefers-reduced-motion: reduce` is active, handled by the existing CSS rule in `src/assets/main.css`. Verifiable by toggling the media query in dev tools.
 
 ### Performance
 
 - **Initial load:** The main bundle (before lazy-loaded route chunks) should remain under 150 KB gzipped, establishing a baseline before feature code is added.
 - **Lazy chunks:** Each route's lazy-loaded chunk should remain under 20 KB gzipped.
 - **Measurement:** Measured from `vite build` output sizes.
+
+## UI/UX Specs
+
+Visual contracts per `docs/technical/ui-ux.md`:
+
+- **SkeletonLoader** (section 8 — Loading States): `animate-pulse bg-surface` shimmer, configurable dimensions and border radius.
+- **EmptyState** (section 9 — Empty States): Centered layout with muted icon, bold heading, slate-400 supporting text, optional primary teal CTA button.
 
 ## Risks & Assumptions
 
@@ -211,6 +241,9 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - 01a has been completed: vue-router is installed and i18n title keys (`page.*.title`) exist (SC-01b-12).
 - Module-level singleton state persists correctly during Vite HMR in development.
 - The `TOAST_DISMISS_MS` constant from 01c exists and exports the expected value (4000ms).
+- `animate-pulse` is sufficient for the shimmer effect (no custom keyframe needed).
+- The `bg-surface` theme color (`--color-surface`) is already defined in `src/assets/main.css` (from base project setup) before SkeletonLoader is implemented.
+- `@vue/test-utils` is available from prerequisite 01a for component testing.
 
 ### Risks
 
@@ -278,6 +311,15 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - [ ] Glossary "Composable" entry updated to acknowledge Presentation-layer composables
 - [ ] `MAX_VISIBLE_TOASTS` constant documented in `data-model.md` constants table
 - [ ] [SC-23] All composable unit tests pass
+- [ ] [SC-17] SkeletonLoader renders with configurable `width`, `height`, and `rounded` props
+- [ ] [SC-17] SkeletonLoader applies `animate-pulse bg-surface` classes
+- [ ] [SC-16] EmptyState renders icon, title, description, and CTA button when all props provided
+- [ ] [SC-16] EmptyState renders only title when optional props are omitted
+- [ ] [SC-16] CTA button invokes `ctaAction` handler when clicked
+- [ ] [SC-24] Component tests for EmptyState pass
+- [ ] [SC-17] SkeletonLoader renders with `aria-hidden="true"`
+- [ ] [SC-17] SkeletonLoader renders with default width, height, and rounded when props are omitted
+- [ ] [SC-24] Component tests for SkeletonLoader pass
 
 ## Constraints
 
