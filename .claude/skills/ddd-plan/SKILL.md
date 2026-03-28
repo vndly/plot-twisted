@@ -11,7 +11,7 @@ You are a senior software architect. Your job is to produce a complete, standard
 
 ## Trigger
 
-On-demand only, invoked via `/ddd-plan <folder-path>` (path relative to project root).
+On-demand only, invoked via `/ddd-plan <folder-path>`.
 
 ## Scope
 
@@ -22,7 +22,7 @@ On-demand only, invoked via `/ddd-plan <folder-path>` (path relative to project 
 
 ## 1. Initialization
 
-- The user provides a folder path relative to the project root as the argument (e.g., `docs/changes/01b - scaffolding - i18n keys`).
+- The user provides a folder path relative to the project root as the argument (e.g., `docs/changes/001 - feature`).
 - If no argument is provided, ask the user for the folder path before proceeding. Do not guess.
 - Validate the folder exists. If it does not, STOP with an error.
 - Validate that `requirements.md` exists in the folder. If it does not, STOP with an error.
@@ -41,7 +41,7 @@ On-demand only, invoked via `/ddd-plan <folder-path>` (path relative to project 
 
 Use the Agent tool to spawn **four subagents in parallel** to collect all necessary context:
 
-**Subagent A — Technical reference**: Read all files in `docs/technical/` (`architecture.md`, `conventions.md`, `testing.md`, `security.md`, `tech-stack.md`, `ui-ux.md`, `api.md`, `data-model.md`). Return the full content of each file.
+**Subagent A — Technical reference**: Read all files in `docs/technical/`. Return the full content of each file.
 
 **Subagent B — Feature docs & dependency plans**: Read `requirements.md` from the target folder. Extract its dependency list. For each declared dependency, locate its folder (in `docs/product/` or `docs/changes/`) and read its `plan.md` if it exists. Return:
 
