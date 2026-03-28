@@ -8,13 +8,13 @@
 
 ### Step 1 — Write domain constants unit test
 
-- [ ] Create `tests/domain/constants.test.ts` — covering: SC-01c-25-01
+- [x] Create `tests/domain/constants.test.ts` — covering: SC-01c-25-01
   - Assert `TOAST_DISMISS_MS` is exported and equals `4000`
   - Assert `TOAST_DISMISS_MS` is of type `number`
 
 ### Step 2 — Confirm test failure
 
-- [ ] Run `npx vitest run tests/domain/constants.test.ts` — expect failure (module does not exist yet)
+- [x] Run `npx vitest run tests/domain/constants.test.ts` — expect failure (module does not exist yet)
 
 ## Phase 2 — Implementation
 
@@ -22,7 +22,7 @@
 
 ### Step 3 — Create domain constants [SC-01c-25]
 
-- [ ] Create `src/domain/constants.ts`:
+- [x] Create `src/domain/constants.ts`:
 
 ```ts
 /** Auto-dismiss timeout for toast notifications (in milliseconds). */
@@ -31,7 +31,7 @@ export const TOAST_DISMISS_MS = 4000
 
 ### Step 4 — Add theme color tokens [SC-01c-21]
 
-- [ ] Append to the existing `@theme { }` block in `src/assets/main.css` after the `--font-sans` line (do not create a new block):
+- [x] Append to the existing `@theme { }` block in `src/assets/main.css` after the `--font-sans` line (do not create a new block):
   - `--color-success: #22c55e`
   - `--color-error: #ef4444`
 
@@ -39,7 +39,7 @@ export const TOAST_DISMISS_MS = 4000
 
 > Vue `<Transition>` requires class-based CSS. Centralizing in `main.css` avoids duplication. Acknowledged exception to the "Tailwind only" rule (see Decisions table in requirements.md).
 
-- [ ] Add after the `@theme` block in `src/assets/main.css`:
+- [x] Add after the `@theme` block in `src/assets/main.css`:
 
 ```css
 .fade-enter-active,
@@ -55,7 +55,7 @@ export const TOAST_DISMISS_MS = 4000
 
 ### Step 6 — Add toast transition CSS [SC-01c-22]
 
-- [ ] Add toast transition CSS in `src/assets/main.css`:
+- [x] Add toast transition CSS in `src/assets/main.css`:
 
 ```css
 .toast-enter-active {
@@ -77,7 +77,7 @@ export const TOAST_DISMISS_MS = 4000
 
 ### Step 7 — Add modal transition CSS [SC-01c-23]
 
-- [ ] Add modal transition CSS in `src/assets/main.css`. These classes apply to the content card only; backdrop transition is managed separately by the modal component in R-01g:
+- [x] Add modal transition CSS in `src/assets/main.css`. These classes apply to the content card only; backdrop transition is managed separately by the modal component in R-01g:
 
 ```css
 .modal-enter-active {
@@ -99,7 +99,7 @@ export const TOAST_DISMISS_MS = 4000
 
 ### Step 8 — Add reduced-motion override [SC-01c-24]
 
-- [ ] Add reduced-motion override in `src/assets/main.css`. The `.animate-pulse` rule disables Tailwind's built-in skeleton shimmer animation used in loading states (R-01f), ensuring all visual motion is suppressed:
+- [x] Add reduced-motion override in `src/assets/main.css`. The `.animate-pulse` rule disables Tailwind's built-in skeleton shimmer animation used in loading states (R-01f), ensuring all visual motion is suppressed:
 
 ```css
 @media (prefers-reduced-motion: reduce) {
@@ -122,28 +122,28 @@ export const TOAST_DISMISS_MS = 4000
 
 ### Step 9 — Run tests
 
-- [ ] Run `npx vitest run` — all tests pass, including `tests/domain/constants.test.ts` (covering: SC-01c-25-01)
+- [x] Run `npx vitest run` — all tests pass, including `tests/domain/constants.test.ts` (covering: SC-01c-25-01)
 
 ### Step 10 — Build and lint check
 
-- [ ] Run `npm run check` — passes with no errors
+- [x] Run `npm run check` — passes with no errors
 
 ### Step 11 — CSS verification
 
 > Covers CSS structural scenarios: SC-01c-21-01, SC-01c-09a-01, SC-01c-22-01, SC-01c-23-01, SC-01c-24-04, SC-01c-24-05.
 
-- [ ] `--color-success` and `--color-error` exist in the `@theme` block of `src/assets/main.css`
-- [ ] Existing theme variables (`--color-bg-primary`, `--color-bg-secondary`, `--color-surface`, `--color-accent`, `--font-sans`) are preserved
-- [ ] `.fade-enter-active`, `.toast-enter-active`, `.modal-enter-active` classes present in `src/assets/main.css`
-- [ ] `.animate-pulse` animation disabled in the `@media (prefers-reduced-motion: reduce)` block
-- [ ] `@media (prefers-reduced-motion: reduce)` block present
-- [ ] No transition duration exceeds 300ms
+- [x] `--color-success` and `--color-error` exist in the `@theme` block of `src/assets/main.css`
+- [x] Existing theme variables (`--color-bg-primary`, `--color-bg-secondary`, `--color-surface`, `--color-accent`, `--font-sans`) are preserved
+- [x] `.fade-enter-active`, `.toast-enter-active`, `.modal-enter-active` classes present in `src/assets/main.css`
+- [x] `.animate-pulse` animation disabled in the `@media (prefers-reduced-motion: reduce)` block
+- [x] `@media (prefers-reduced-motion: reduce)` block present
+- [x] No transition duration exceeds 300ms
 
 ### Step 12 — Deferred behavioral verification
 
 > Behavioral scenarios requiring downstream components are verified in their respective feature phases:
 
-- [ ] SC-01c-22-02, SC-01c-22-03 — Verified in R-01g (Toast Container & Modal Dialog) integration testing
-- [ ] SC-01c-23-02 — Verified in R-01g (Toast Container & Modal Dialog) integration testing
-- [ ] SC-01c-24-01 — Verified in R-01k (App Shell & Assembly) with route transition wiring
-- [ ] SC-01c-24-02, SC-01c-24-03 — Verified in R-01g and R-01k with reduced-motion testing
+- [x] SC-01c-22-02, SC-01c-22-03 — Verified in R-01g (Toast Container & Modal Dialog) integration testing
+- [x] SC-01c-23-02 — Verified in R-01g (Toast Container & Modal Dialog) integration testing
+- [x] SC-01c-24-01 — Verified in R-01k (App Shell & Assembly) with route transition wiring
+- [x] SC-01c-24-02, SC-01c-24-03 — Verified in R-01g and R-01k with reduced-motion testing
