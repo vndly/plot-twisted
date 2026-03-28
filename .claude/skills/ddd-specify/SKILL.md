@@ -41,7 +41,7 @@ On-demand only, invoked via `/ddd-specify <feature-name>` (e.g., `/ddd-specify 0
 
 Use the Agent tool to spawn **three subagents in parallel** to collect all necessary context:
 
-**Subagent A — Technical reference**: Read all files in `docs/technical/` (`architecture.md`, `conventions.md`, `testing.md`, `security.md`, `tech-stack.md`, `ui-ux.md`, `api.md`, `data-model.md`). Return the full content of each file.
+**Subagent A — Technical reference**: Read all files in `docs/technical/`. Return the full content of each file.
 
 **Subagent B — Requirements standard**: Read `docs/standards/requirements.md`. Return the full content.
 
@@ -158,7 +158,26 @@ Write the final `requirements.md` to `docs/changes/<feature-name>/requirements.m
 
 Create `index.md` in the new folder, then apply the `audit-index` skill to format it.
 
-## 8. Handoff to Review
+## 8. Completion Summary
+
+Present a summary to the user before handing off to review:
+
+```
+## Specification Complete
+
+**Feature**: [title] ([feature ID])
+**Status**: draft
+**Location**: docs/changes/<feature-name>/
+
+### Files Written
+- `requirements.md` — [count] functional requirements, [count] non-functional requirements
+- `index.md`
+
+### Requirement IDs
+- [list of all functional and non-functional requirement IDs with brief descriptions]
+```
+
+## 9. Handoff to Review
 
 Run `/ddd-review docs/changes/<feature-name>` to perform a formal review of the new specification.
 

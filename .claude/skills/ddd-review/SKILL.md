@@ -27,6 +27,7 @@ On-demand only, invoked via `/ddd-review <folder-path>` (path relative to projec
   - **Optional**: `implementation.md`, `api.md`, `data-model.md`, `plan.md`, `scenarios/`, `index.md`
 - If required files are missing, note it as a Critical finding but continue reviewing whatever files exist.
 - If the folder contains files not in the expected list above, ignore them.
+- **Status update**: Read the `status` field from the target folder's `requirements.md` frontmatter. If the current status is `draft` or `approved`, update it to `review`. If the status is `in_development`, `under_test`, or `released`, do not change it — the review is informational only for features past the approval stage.
 
 ## 2. Information Collection
 
@@ -34,7 +35,7 @@ Use the Agent tool to spawn subagents in parallel to collect all necessary conte
 
 **Subagent A — Reference docs**: Read all files in `docs/technical/`.
 
-**Subagent B — Project context**: Read the target folder's `requirements.md` to extract its dependency list. Then list all sibling feature folders in `docs/product/` and, for each sibling folder, read only the `Scope` and `Functional Requirements` sections of its `requirements.md`. Return a brief summary of each sibling feature (title, scope boundaries, and requirement IDs) — not the full content — to avoid filling the context window. Mark which siblings are declared dependencies.
+**Subagent B — Project context**: Read the target folder's `requirements.md` to extract its dependency list. Then list all sibling feature folders in both `docs/product/` and `docs/changes/` (excluding the folder being reviewed). For each sibling folder, read only the `Scope` and `Functional Requirements` sections of its `requirements.md`. Return a brief summary of each sibling feature (title, scope boundaries, and requirement IDs) — not the full content — to avoid filling the context window. Mark which siblings are declared dependencies.
 
 After both subagents return, read the standards files needed for the per-file review phase:
 
@@ -177,7 +178,7 @@ After all per-file subagents from step 3 complete, spawn a single **cross-cuttin
 - **Plan ↔ scenarios alignment**: Plan steps that produce user-visible behavior should have corresponding scenario coverage. Scenarios that assume functionality not addressed by any plan step should be flagged.
 - **Scenario ↔ test traceability**: Every scenario ID in `scenarios/` must be referenced by at least one test step in the plan's testing phase. Flag orphan scenarios (defined but never referenced by a test). Flag test steps that lack both scenario references and an `(implementation detail)` justification.
 - **Implementation alignment**: If `implementation.md` exists, verify it aligns with the plan and requirements. No contradictions between implementation approach and architectural constraints.
-- **Cross-feature conflicts**: No overlap or contradiction with other features in `docs/product/` (using project context from Subagent B).
+- **Cross-feature conflicts**: No overlap or contradiction with other features in `docs/product/` or `docs/changes/` (using project context from Subagent B).
 - **Dependency impact**: If the feature touches existing modules, are ripple effects acknowledged?
 - **Migration & rollback**: If the feature introduces schema changes, API breaking changes, or data migrations, verify there is a backwards compatibility or rollback plan. Skip for features with no data/API impact.
 
@@ -318,6 +319,20 @@ Re-render the report from step 5, incorporating the triage and fix outcomes:
 
 Present the final report using the Report Structure defined in step 5.
 
+### Status Update
+
+After presenting the final report, update the `status` field in the target folder's `requirements.md` frontmatter based on the verdict:
+
+- If the verdict is **Approved** and the current status is `review`: update status to `approved`.
+- If the verdict is **Needs Revision** or **Blocked**: leave status as `review`. The feature must be re-reviewed after fixes are applied.
+- If the current status is `in_development`, `under_test`, or `released`: do not change the status regardless of verdict.
+
 ## Rules
 
+- **Standards and technical docs are authoritative**: When feature documentation conflicts with `docs/standards/` or `docs/technical/`, the standards and technical docs are the source of truth. Flag the conflict — do not silently accept the feature doc's version.
+- **No fix scope creep**: When applying fixes (step 7.2), only address findings the user triaged as **Fix**. Do not make additional changes, improvements, or reformatting beyond what was agreed upon.
+- **Read before fixing**: Always read the current file content before editing. Fixes may interact with each other — apply them against the latest state, not a stale snapshot.
+- **Severity discipline**: **Critical** = will cause implementation failures, architectural violations, or missing required content. **Warning** = could lead to problems, ambiguities, or inconsistencies. **Suggestion** = would improve quality but is not blocking. Do not inflate or deflate severity.
+- **Evidence-based findings only**: Every finding must cite the specific text in the reviewed file and the reference doc or standard that contradicts it. Do not flag subjective preferences or stylistic opinions.
+- **Status transitions are conditional**: Only update `requirements.md` status for features in `draft` or `approved` state. Never regress status for features in `in_development`, `under_test`, or `released` — those reviews are informational only.
 - **Format after fixes**: After applying fixes (step 7.2), run `npm run format` to ensure consistent formatting across all modified files.

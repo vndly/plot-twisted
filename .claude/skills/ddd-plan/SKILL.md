@@ -26,6 +26,7 @@ On-demand only, invoked via `/ddd-plan <folder-path>`.
 - If no argument is provided, ask the user for the folder path before proceeding. Do not guess.
 - Validate the folder exists. If it does not, STOP with an error.
 - Validate that `requirements.md` exists in the folder. If it does not, STOP with an error.
+- **Status gate**: Read the `status` field from `requirements.md` frontmatter. If status is not `approved`, STOP with an error: "Requirements must be reviewed and approved before planning. Current status: {status}. Run `/ddd-review` to review the requirements first."
 - **Check for existing artifacts**: If `plan.md` or `scenarios/` already exist in the folder, use `AskUserQuestion` to ask the user how to proceed:
   - **Header**: "Existing Artifacts"
   - **Question**: List which artifacts already exist (`plan.md`, `scenarios/`, or both).
@@ -33,8 +34,8 @@ On-demand only, invoked via `/ddd-plan <folder-path>`.
     1. **Resume** — "Refine the existing plan and scenarios"
     2. **Overwrite** — "Start fresh, discarding existing content"
     3. **Abort** — "Cancel"
-  - If **Resume**: read the existing `plan.md` and/or `scenarios/*.feature` files as the starting drafts. Run steps 2 (Context Loading) and 3 (Validation & Challenge) as normal. Then skip steps 4–5 (draft generation — existing drafts are used instead) and run step 6 (Cross-Validation) against the existing drafts. Proceed to step 7 (Interactive Refinement) with the existing drafts and any cross-validation findings.
-  - If **Overwrite**: proceed as if the artifacts do not exist (existing files will be overwritten in step 8).
+  - If **Resume**: read the existing `plan.md` and/or `scenarios/*.feature` files as the starting drafts. Run steps 2 (Context Loading), 3 (Validation & Challenge), and 4 (Compliance Brief) as normal. Then skip steps 5–6 (draft generation — existing drafts are used instead) and run step 7 (Cross-Validation) against the existing drafts. Proceed to step 8 (Interactive Refinement) with the existing drafts and any cross-validation findings.
+  - If **Overwrite**: proceed as if the artifacts do not exist (existing files will be overwritten in step 9).
   - If **Abort**: STOP.
 
 ## 2. Context Loading
@@ -84,7 +85,24 @@ Performed by the orchestrator directly — no subagents. This is a critical gate
 - **Warnings found** (minor ambiguities, soft conflicts, missing optional info): Present the warnings to the user and proceed. Note any assumptions you will make during planning and ask the user to confirm or correct them before continuing.
 - **Clean** (no issues): Proceed to step 4.
 
-## 4. Plan Draft
+## 4. Compliance Brief
+
+Before generating the plan and scenarios, synthesize a **compliance brief** from the technical reference docs (Subagent A output). This is a condensed set of rules that apply to plan generation, ensuring every plan step and scenario respects the project's standards.
+
+Extract from each technical doc:
+
+- **architecture.md**: Layer boundaries, import rules, folder structure, component organization.
+- **conventions.md**: Naming conventions, SFC order, ESLint/Prettier config, guardrails, i18n rules.
+- **testing.md**: Test file structure, naming, what to test per layer, AAA pattern, mocking strategy.
+- **security.md**: Input validation, sanitization rules, token handling.
+- **tech-stack.md**: Allowed technologies and version constraints.
+- **ui-ux.md**: Design tokens, responsive patterns, component guidelines.
+- **api.md**: Endpoint patterns, error handling, pagination.
+- **data-model.md**: Schema shapes, storage patterns, relationships.
+
+This is NOT a subagent step — the orchestrator condenses the already-loaded content into a working reference that informs steps 5 and 6.
+
+## 5. Plan Draft
 
 Generate a complete `plan.md` draft. Do **not** write the file yet — hold it in memory for refinement.
 
@@ -103,7 +121,7 @@ Generate a complete `plan.md` draft. Do **not** write the file yet — hold it i
 - **Scope discipline**: Every functional requirement must map to at least one step. No step may introduce work outside the defined scope.
 - **Verification phase**: The final phase must list concrete, runnable pass/fail checks (e.g., `npm run test`, `npm run build`, `npm run check`). No vague checks like "verify it works."
 
-## 5. Scenarios Draft
+## 6. Scenarios Draft
 
 Generate a complete `scenarios/` folder draft. Do **not** write files yet — hold them in memory for refinement.
 
@@ -128,7 +146,7 @@ Generate a complete `scenarios/` folder draft. Do **not** write files yet — ho
 
 Also draft a `scenarios/index.md` listing all `.feature` files with their feature names and scenario counts.
 
-## 6. Cross-Validation
+## 7. Cross-Validation
 
 After drafting both plan and scenarios, perform an alignment check. This catches issues before presenting to the user, avoiding a wasted review cycle.
 
@@ -144,9 +162,9 @@ After drafting both plan and scenarios, perform an alignment check. This catches
 
 ### On issues found
 
-Do not interrupt — collect all issues and include them as flagged items when presenting to the user in step 7. The user will address them during refinement.
+Do not interrupt — collect all issues and include them as flagged items when presenting to the user in step 8. The user will address them during refinement.
 
-## 7. Interactive Refinement
+## 8. Interactive Refinement
 
 Present the complete draft (plan + scenarios) to the user for review. This step is mandatory — always perform at least one refinement round, even if everything looks clean.
 
@@ -156,7 +174,7 @@ Use `AskUserQuestion` with a comprehensive prompt containing:
 
 1. **Plan draft**: The complete `plan.md` content.
 2. **Scenarios summary**: For each `.feature` file, list the feature name, scenario IDs, and scenario names. Include full Gherkin content only for complex or non-obvious scenarios — summarize straightforward ones.
-3. **Cross-validation results**: Any issues found in step 6, presented as flagged items with recommendations.
+3. **Cross-validation results**: Any issues found in step 7, presented as flagged items with recommendations.
 4. **Follow-up questions**, grouped into:
    - **Gaps**: Requirements or acceptance criteria with weak plan coverage or missing scenarios. Explain what's missing and propose additions.
    - **Ambiguities**: Points where the requirements could be interpreted in multiple ways. State the interpretation used in the draft and ask the user to confirm or correct.
@@ -174,27 +192,49 @@ Use `AskUserQuestion` with a comprehensive prompt containing:
 
 - Apply the user's feedback to both the plan and scenarios drafts.
 - If the user's responses introduce **significant changes** (new requirements coverage, reordering of phases, scope changes, or new scenarios), do **one more refinement round** on the affected areas only. Use the same format but only include the changed sections and new questions.
-- If the changes are minor (wording tweaks, confirmations, small additions), proceed directly to step 8.
+- If the changes are minor (wording tweaks, confirmations, small additions), proceed directly to step 9.
 
-## 8. Write Files
+## 9. Write Files
 
-### 8.1 Write plan.md
+### 9.1 Write plan.md
 
 Write the final `plan.md` to the target folder.
 
-### 8.2 Write scenarios
+### 9.2 Write scenarios
 
 Create the `scenarios/` folder in the target folder (if it does not already exist). Write each `.feature` file. Write `scenarios/index.md`, then apply the `audit-index` skill to format it.
 
-### 8.3 Update folder index
+### 9.3 Update folder index
 
 If the target folder has an `index.md`, update it to include entries for `plan.md` and `scenarios/`. Then apply the `audit-index` skill to format it. If no `index.md` exists, create one listing all files in the folder, then apply the `audit-index` skill.
 
-### 8.4 Format
+### 9.4 Format
 
-Run `npm run format` once to ensure consistent formatting across all written files. Note: `audit-index` (steps 8.2/8.3) may already format index files — this final pass covers all remaining files and is idempotent.
+Run `npm run format` once to ensure consistent formatting across all written files. Note: `audit-index` (steps 9.2/9.3) may already format index files — this final pass covers all remaining files and is idempotent.
 
-## 9. Handoff to Review
+## 10. Completion Summary
+
+Present a summary to the user before handing off to review:
+
+```
+## Planning Complete
+
+**Feature**: [title] ([feature ID])
+**Location**: [folder path]
+
+### Artifacts Written
+- `plan.md` — [phase count] phases, [step count] steps
+- `scenarios/` — [file count] `.feature` files, [scenario count] scenarios
+
+### Coverage
+- Functional requirements covered: [list of requirement IDs with plan step mappings]
+- Scenarios coverage: [list of requirement IDs with scenario counts]
+
+### Assumptions Made
+- [Any assumptions from step 3 that were carried into the plan]
+```
+
+## 11. Handoff to Review
 
 Run `/ddd-review <folder-path>` to perform a formal review of the new artifacts.
 
@@ -204,11 +244,11 @@ Before running, inform the user:
 
 ## Rules
 
-- **Never guess requirements**: If the requirements are insufficient to derive a plan step or scenario, flag it in step 3 or step 7. Do not invent requirements.
+- **Never guess requirements**: If the requirements are insufficient to derive a plan step or scenario, flag it in step 3 or step 8. Do not invent requirements.
 - **Standards are the source of truth**: The structure, naming, and quality criteria from `docs/standards/plan.md` and `docs/standards/scenarios.md` override any other convention.
 - **Technical docs constrain the plan**: Every plan step must be consistent with the project's technical reference. If a requirement conflicts with the technical docs, flag it — do not silently override the technical docs.
-- **One refinement round minimum**: Always present the draft and ask follow-up questions (step 7), even if the requirements seem complete. There are always design decisions, ordering choices, or edge cases worth surfacing.
+- **One refinement round minimum**: Always present the draft and ask follow-up questions (step 8), even if the requirements seem complete. There are always design decisions, ordering choices, or edge cases worth surfacing.
 - **Atomic steps by default**: Every plan step must be atomic — completable in one pass, specific enough that two developers would produce the same result. Do not offer coarse-grained alternatives.
 - **Moderate scenario depth**: Cover happy paths, key error paths, and important edge cases. Use Scenario Outlines for data variation. Do not exhaustively cover every dimension — leave that for the review cycle.
-- **Scope discipline**: Do not add plan steps or scenarios for work outside the defined scope. Suggest out-of-scope improvements in step 7, but only include them if the user agrees.
-- **Format after writing**: After writing all files (step 8), run `npm run format` once as a final pass to ensure consistent formatting.
+- **Scope discipline**: Do not add plan steps or scenarios for work outside the defined scope. Suggest out-of-scope improvements in step 8, but only include them if the user agrees.
+- **Format after writing**: After writing all files (step 9), run `npm run format` once as a final pass to ensure consistent formatting.

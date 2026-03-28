@@ -28,6 +28,7 @@ On-demand only, invoked via `/ddd-implement <folder-path>` (path relative to pro
 - Validate the folder exists.
 - Validate that `requirements.md` exists — if missing, STOP with an error.
 - Validate that `plan.md` exists — if missing, STOP with an error.
+- **Status gate**: Read the `status` field from `requirements.md` frontmatter. If status is not `approved`, STOP with an error: "Documentation must be reviewed and approved before implementation. Current status: {status}. Run `/ddd-review` to review the documentation first."
 - Note the presence of optional files: `scenarios/`, `implementation.md`, `index.md`.
 - If `implementation.md` already exists, warn the user that it will be regenerated at the end.
 
@@ -35,7 +36,7 @@ On-demand only, invoked via `/ddd-implement <folder-path>` (path relative to pro
 
 Use the Agent tool to spawn **two subagents in parallel** to collect all necessary context:
 
-**Subagent A — Technical reference**: Read all files in `docs/technical/` (`architecture.md`, `conventions.md`, `testing.md`, `security.md`, `tech-stack.md`, `ui-ux.md`, `api.md`, `data-model.md`). Return the full content of each file.
+**Subagent A — Technical reference**: Read all files in `docs/technical/`. Return the full content of each file.
 
 **Subagent B — Feature docs**: Read `requirements.md` and `plan.md` from the target folder. If `scenarios/` exists, read all `.feature` files. Return:
 
@@ -80,6 +81,8 @@ Extract from each technical doc:
 This is NOT a subagent step — the orchestrator condenses the already-loaded content into a working reference.
 
 ## 5. Implementation
+
+Before processing the first step, update the `status` field in `requirements.md` frontmatter to `in_development`.
 
 Process phases in order. Within each phase, process steps sequentially. Do not pause between phases — run all phases continuously, stopping only on step failure.
 
@@ -152,6 +155,10 @@ Run all automated checks before stopping — do not halt between checks. After a
 
 If the user chooses **Investigate**: read the error output, identify the likely cause, propose a fix, and ask the user to approve before applying it. After the fix, re-run only the previously failed checks.
 
+### On verification success
+
+When all verification checks pass, update the `status` field in `requirements.md` frontmatter to `under_test`.
+
 ## 7. Implementation Log
 
 After verification, read `docs/standards/implementation.md` to understand the review checks that apply to this file. Then generate `implementation.md` in the target folder using the implementation log accumulated during step 5 and the verification results from step 6.
@@ -205,6 +212,10 @@ The generated `implementation.md` must satisfy the review checks in `docs/standa
 - Content must align with `plan.md` phases and steps.
 - Deviations from the plan must be noted with justification.
 
+### Update Index
+
+After writing `implementation.md`, update the target folder's `index.md` to include an entry for `implementation.md`. If no `index.md` exists, create one listing all files in the folder. Apply the `audit-index` skill to format it.
+
 ## 8. Summary
 
 Present a final summary to the user:
@@ -230,6 +241,14 @@ Present a final summary to the user:
 - [Any step failures, retries, or deviations]
 - [If none: "No issues encountered."]
 ```
+
+## 9. Handoff to Code Review
+
+Run `/delta-review` to audit the implemented code against project standards.
+
+Before running, inform the user:
+
+> Implementation complete. Running `/delta-review` to audit the code against project standards.
 
 ## Rules
 

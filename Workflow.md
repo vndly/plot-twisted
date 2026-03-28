@@ -1,6 +1,6 @@
 # Workflow
 
-The DDD workflow has five phases. Each phase has clear inputs, outputs, and quality gates.
+The DDD workflow has four phases. Each phase has clear inputs, outputs, and quality gates.
 
 ## Phase A: Specification
 

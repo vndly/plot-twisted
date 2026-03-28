@@ -28,6 +28,15 @@ On-demand only, invoked via `/ddd-promote`.
   2. **Target** — the product folder to promote into (e.g., `docs/product/001 - feature`). This folder may or may not exist yet.
 - Validate that the source folder exists. If it does not, STOP with an error.
 - List all files in the source folder (including `scenarios/` contents if present).
+- **Interrupted promotion check**: If the target folder already exists, check whether it contains files with the same names as the source folder. If it does and the source folder still exists, a previous promotion may have been interrupted. Use `AskUserQuestion`:
+  - **Header**: "Possible Interrupted Promotion"
+  - **Question**: "The target folder already exists and contains files matching the source. A previous promotion may have been interrupted."
+  - **Options**:
+    1. **Resume** — "Continue the promotion (re-run merge, then cleanup)"
+    2. **Restart** — "Start the promotion fresh"
+    3. **Abort** — "Cancel"
+  - If **Resume** or **Restart**: proceed to step 2 (Pre-flight Validation). Both paths re-run the full promotion logic — the difference is that Resume signals that partial work may exist in the target.
+  - If **Abort**: STOP.
 
 ## 2. Pre-flight Validation
 
@@ -35,7 +44,15 @@ Check the source folder for readiness:
 
 1. **Required files**: `requirements.md` and `plan.md` must exist. If either is missing, STOP with an error.
 2. **Implementation gate**: `implementation.md` must exist. If missing, STOP with an error: "This change has not been implemented yet. Run `/ddd-implement` first."
-3. **Inventory**: Note the presence of optional files: `scenarios/`, `index.md`, `api.md`, `data-model.md`. These will be carried forward during promotion.
+3. **Plan completion**: Parse `plan.md` and verify all step checkboxes are marked `[x]`. If any steps are `[ ]`, STOP with an error listing the incomplete steps: "N of M plan steps are incomplete. Run `/ddd-implement` to complete implementation first."
+4. **Status gate**: Read the `status` field from `requirements.md` frontmatter. If status is not `under_test`, STOP with an error: "Feature must be fully implemented and verified before promotion. Current status: {status}."
+5. **Verification check**: Read `implementation.md` and locate the Testing/Verification section. If no verification results are present or if results show failures, warn the user. Use `AskUserQuestion`:
+   - **Header**: "Verification Warning"
+   - **Question**: "No passing verification results found in implementation.md. The implementation may not have been fully verified."
+   - **Options**:
+     1. **Proceed** — "Continue with promotion anyway"
+     2. **Abort** — "Cancel and verify first"
+6. **Inventory**: Note the presence of optional files: `scenarios/`, `index.md`, `api.md`, `data-model.md`. These will be carried forward during promotion.
 
 Present a summary to the user:
 
@@ -152,6 +169,26 @@ Present a merge summary:
 **Conflicts resolved**: [count] (N kept target, M used source, K manual)
 **Files added**: [list of new files]
 ```
+
+### 4.3 Post-Merge Consistency Check
+
+After the merge completes (in Merge mode) or files are written (in Create mode), verify the combined target is internally consistent:
+
+1. **Dangling references**: All requirement IDs referenced in `plan.md`, `scenarios/`, and `implementation.md` must exist in the target's `requirements.md`. Flag any dangling references.
+2. **Duplicate IDs**: No duplicate requirement IDs, scenario IDs, or decision names across the merged content.
+3. **Scope contradictions**: No item appears in both "In Scope" and "Out of Scope" in the merged `requirements.md`.
+4. **Term consistency**: Entity names and domain terms are consistent across all files in the target folder.
+
+If any issues are found, present them to the user using `AskUserQuestion`:
+
+- **Header**: "Post-Merge Issues"
+- **Question**: List each issue with context.
+- **Options**:
+  1. **Fix** — "Resolve these issues before continuing"
+  2. **Proceed** — "Continue despite these issues"
+  3. **Abort** — "Cancel the promotion"
+
+If the user chooses **Fix**: address each issue interactively (ask the user for resolution on ambiguous items). If **Proceed**: continue to cleanup. If **Abort**: STOP — do not delete the source folder (target may have been modified).
 
 ## 5. Cleanup
 
