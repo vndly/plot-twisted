@@ -6,7 +6,7 @@
 
 ### Step 1 — Write empty-state tests
 
-- [ ] Create `tests/presentation/components/common/empty-state.test.ts` covering:
+- [x] Create `tests/presentation/components/common/empty-state.test.ts` covering:
 
 - **SC-16-01** — Renders icon, title, and description when all provided
 - **SC-16-02** — With only title prop, icon and description are absent
@@ -23,7 +23,7 @@ Tests use `@vue/test-utils` `mount()` (provided by prerequisite 01a). Type-check
 
 ### Step 2 — Write skeleton-loader tests
 
-- [ ] Create `tests/presentation/components/common/skeleton-loader.test.ts` covering:
+- [x] Create `tests/presentation/components/common/skeleton-loader.test.ts` covering:
 
 - **SC-17-01** — Renders with specified dimensions, pulsing shimmer animation, and `aria-hidden="true"`
 - **SC-17-02** — Applies custom `rounded` prop
@@ -36,7 +36,7 @@ Tests use `@vue/test-utils` `mount()` (provided by prerequisite 01a). Type-check
 
 ### Step 3 — Create skeleton-loader component
 
-- [ ] Create `src/presentation/components/common/skeleton-loader.vue`:
+- [x] Create `src/presentation/components/common/skeleton-loader.vue`:
 
 - Props: `width` (string, default `'100%'`), `height` (string, default `'1rem'`), `rounded` (string, default `'rounded-md'`)
 - Single `<div>` with `animate-pulse bg-surface`, `aria-hidden="true"`, and dimensions applied via `:style="{ width, height }"`
@@ -45,7 +45,7 @@ Tests use `@vue/test-utils` `mount()` (provided by prerequisite 01a). Type-check
 
 ### Step 4 — Create empty-state component
 
-- [ ] Create `src/presentation/components/common/empty-state.vue`:
+- [x] Create `src/presentation/components/common/empty-state.vue`:
 
 - **Props:** `icon` (Vue `Component` type, optional), `title` (string), `description` (string, optional), `ctaLabel` (string, optional), `ctaAction` (() => void, optional)
 - **Layout:** Centered with `flex flex-col items-center justify-center`
@@ -59,7 +59,7 @@ Tests use `@vue/test-utils` `mount()` (provided by prerequisite 01a). Type-check
 
 ### Step 5 — Verify
 
-- [ ] `npm run type-check` passes with no errors
-- [ ] `npm run lint` passes with no errors
-- [ ] `npm run test` — all tests pass including the new empty-state and skeleton-loader test files
-- [ ] `npm run build` succeeds with no warnings
+- [x] `npm run type-check` passes with no errors
+- [x] `npm run lint` passes with no errors
+- [x] `npm run test` — all tests pass including the new empty-state and skeleton-loader test files
+- [x] `npm run build` succeeds with no warnings

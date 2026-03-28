@@ -1,7 +1,7 @@
 ---
 id: R-01f
 title: App Scaffolding — Skeleton & Empty State
-status: approved
+status: under_test
 type: infrastructure
 importance: critical
 tags: [components, ui-primitives]
