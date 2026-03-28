@@ -26,11 +26,11 @@ Add all i18n keys needed by the scaffolding phases (navigation labels, page titl
 
 ## Decisions
 
-| Decision                          | Choice                                                | Rationale                                                                                                                                                                                                             |
-| :-------------------------------- | :---------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Namespace pattern for shared keys | `common.*` (e.g., `common.error.*`, `common.empty.*`) | Distinguishes global reusable strings from feature-scoped keys (e.g., `library.empty.title`). Keeps shared error and empty state text under a single top-level namespace rather than scattering across feature areas. |
-| Page title namespace              | `page.*` (e.g., `page.home.title`, `page.settings.title`)   | Separates document/page titles from nav labels (`nav.*`). Allows titles to diverge independently (e.g., subtitles, contextual prefixes) without affecting nav items.                                                  |
-| Toast action labels               | `toast.*` (e.g., `toast.dismiss`, `toast.retry`)            | Groups toast-related labels under a dedicated top-level namespace. Avoids nesting under `common.*` since toasts are a distinct UI pattern used across many features.                                                  |
+| Decision                          | Choice                                                    | Rationale                                                                                                                                                                                                             |
+| :-------------------------------- | :-------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Namespace pattern for shared keys | `common.*` (e.g., `common.error.*`, `common.empty.*`)     | Distinguishes global reusable strings from feature-scoped keys (e.g., `library.empty.title`). Keeps shared error and empty state text under a single top-level namespace rather than scattering across feature areas. |
+| Page title namespace              | `page.*` (e.g., `page.home.title`, `page.settings.title`) | Separates document/page titles from nav labels (`nav.*`). Allows titles to diverge independently (e.g., subtitles, contextual prefixes) without affecting nav items.                                                  |
+| Toast action labels               | `toast.*` (e.g., `toast.dismiss`, `toast.retry`)          | Groups toast-related labels under a dedicated top-level namespace. Avoids nesting under `common.*` since toasts are a distinct UI pattern used across many features.                                                  |
 
 ## Scope
 

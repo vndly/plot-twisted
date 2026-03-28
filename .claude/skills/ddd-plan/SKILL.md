@@ -71,7 +71,16 @@ Performed by the orchestrator directly — no subagents. This is a critical gate
 
 ### Outcomes
 
-- **Critical issues found** (requirements too vague to plan, architectural contradictions, missing dependencies that block planning): STOP. Present all critical issues to the user using `AskUserQuestion`. Challenge the approach — explain why each issue would lead to a flawed plan and what needs to be resolved. Ask the user to fix the requirements or clarify before retrying.
+- **Critical issues found** (requirements too vague to plan, architectural contradictions, missing dependencies that block planning): Present all critical issues to the user using `AskUserQuestion`. Challenge the approach — explain why each issue would lead to a flawed plan and what needs to be resolved.
+  - **Header**: "Critical Issues"
+  - **Question**: List each critical issue with context and why it blocks planning.
+  - **Options**:
+    1. **Re-validate** — "I've updated the requirements, re-run validation"
+    2. **Proceed** — "Continue planning despite these issues (they become warnings)"
+    3. **Abort** — "Stop and fix requirements first"
+  - If **Re-validate**: re-run from step 2 (Context Loading) to pick up any changes the user made to `requirements.md`.
+  - If **Proceed**: downgrade all critical issues to warnings, note them as assumptions, and continue to step 4.
+  - If **Abort**: STOP.
 - **Warnings found** (minor ambiguities, soft conflicts, missing optional info): Present the warnings to the user and proceed. Note any assumptions you will make during planning and ask the user to confirm or correct them before continuing.
 - **Clean** (no issues): Proceed to step 4.
 
@@ -183,7 +192,7 @@ If the target folder has an `index.md`, update it to include entries for `plan.m
 
 ### 8.4 Format
 
-Run `npm run format` to ensure consistent formatting across all written files.
+Run `npm run format` once to ensure consistent formatting across all written files. Note: `audit-index` (steps 8.2/8.3) may already format index files — this final pass covers all remaining files and is idempotent.
 
 ## 9. Handoff to Review
 
@@ -202,4 +211,4 @@ Before running, inform the user:
 - **Atomic steps by default**: Every plan step must be atomic — completable in one pass, specific enough that two developers would produce the same result. Do not offer coarse-grained alternatives.
 - **Moderate scenario depth**: Cover happy paths, key error paths, and important edge cases. Use Scenario Outlines for data variation. Do not exhaustively cover every dimension — leave that for the review cycle.
 - **Scope discipline**: Do not add plan steps or scenarios for work outside the defined scope. Suggest out-of-scope improvements in step 7, but only include them if the user agrees.
-- **Format after writing**: After writing all files (step 8), run `npm run format` to ensure consistent formatting.
+- **Format after writing**: After writing all files (step 8), run `npm run format` once as a final pass to ensure consistent formatting.

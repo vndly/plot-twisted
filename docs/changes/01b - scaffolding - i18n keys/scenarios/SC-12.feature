@@ -36,21 +36,25 @@ Feature: SC-12 — i18n Keys
       | language | route              | page            | expected        |
       | English  | /                  | home            | Home            |
       | Spanish  | /                  | home            | Inicio          |
+      | French   | /                  | home            | Accueil         |
       | English  | /recommendations   | recommendations | Recommendations |
+      | Spanish  | /recommendations   | recommendations | Recomendaciones |
       | French   | /recommendations   | recommendations | Recommandations |
       | English  | /calendar          | calendar        | Calendar        |
       | Spanish  | /calendar          | calendar        | Calendario      |
+      | French   | /calendar          | calendar        | Calendrier      |
       | English  | /library           | library         | Library         |
+      | Spanish  | /library           | library         | Biblioteca      |
       | French   | /library           | library         | Bibliothèque    |
       | English  | /settings          | settings        | Settings        |
       | Spanish  | /settings          | settings        | Ajustes         |
+      | French   | /settings          | settings        | Paramètres      |
 
   Scenario: SC-12-03 — i18n key completeness
     Given all locale files for en, es, and fr
     When I compare their key structures
     Then each file contains keys in the following namespaces:
       | namespace      |
-      | app.title      |
       | nav.*          |
       | page.*.title   |
       | common.empty.* |
@@ -60,22 +64,27 @@ Feature: SC-12 — i18n Keys
     And every leaf value in each locale file is a non-empty string
     And the existing "app.title" key is preserved with its original value
     And each locale file is valid JSON
-    And every key segment matches the camelCase pattern
+    And every key segment matches the camelCase pattern "^[a-z][a-zA-Z0-9]*$"
 
   Scenario: SC-12-04 — Fallback to English on missing key
-    Given the app language is set to Spanish
+    Given all locale files contain the full default key set
+    And the app language is set to Spanish
     And the es.json locale file has the key "toast.dismiss" removed
     When a component renders the toast.dismiss translation
+    # Expected value matches en.json toast.dismiss
     Then the displayed text falls back to the English value "Dismiss"
 
   Scenario: SC-12-05 — Fallback when entire namespace missing from non-English locale
-    Given the app language is set to French
+    Given all locale files contain the full default key set
+    And the app language is set to French
     And the entire "toast" namespace is removed from fr.json
     When a component renders the toast.error translation
     Then the displayed text falls back to the English value "An error occurred"
 
   Scenario: SC-12-06 — Raw key path rendered when missing from all locales
-    Given the app language is set to Spanish
+    Given all locale files contain the full default key set
+    And the app language is set to Spanish
+    # fr.json is not consulted because the fallback chain is es → en
     And the key "toast.dismiss" is removed from both es.json and en.json
     When a component renders the toast.dismiss translation
     Then the displayed text shows the raw key path "toast.dismiss"
