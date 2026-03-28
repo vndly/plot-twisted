@@ -18,5 +18,8 @@
 14. **[SC-01d-11](./SC-01d-11.feature)**: Scroll-to-top behavior on route change.
 15. **[SC-01d-22](./SC-01d-22.feature)**: Router unit test specification for route behavior.
 16. **[SC-01d-29](./SC-01d-29.feature)**: Vue Router setup with HTML5 history mode and app registration.
+17. **[SC-12](./SC-12.feature)**: Modal composable behavior — open, close, single-instance replacement, and edge cases.
+18. **[SC-13](./SC-13.feature)**: Toast composable behavior — toast queue management, auto-dismiss, action buttons, and eviction.
+19. **[SC-23](./SC-23.feature)**: Composable unit tests — toast and modal state management verification.
 
 > **i18n note:** Theme, transitions, and constants deliver CSS definitions and a numeric constant with no user-facing text. i18n coverage is not applicable for those scenarios.

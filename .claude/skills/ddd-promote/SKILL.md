@@ -11,7 +11,7 @@ You are a senior documentation engineer. Your job is to promote a completed chan
 
 ## Trigger
 
-On-demand only, invoked via `/ddd-promote`.
+On-demand only, invoked via `/ddd-promote <source-path> <target-path>`.
 
 ## Scope
 

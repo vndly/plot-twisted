@@ -16,6 +16,10 @@ tags:
     constants,
     routing,
     navigation,
+    composables,
+    toast,
+    modal,
+    state,
   ]
 ---
 
@@ -27,11 +31,15 @@ Add Tailwind theme color tokens (success, error), all transition/animation CSS (
 
 Configure Vue Router with 4 lazy-loaded routes, catch-all redirect, scroll-to-top, and i18n-based document title updates.
 
+Create the `useToast` and `useModal` composables — module-level singleton reactive state for toast notifications and modal dialogs — along with their unit tests.
+
 ## Context & Background
 
 ### Problem Statement
 
 Downstream scaffolding features (01b through 01k) need test infrastructure and routing/test-utils dependencies before they can write or validate code. Without a configured Vitest setup and the required npm packages, no tests can be authored in subsequent phases.
+
+Downstream features (01g — Toast Container, 01h — Error Handling) require shared reactive state for toast notifications and modal dialogs. These composables must be available both inside and outside Vue component `setup()` so the global error handler can dispatch toast notifications.
 
 ### User Stories
 
@@ -51,6 +59,7 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - Phase 00 ([R-00](../../product/00%20-%20setup/requirements.md)) complete — Vue 3, Vite, TypeScript, Tailwind v4, vue-i18n, lucide-vue-next all installed.
 - [Phase 00 (Setup)](../../product/00%20-%20setup/) complete — vue-i18n installed, locale files exist with `app.title` key.
 - R-01a (Dependencies & Test Infrastructure) complete — Vitest, `@vue/test-utils`, and test configuration available.
+- R-01c — `TOAST_DISMISS_MS` constant in `src/domain/constants.ts`.
 
 ### Dependents
 
@@ -74,6 +83,8 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 | Domain file in scaffolding        | Early creation                                            | `src/domain/constants.ts` is introduced during a Presentation-focused scaffolding phase because downstream phases (R-01e, R-01g) depend on `TOAST_DISMISS_MS`.                                                        |
 | Router history mode               | `createWebHistory()`                                      | Clean URLs without hash fragments. Firebase SPA rewrite already handles fallback.                                                                                                                                     |
 | Home route matching               | Exact match only                                          | Prevents the Home nav item from appearing active on every route.                                                                                                                                                      |
+| Composable state pattern          | Module-level singleton                                    | Toast and modal composables use module-level reactive state so they work both inside and outside component `setup()` (needed for the global error handler).                                                           |
+| Composable return shape           | Custom per composable                                     | The `{ data, loading, error, refresh? }` return convention applies to Application-layer composables wrapping async operations. Presentation-layer UI-state composables use a shape suited to their purpose.            |
 
 ## Scope
 
@@ -94,6 +105,9 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - Create router configuration in `src/presentation/router.ts`.
 - Register router in `src/main.ts`.
 - Write router unit tests.
+- Create `src/presentation/composables/use-toast.ts` and `use-modal.ts`.
+- Write unit tests for both composables.
+- Define `MAX_VISIBLE_TOASTS` constant in `src/domain/constants.ts`.
 
 > **Note:** `nav.recommendations` and `page.recommendations.title` are included for forward compatibility with the Recommendations feature phase, even though no scaffolding sibling currently consumes them.
 
@@ -101,8 +115,6 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 
 ### Out of Scope
 
-- No composables or components are introduced in this phase.
-- No application tests are written in this phase — only the test infrastructure is set up.
 - Vue component creation or modification.
 - vue-i18n instance configuration or locale switching logic (fallback verification for scaffolded keys is in scope).
 - i18n keys beyond the scaffolding namespaces listed above (e.g., `library.*`, `details.*`).
@@ -116,6 +128,10 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - Route transition animations — covered by 01k.
 - Navigation guards beyond catch-all redirect.
 - Route-level middleware or authentication guards.
+- Global error handler integration — covered by 01h.
+- Toast container component (`toast-container.vue`) — covered by 01g.
+- Modal dialog component (`modal-dialog.vue`) — covered by 01g.
+- Toast animations and transitions — covered by 01g.
 
 > All subsequent scaffolding features (01b through 01k) depend on the infrastructure established here.
 
@@ -142,6 +158,9 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 | SC-01d-10 | Document title | `router.afterEach` guard sets `document.title` to `${t(meta.titleKey)} — ${t('app.title')}`. Each route's `meta.titleKey` uses the pattern `page.<route-name>.title`. If `meta.titleKey` is undefined (e.g., catch-all route during redirect), fall back to just `t('app.title')`. | P1 |
 | SC-01d-11 | Scroll-to-top | Router `scrollBehavior` returns `{ top: 0 }` on every navigation. | P1 |
 | SC-01d-22 | Router unit tests | Tests in `tests/presentation/router.test.ts` for route definitions (4 named routes + catch-all), `scrollBehavior` returning `{ top: 0 }`, and `afterEach` guard setting `document.title`. | P0 |
+| SC-13 | Toast notification system | `useToast()` composable with module-level reactive state. `addToast(options)` pushes a toast (options: `{ message, type, action?: { label: string, handler: () => void } }`) with a generated unique ID (incrementing counter) and auto-dismiss after `TOAST_DISMISS_MS` (default 4000ms, from `src/domain/constants.ts`). `removeToast(id)` removes it and clears its auto-dismiss timer. Toast types: error (red), success (green), info (teal). Enforces a maximum of `MAX_VISIBLE_TOASTS` (5) simultaneous toasts; when exceeded, the oldest toast is evicted before the new one is added. | P0 |
+| SC-12 | Modal/dialog | `useModal()` composable (single-instance). `open(props)` sets visible true and stores props (shape: `{ title: string, content?: string, confirmLabel?: string, cancelLabel?: string, onConfirm?: () => void, onCancel?: () => void }`). `close()` sets visible false and clears props. Opening a new modal while one is active replaces the current modal. The composable stores callback references in props; invocation of callbacks is the consuming component's responsibility (see 01g). | P1 |
+| SC-23 | Composable unit tests | `useToast`: add/remove toast, auto-dismiss after timeout, toast types. `useModal`: open/close state, callback storage in props. | P0 |
 
 > **Note:** `src/domain/constants.ts` is created in this phase with `TOAST_DISMISS_MS` only (additional constants will be added in their respective feature phases). See Decisions table for rationale.
 
@@ -169,6 +188,7 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 ### Architecture Compliance
 
 - **CSS centralization:** No CSS files other than `src/assets/main.css` shall exist in the project. All transition and animation styles are centralized in the single Tailwind entry point.
+- **Composable location:** Toast and modal composables live in `src/presentation/composables/` rather than `src/application/` because they manage UI-only state with no domain or infrastructure dependencies. This introduces a `composables/` subdirectory under `src/presentation/` not currently defined in `architecture.md` — both `architecture.md` and the glossary entry for "Composable" should be updated to acknowledge that purely UI-state composables may reside in the Presentation layer.
 
 ### Performance
 
@@ -189,6 +209,8 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - Vue 3 `<Transition>` class naming convention (`name-enter-active`, `name-leave-active`, etc.) is stable and will not change in minor versions.
 - Firebase SPA rewrite is configured in Phase 00.
 - 01a has been completed: vue-router is installed and i18n title keys (`page.*.title`) exist (SC-01b-12).
+- Module-level singleton state persists correctly during Vite HMR in development.
+- The `TOAST_DISMISS_MS` constant from 01c exists and exports the expected value (4000ms).
 
 ### Risks
 
@@ -198,6 +220,8 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - **Key path mismatch** (medium likelihood, medium impact): Downstream features (01d, 01h, 01i, 01j) may reference key paths that do not match the exact paths defined here. Mitigation: downstream requirements explicitly list the keys they consume; the locale key parity test catches missing keys.
 - **Low likelihood, low impact:** If Tailwind v4 changes the `@theme` block syntax in a future update, the custom property declarations may need to be moved. Mitigation: pin Tailwind version in `package.json`.
 - **Firebase SPA fallback** (low likelihood, high impact): `createWebHistory()` requires Firebase SPA rewrite. Mitigation: verify `hosting.rewrites` from Phase 00.
+- **Leaked timers during HMR** (low likelihood, low impact): Tests validate timer cleanup; HMR invalidation replaces module state.
+- **Module-level state not cleared between tests** (medium likelihood, medium impact): Expose a `_resetForTesting()` helper or clear state in `beforeEach` via the public API.
 
 ## Acceptance Criteria
 
@@ -239,6 +263,21 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - [ ] [NFR, Performance] Main bundle remains under 150 KB gzipped
 - [ ] [NFR, Performance] Each route's lazy-loaded chunk remains under 20 KB gzipped
 - [ ] [SC-01d-22] Router unit tests pass
+- [ ] [SC-13] `useToast` adds toasts to the queue with unique IDs
+- [ ] [SC-13] `useToast` removes toasts via `removeToast(id)`
+- [ ] [SC-13] Toasts auto-dismiss after `TOAST_DISMISS_MS`
+- [ ] [SC-13] Maximum `MAX_VISIBLE_TOASTS` (5) simultaneous toasts; when exceeded, the oldest toast is evicted
+- [ ] [SC-13] `removeToast(id)` with a non-existent ID has no effect and does not throw
+- [ ] [SC-12] `useModal` `open(props)` sets the modal visible and stores props (including optional callbacks)
+- [ ] [SC-12] `useModal` `close()` hides the modal and clears props
+- [ ] [SC-12] Calling `close()` when no modal is open has no effect and does not throw
+- [ ] [SC-12] Opening a second modal replaces the first — single-instance behavior
+- [ ] [SC-13] `addToast` works correctly when the optional `action` field is omitted
+- [ ] [SC-13] `removeToast(id)` clears the auto-dismiss timer for that toast
+- [ ] `architecture.md` updated to document `src/presentation/composables/` for UI-only state composables
+- [ ] Glossary "Composable" entry updated to acknowledge Presentation-layer composables
+- [ ] `MAX_VISIBLE_TOASTS` constant documented in `data-model.md` constants table
+- [ ] [SC-23] All composable unit tests pass
 
 ## Constraints
 
@@ -247,3 +286,5 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - Must use `createWebHistory()` (no hash mode) — requires Firebase SPA rewrite for server-side fallback.
 - View component files (`*-screen.vue`) are provided by change 01j — router configuration will reference them before they exist.
 - All new files live in `src/presentation/` (router configuration). `src/main.ts` is the only existing file modified.
+- Composables must work both inside and outside Vue component `setup()` context (needed by the global error handler in 01h).
+- `MAX_VISIBLE_TOASTS` must be defined as a named constant in `src/domain/constants.ts`.
