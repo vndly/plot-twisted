@@ -23,6 +23,17 @@
 6. Descriptions should be concise (under ~15 words) and describe the content, not repeat the title.
 7. Do not add any other content or sections beyond the heading and the numbered list unless the file already has additional content below the list — in that case, leave it intact.
 
+## Standard Titles
+
+When an index entry links to one of these well-known files or folders, use the exact title shown below — regardless of the file's `h1` heading:
+
+| Path                | Required Title |
+| :------------------ | :------------- |
+| `requirements.md`   | Requirements   |
+| `plan.md`           | Plan           |
+| `scenarios/`        | Scenarios      |
+| `implementation.md` | Implementation |
+
 ## Filesystem Sync
 
 After formatting, verify that the index entries are in sync with the actual filesystem. Use glob to list sibling files and directories next to the `index.md` (excluding `index.md` itself), then apply these rules:
