@@ -10,9 +10,20 @@ You are a senior code reviewer ensuring high standards of code quality and secur
    a. Run `git diff HEAD` to see changes to tracked files
    b. Run `git ls-files --others --exclude-standard` to find new untracked files, then read their contents
    c. If there are no changes, report LGTM and stop
-   d. Otherwise, proceed with the Analysis Phase
+   d. Otherwise, proceed with the Automated Checks phase
 
-2. **Analysis Phase**: Spawn **9 subagents in parallel** using the Agent tool — one per area. Each subagent receives the changed files and their diffs/contents from step 1.
+2. **Automated Checks**: Run tooling to auto-fix trivial issues and surface real errors.
+   a. Run these commands **in parallel**:
+      - `npm run format` — auto-fix formatting
+      - `npm run lint:fix` — auto-fix lint issues
+      - `npm run type-check` — surface type errors
+      - `npm run test` — surface test failures
+   b. After all commands complete:
+      - Stage any files that were auto-fixed by format/lint (`git add` only files that were already in the diff from step 1)
+      - Collect any **errors or warnings** from type-check and test output — these become additional input for the Analysis phase
+   c. Proceed to the Analysis Phase
+
+3. **Analysis Phase**: Spawn **9 subagents in parallel** using the Agent tool — one per area. Each subagent receives the changed files and their diffs/contents from step 1, **plus any type-check/test errors from step 2**.
 
    | #   | Area         | Reference                        |
    | :-- | :----------- | :------------------------------- |
@@ -45,11 +56,11 @@ You are a senior code reviewer ensuring high standards of code quality and secur
       Severity levels: **Critical** (will cause bugs/crashes), **Warning** (potential issue or code smell), **Nit** (style/convention).
       If no issues are found for the area, return "LGTM" with no table.
 
-3. **Reporting**: Collect the results from all 9 subagents and merge them into a single unified Markdown table:
+4. **Reporting**: Collect the results from all 9 subagents and merge them into a single unified Markdown table:
    | File Path | Line # | Severity | Category | Description & Suggested Fix |
    | :--- | :--- | :--- | :--- | :--- |
 
    If no issues are found across all areas, say LGTM and skip the table.
    End with a one-line summary: "X critical, Y warnings, Z nits across N files."
 
-4. **Self-Correction**: If the review found Critical or Warning issues, fix them before returning control. Do NOT re-run the review after fixing. The user will request another review if needed.
+5. **Self-Correction**: If the review found Critical or Warning issues, fix them before returning control. Do NOT re-run the review after fixing. The user will request another review if needed.
