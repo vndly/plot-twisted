@@ -2,9 +2,10 @@ Feature: SC-13 — Toast composable behavior
   The toast composable SHALL manage a reactive toast queue.
 
   Scenario Outline: SC-13-01 — Toast appears and auto-dismisses
+    Given the toast queue is empty
     When a toast is triggered with message "<message>" and type "<type>"
     Then it is visible in the top-right corner with a <color> accent
-    And it automatically disappears after the configured toast dismiss duration
+    And it automatically disappears after TOAST_DISMISS_MS (4000 ms)
 
     Examples:
       | type    | color | message            |
@@ -18,6 +19,7 @@ Feature: SC-13 — Toast composable behavior
     Then the toast is removed immediately
 
   Scenario: SC-13-03 — Toast with action button
+    Given the toast queue is empty
     When a toast is triggered with an action (label: "Retry", handler function)
     Then it shows a "Retry" button alongside the dismiss button
     And clicking "Retry" triggers the associated action

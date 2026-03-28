@@ -13,6 +13,10 @@ Create the `useToast` and `useModal` composables — module-level singleton reac
 
 ## Context & Background
 
+### Problem Statement
+
+Downstream features (01g — Toast Container, 01h — Error Handling) require shared reactive state for toast notifications and modal dialogs. These composables must be available both inside and outside Vue component `setup()` so the global error handler can dispatch toast notifications.
+
 ### Dependencies
 
 - **01a** — Test infrastructure (vitest config, setup file, `@vue/test-utils`).
@@ -45,7 +49,7 @@ Create the `useToast` and `useModal` composables — module-level singleton reac
 | ID    | Requirement               | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Priority |
 | :---- | :------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
 | SC-13 | Toast notification system | `useToast()` composable with module-level reactive state. `addToast(options)` pushes a toast (options: `{ message, type, action?: { label: string, handler: () => void } }`) with a generated unique ID (incrementing counter) and auto-dismiss after `TOAST_DISMISS_MS` (default 4000ms, from `src/domain/constants.ts`). `removeToast(id)` removes it and clears its auto-dismiss timer. Toast types: error (red), success (green), info (teal). Enforces a maximum of `MAX_VISIBLE_TOASTS` (5) simultaneous toasts; when exceeded, the oldest toast is evicted before the new one is added. | P0       |
-| SC-15 | Modal/dialog              | `useModal()` composable (single-instance). `open(props)` sets visible true and stores props (shape: `{ title: string, content?: string, confirmLabel?: string, cancelLabel?: string, onConfirm?: () => void, onCancel?: () => void }`). `close()` sets visible false and clears props. Opening a new modal while one is active replaces the current modal. The composable stores callback references in props; invocation of callbacks is the consuming component's responsibility (see 01g).                                                                                                  | P1       |
+| SC-12 | Modal/dialog              | `useModal()` composable (single-instance). `open(props)` sets visible true and stores props (shape: `{ title: string, content?: string, confirmLabel?: string, cancelLabel?: string, onConfirm?: () => void, onCancel?: () => void }`). `close()` sets visible false and clears props. Opening a new modal while one is active replaces the current modal. The composable stores callback references in props; invocation of callbacks is the consuming component's responsibility (see 01g).                                                                                                  | P1       |
 | SC-23 | Composable unit tests     | `useToast`: add/remove toast, auto-dismiss after timeout, toast types. `useModal`: open/close state, callback storage in props.                                                                                                                                                                                                                                                                                                                                                                                                                                                                | P0       |
 
 ## Non-Functional Requirements
@@ -84,4 +88,9 @@ Create the `useToast` and `useModal` composables — module-level singleton reac
 - [ ] `useModal` `close()` hides the modal and clears props
 - [ ] Calling `close()` when no modal is open has no effect and does not throw
 - [ ] Opening a second modal replaces the first — single-instance behavior
+- [ ] `addToast` works correctly when the optional `action` field is omitted
+- [ ] `removeToast(id)` clears the auto-dismiss timer for that toast
+- [ ] `architecture.md` updated to document `src/presentation/composables/` for UI-only state composables
+- [ ] Glossary "Composable" entry updated to acknowledge Presentation-layer composables
+- [ ] `MAX_VISIBLE_TOASTS` constant documented in `data-model.md` constants table
 - [ ] All composable unit tests pass
