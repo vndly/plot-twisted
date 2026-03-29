@@ -147,6 +147,8 @@ Compare the refined draft against the existing specifications collected by Subag
 1. **Duplicate requirements**: Flag any functional requirement that substantially overlaps with a requirement in an existing spec. Include the conflicting requirement ID and feature name.
 2. **Scope conflicts**: Flag if the draft's "In Scope" items overlap with another feature's scope.
 3. **ID collisions**: Verify the auto-generated feature ID and all requirement IDs are unique across all existing specs.
+4. **Dependency validity**: Verify that declared dependencies exist and are named consistently with existing specs.
+5. **Affected-doc awareness**: Flag if the draft implies changes to existing `docs/product/` content but does not identify the affected docs.
 
 ### On conflicts found
 
@@ -214,4 +216,5 @@ Before running, inform the user:
 - **One round-trip minimum**: Always present the draft and ask follow-up questions (step 6), even if the user's description seems complete. There are always gaps or ambiguities worth surfacing.
 - **No scope creep**: Do not add requirements, sections, or acceptance criteria that the user did not ask for or confirm. Suggest them in step 6, but only include them if the user agrees.
 - **ID uniqueness is mandatory**: The feature ID and all requirement IDs must be unique across the entire project. If a collision is detected, resolve it before writing files.
+- **Capture downstream planning inputs**: Dependencies, decisions, risks/assumptions, migration concerns, and affected existing product docs must be captured when present. Do not leave them implicit if the user provided enough information to state them.
 - **Format after writing**: After writing `requirements.md` and `index.md` (step 8), run `npm run format` to ensure consistent formatting.

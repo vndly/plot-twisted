@@ -15,7 +15,7 @@ On-demand only, invoked via `/ddd-promote <source-path> <target-path>`.
 
 ## Scope
 
-- Promotes a single change request by merging its documentation into the product specification.
+- Promotes a single change request by merging its canonical current-state documentation into the product specification.
 - Handles both new product folders (create) and existing ones (merge at section/requirement level).
 - Cleans up the source change folder after successful promotion.
 - Updates all affected index files.
@@ -26,6 +26,7 @@ On-demand only, invoked via `/ddd-promote <source-path> <target-path>`.
 - Ask the user for **two paths** (relative to project root):
   1. **Source** — the change folder to promote (e.g., `docs/changes/001 - change`).
   2. **Target** — the product folder to promote into (e.g., `docs/product/001 - feature`). This folder may or may not exist yet.
+- If either argument is missing, ask the user for the missing path(s) before proceeding.
 - Validate that the source folder exists. If it does not, STOP with an error.
 - List all files in the source folder (including `scenarios/` contents if present).
 - **Interrupted promotion check**: If the target folder already exists, check whether it contains files with the same names as the source folder. If it does and the source folder still exists, a previous promotion may have been interrupted. Use `AskUserQuestion`:
@@ -195,6 +196,7 @@ After the merge completes (in Merge mode) or files are written (in Create mode),
 2. **Duplicate IDs**: No duplicate requirement IDs, scenario IDs, or decision names across the merged content.
 3. **Scope contradictions**: No item appears in both "In Scope" and "Out of Scope" in the merged `requirements.md`.
 4. **Term consistency**: Entity names and domain terms are consistent across all files in the target folder.
+5. **Affected-doc updates**: If the change alters behavior already documented in other `docs/product/` folders, verify those docs were updated or explicitly called out for follow-up.
 
 If any issues are found, present them to the user using `AskUserQuestion`:
 
@@ -254,6 +256,7 @@ Present a final summary:
 ## Rules
 
 - **Never modify files outside scope**: Only modify files in the source folder, target folder, index files, and roadmap files. Do not touch any other files.
+- **Update affected canonical docs when required**: If the promoted change alters behavior already documented elsewhere in `docs/product/`, update those affected product docs as part of promotion.
 - **Read before writing**: Always read current file content before modifying. Preserve existing content unless a merge decision says otherwise.
 - **Atomic operation**: If any step fails after files have been written to the target, do NOT delete the source folder. Only delete the source after all target writes succeed.
 - **No guessing**: If a merge conflict is ambiguous, always ask the user. Do not silently pick a side.

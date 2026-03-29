@@ -182,6 +182,7 @@ After all per-file subagents from step 3 complete, spawn a single **cross-cuttin
 - **Cross-feature conflicts**: No overlap or contradiction with other features in `docs/product/` or `docs/changes/` (using project context from Subagent B).
 - **Dependency impact**: If the feature touches existing modules, are ripple effects acknowledged?
 - **Migration & rollback**: If the feature introduces schema changes, API breaking changes, or data migrations, verify there is a backwards compatibility or rollback plan. Skip for features with no data/API impact.
+- **Affected-doc coverage**: If the change alters behavior already documented elsewhere in `docs/product/`, verify the impacted docs are identified and accounted for.
 
 ### 4.2 Challenge & Improve
 

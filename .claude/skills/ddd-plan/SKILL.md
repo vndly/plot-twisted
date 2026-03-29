@@ -88,7 +88,7 @@ Performed by the orchestrator directly — no subagents. This is a critical gate
   - If **Re-validate**: re-run from step 2 (Context Loading) to pick up any changes the user made to `requirements.md`.
   - If **Proceed**: downgrade all critical issues to warnings, note them as assumptions, and continue to step 4.
   - If **Abort**: STOP.
-- **Warnings found** (minor ambiguities, soft conflicts, missing optional info): Present the warnings to the user and proceed. Note any assumptions you will make during planning and ask the user to confirm or correct them before continuing.
+- **Warnings found** (minor ambiguities, soft conflicts, missing optional info, technical drift detected while resuming): Present the warnings to the user and proceed. Note any assumptions you will make during planning and ask the user to confirm or correct them before continuing.
 - **Clean** (no issues): Proceed to step 4.
 
 ## 4. Compliance Brief
@@ -121,7 +121,7 @@ Generate a complete `plan.md` draft. Do **not** write the file yet — hold it i
 - **Test-first order**: Include a testing phase before the implementation phase. Tests are written first (derived from scenarios), run to confirm failure, then implementation follows. The testing phase may be split across multiple phases if the plan has distinct implementation stages.
 - **Atomic steps**: Each step must be small enough to complete in one pass but not trivially small. Steps must be actionable and concrete — include enough detail (props, types, behavior, config values, file paths) that two developers would produce the same result.
 - **Checkboxes**: Every step has a `- [ ]` checkbox for progress tracking.
-- **Scenario traceability**: Each test step must list the scenario IDs it covers (e.g., `covering: SC-04-01, SC-04-02`). Tests for implementation details not tied to a specific scenario are marked as `(implementation detail)`.
+- **Scenario traceability**: Each test step must list the scenario IDs it covers. Tests for implementation details not tied to a specific scenario are marked as `(implementation detail)`.
 - **Dependency management**: Steps that install packages must specify version ranges.
 - **Rollback safety**: Destructive steps must note a rollback path.
 - **Dependency ordering**: If the feature depends on other features, ensure plan steps do not assume infrastructure or patterns that are introduced by dependency plans in a later phase. Reference dependency plan outputs where relevant.

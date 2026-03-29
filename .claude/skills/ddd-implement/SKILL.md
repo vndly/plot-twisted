@@ -28,6 +28,10 @@ On-demand only, invoked via `/ddd-implement <folder-path>` (path relative to pro
 - Validate the folder exists.
 - Validate that `requirements.md` exists — if missing, STOP with an error.
 - Validate that `plan.md` exists — if missing, STOP with an error.
+- Validate that implementation-ready planning artifacts exist:
+  - `requirements.md` must contain functional requirements and acceptance criteria.
+  - `plan.md` must contain executable steps with checkboxes.
+  - If `plan.md` references scenario IDs, `scenarios/` must exist.
 - **Status gate**: Read the `status` field from `requirements.md` frontmatter.
   - If status is `approved`: proceed.
   - If status is `in_development`: a previous implementation was started. Use `AskUserQuestion`:
@@ -44,7 +48,7 @@ On-demand only, invoked via `/ddd-implement <folder-path>` (path relative to pro
     - `draft` → "Requirements are still in draft. Run `/ddd-specify` to complete the specification, then `/ddd-review` to review it."
     - `review` → "A review is currently in progress. Wait for it to complete or re-run `/ddd-review` to finish the review."
     - `planned` → "Planning is complete but not yet reviewed. Run `/ddd-review` to review the plan before implementation."
-    - `under_test` → "This feature is already implemented and under testing. Run `/ddd-promote` when testing is complete."
+    - `under_test` → "This feature is already implemented and under testing."
     - `released` → "This feature has already been promoted to the product specification."
 - Note the presence of optional files: `scenarios/`, `implementation.md`, `index.md`.
 - If `implementation.md` already exists, warn the user that it will be regenerated at the end.
@@ -74,7 +78,7 @@ Performed by the orchestrator directly — no subagents. This is a quick cross-r
 3. **Plan structure**: Plan has at least one step with a checkbox. If zero steps found, STOP.
 4. **Scope contradictions**: Plan steps do not create or implement anything listed as out of scope in `requirements.md`. Flag obvious contradictions.
 5. **Dependency check**: If `requirements.md` lists dependencies on other features, warn the user to confirm those are already implemented.
-6. **Scenario reference validation**: Every scenario ID referenced in plan test steps (e.g., `covering: SC-04-01`) must exist in `scenarios/`. If `scenarios/` is missing but the plan references scenario IDs, warn that test-first implementation will lack scenario context.
+6. **Scenario reference validation**: Every scenario ID referenced in plan test steps must exist in `scenarios/`. If `scenarios/` is missing but the plan references scenario IDs, warn that test-first implementation will lack scenario context.
 7. **Technical consistency**: Validate that plan steps are still consistent with the current technical reference docs. Since time may pass between planning and implementation, actively check for drift:
    - No steps reference deprecated patterns, removed APIs, or technologies not in `tech-stack.md`.
    - Architecture boundaries in `architecture.md` have not changed in ways that affect the plan.
@@ -94,7 +98,7 @@ Performed by the orchestrator directly — no subagents. This is a quick cross-r
   - If **Re-validate**: re-run from step 2 (Context Loading) to pick up any changes.
   - If **Proceed**: downgrade all critical issues to warnings, note them as assumptions, and continue to step 4.
   - If **Abort**: STOP.
-- **Warnings found** (missing scenario references, dependency confirmation needed): Present warnings to the user alongside the start/resume summary. Proceed unless the user chooses to abort.
+- **Warnings found** (missing scenario references, dependency confirmation needed, verification exceptions from prior attempts): Present warnings to the user alongside the start/resume summary. Proceed unless the user chooses to abort.
 - **Resume detected** (some steps already marked `[x]`): Present a resume summary — how many steps done, which phase/step to resume from. Use `AskUserQuestion` to confirm before continuing.
 - **Clean start** (no steps marked `[x]`): Present a brief summary — feature title, number of phases, number of steps. Use `AskUserQuestion` to confirm before starting.
 
@@ -191,6 +195,12 @@ Run all automated checks before stopping — do not halt between checks. After a
     3. **Abort** — "Stop here"
 
 If the user chooses **Investigate**: read the error output, identify the likely cause, propose a fix, and ask the user to approve before applying it. After the fix, re-run only the previously failed checks.
+
+If the user chooses **Ignore**:
+
+- Leave the `requirements.md` status as `in_development`.
+- Record the ignored verification failures in `implementation.md`.
+- State clearly in the final summary that automated verification did not pass and promotion is blocked until verification succeeds.
 
 ### On verification success
 
@@ -294,8 +304,8 @@ Present a final summary to the user:
 - [If none: "No issues encountered."]
 
 ### Next Steps
-- Status has been set to `under_test` — perform manual testing before promotion.
-- When testing is complete, run `/ddd-promote` to promote the feature to the product specification.
+- If verification passed, status has been set to `under_test` — perform manual testing before promotion.
+- If verification did not pass and was ignored, status remains `in_development` and promotion is blocked until verification succeeds.
 ```
 
 ## 9. Handoff to Code Review
