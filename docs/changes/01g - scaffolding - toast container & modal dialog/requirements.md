@@ -1,7 +1,7 @@
 ---
 id: R-01g
 title: App Scaffolding — Toast Container & Modal Dialog
-status: draft
+status: approved
 type: infrastructure
 importance: critical
 tags: [components, toast, modal, overlay]
@@ -11,10 +11,12 @@ tags: [components, toast, modal, overlay]
 
 Create the ToastContainer and ModalDialog overlay components that render the toast queue and modal state managed by the composables from 01e.
 
-## Prerequisites
+## Context & Background
+
+### Dependencies
 
 - **01a** — Test infrastructure (vitest config, setup file, `@vue/test-utils`).
-- **01c** — Theme colors for type-colored borders (`--color-success`, `--color-error`).
+- **01c** — Theme colors for type-colored borders (`--color-success`, `--color-error`) and transition CSS classes (`toast-*`, `modal-*`).
 - **01e** — `useToast` and `useModal` composables.
 
 ## Decisions
@@ -23,38 +25,60 @@ None specific to this sub-phase (composable decision was in 01e).
 
 ## Scope
 
-- Create `src/presentation/components/common/toast-container.vue` and `modal-dialog.vue`.
-- Write component tests for both.
+### In Scope
+
+- Create `src/presentation/components/common/toast-container.vue`.
+- Create `src/presentation/components/common/modal-dialog.vue`.
+- Write component tests: `tests/presentation/components/common/toast-container.test.ts` and `tests/presentation/components/common/modal-dialog.test.ts`.
+
+### Out of Scope
+
+- Composable logic (managed by 01e).
+- Transition CSS classes (delivered by 01c).
+- Toast/modal integration into App.vue (handled by 01k).
 
 ## Functional Requirements
 
-| ID    | Requirement                  | Description                                                                                                                                                                                                                                                                                            | Priority |
-| :---- | :--------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
-| SC-14 | Toast container              | Fixed top-right container (`z-50`) rendering the toast queue with `<TransitionGroup>` (slide in from the right into the top-right position, fade-out on dismiss). Each toast has dismiss button and optional action button. Maximum 5 simultaneous toasts; when exceeded, the oldest toast is evicted. | P0       |
-| SC-15 | Modal/dialog                 | `modal-dialog.vue` with backdrop (`bg-black/50`), centered content card, title, optional body, confirm/cancel buttons. Closes on backdrop click and Escape key. Opening a new modal while one is active replaces the current modal.                                                                    | P1       |
-| SC-24 | UI primitive tests (partial) | Component tests for ToastContainer (renders toast queue) and ModalDialog (renders title/body/buttons, closes on backdrop click and Escape).                                                                                                                                                            | P0       |
+| ID    | Requirement                  | Description                                                                                                                                                                                                                                                                                                                                                                                     | Priority |
+| :---- | :--------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
+| SC-14 | Toast container              | Fixed top-right container (`z-50`) rendering the toast queue with `<TransitionGroup>` using the `toast-*` CSS transition classes (300 ms slide-in from the right, 200 ms fade-out on dismiss). Each toast has a dismiss button and an optional action button (text-style, positioned left of the dismiss button). Maximum 5 simultaneous toasts; when exceeded, the oldest toast is evicted.    | P0       |
+| SC-15 | Modal/dialog                 | `modal-dialog.vue` with backdrop (`bg-black/50`), centered content card, title, optional content, confirm/cancel buttons. Escape key listener registered on `document` when the modal is open, removed on close. Confirm defaults to `$t('modal.confirm')`, cancel defaults to `$t('modal.cancel')` when labels are not provided. Opening a new modal while one is active replaces the current. | P1       |
+| SC-24 | UI primitive tests (partial) | Component tests for ToastContainer (SC-24-04: renders toast queue, dismiss, positioning) and ModalDialog (SC-24-05: renders title/content/buttons, closes on backdrop click and Escape). Remaining SC-24 coverage (ErrorBoundary) is in R-01h.                                                                                                                                                  | P0       |
 
 ## Non-Functional Requirements
 
 ### Stacking Order
 
-- Page content: default (`z-0`)
-- Bottom nav: `z-10`
+Overlay elements introduced by this feature use the following z-index scale. Navigation component z-indices are defined in R-01i.
+
 - Modal backdrop: `z-40`
 - Modal content card: `z-40` (same layer as backdrop; stacks above via DOM order)
 - Toast container: `z-50` (renders above modals — toasts remain visible when a modal is open)
 
+### Accessibility
+
+- Toast and modal transitions must respect `prefers-reduced-motion` by disabling animations when the user preference is set.
+
+## Risks & Assumptions
+
+### Assumptions
+
+- `useToast` and `useModal` composables are implemented and tested (01e dependency).
+- Transition CSS classes (`toast-*`, `modal-*`) exist in `main.css` (delivered in 01c).
+- No accessibility focus trapping is required for the modal (per ui-ux.md § 11: minimal scope).
+
 ## Acceptance Criteria
 
 - [ ] Toast container is fixed top-right with `z-50`
-- [ ] Toasts stack vertically without overlapping
+- [ ] Toasts stack vertically (flex column, `gap-3`) without overlapping
 - [ ] Each toast has a dismiss button; clicking it removes the toast
-- [ ] Toasts display type-colored left borders (error -> red, success -> green, info -> teal)
-- [ ] Toast enter/leave uses `<TransitionGroup>` animation
+- [ ] Toasts display type-colored left borders (error -> `--color-error`, success -> `--color-success`, info -> `--color-accent`)
+- [ ] Toast enter/leave uses `<TransitionGroup>` animation (300 ms slide-in, 200 ms fade-out)
+- [ ] Toast and modal transitions are disabled when `prefers-reduced-motion: reduce` is active
 - [ ] Modal renders backdrop overlay (`bg-black/50`) and centered content card
-- [ ] Modal displays title, optional body, confirm and cancel buttons
+- [ ] Modal displays title, optional content, confirm and cancel buttons
 - [ ] Modal closes on backdrop click
-- [ ] Modal closes on Escape key
+- [ ] Modal closes on Escape key (document-level listener)
 - [ ] Confirm button invokes `onConfirm` callback and closes the modal
 - [ ] Cancel button invokes `onCancel` callback and closes the modal
 - [ ] Component tests for ToastContainer pass
