@@ -62,6 +62,14 @@ describe('router', () => {
         expect(typeof component, `${String(route.name)} component`).toBe('function')
       }
     })
+
+    it('triggers the calendar route lazy import on navigation', async () => {
+      // Act
+      await router.push('/calendar')
+
+      // Assert
+      expect(router.currentRoute.value.name).toBe('calendar')
+    })
   })
 
   // Implementation detail — meta.titleKey per route
@@ -140,6 +148,25 @@ describe('router', () => {
 
       // Assert
       expect(document.title).toBe('page.home.title \u2014 app.title')
+    })
+
+    it('falls back to app.title when route has no titleKey', async () => {
+      // Arrange — add a temporary route with no titleKey meta
+      router.addRoute({
+        path: '/no-title',
+        name: 'no-title',
+        component: { template: '<div />' },
+      })
+
+      try {
+        // Act
+        await router.push('/no-title')
+
+        // Assert
+        expect(document.title).toBe('app.title')
+      } finally {
+        router.removeRoute('no-title')
+      }
     })
   })
 })

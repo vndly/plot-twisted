@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { useToast, _resetForTesting } from '@/presentation/composables/use-toast'
-import { TOAST_DISMISS_MS } from '@/domain/constants'
+import { useToast, _resetForTesting, type Toast } from '@/presentation/composables/use-toast'
+import { TOAST_DISMISS_MS, MAX_VISIBLE_TOASTS } from '@/domain/constants'
 
 describe('useToast', () => {
   beforeEach(() => {
@@ -175,5 +175,38 @@ describe('useToast', () => {
 
     // Assert
     expect(toasts.value[0].action).toBeUndefined()
+  })
+
+  // Defensive branch: removeToast when toast exists but has no timer in the map
+  it('handles removeToast for a toast with no associated timer', () => {
+    // Arrange — push a toast directly into the array, bypassing addToast (no timer created)
+    const { toasts, removeToast } = useToast()
+    const orphan: Toast = { id: 'orphan', message: 'No timer', type: 'info' }
+    ;(toasts.value as Toast[]).push(orphan)
+    expect(toasts.value).toHaveLength(1)
+
+    // Act
+    removeToast('orphan')
+
+    // Assert
+    expect(toasts.value).toHaveLength(0)
+  })
+
+  // Defensive branch: eviction when the oldest toast has no timer in the map
+  it('handles eviction when the oldest toast has no associated timer', () => {
+    // Arrange — fill to capacity by pushing directly (no timers created)
+    const { toasts, addToast } = useToast()
+    for (let i = 0; i < MAX_VISIBLE_TOASTS; i++) {
+      ;(toasts.value as Toast[]).push({ id: `manual-${i}`, message: `Manual ${i}`, type: 'info' })
+    }
+    expect(toasts.value).toHaveLength(MAX_VISIBLE_TOASTS)
+
+    // Act — addToast triggers eviction of the oldest (which has no timer)
+    addToast({ message: 'Triggers eviction', type: 'success' })
+
+    // Assert — oldest manual toast was evicted, new toast is present
+    expect(toasts.value).toHaveLength(MAX_VISIBLE_TOASTS)
+    expect(toasts.value.find((t) => t.id === 'manual-0')).toBeUndefined()
+    expect(toasts.value[toasts.value.length - 1].message).toBe('Triggers eviction')
   })
 })
