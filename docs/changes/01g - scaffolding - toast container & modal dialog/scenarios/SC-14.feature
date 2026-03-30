@@ -22,10 +22,13 @@ Feature: SC-14 — Toast container component
     Then the oldest toast is removed
     And the new toast is added to the container
 
-  Scenario: SC-14-05 — Toast enter and leave transitions
+  Scenario: SC-14-05a — Toast enter transition
     Given a toast is triggered
     When the toast appears
     Then it slides in from the right (300 ms, ease-in-out)
+
+  Scenario: SC-14-05b — Toast leave transition
+    Given a toast is visible
     When the toast is dismissed
     Then it fades out (200 ms, ease-in-out)
 
@@ -41,8 +44,8 @@ Feature: SC-14 — Toast container component
       | info    | --color-accent (teal)   |
 
   Scenario: SC-14-07 — Toast auto-dismisses after timeout
-    Given a toast is triggered
-    When the default dismiss timeout elapses without user interaction
+    Given an info toast is triggered with the default TOAST_DISMISS_MS timeout
+    When the timeout elapses without user interaction
     Then the toast is automatically removed from the container
 
   Scenario: SC-14-08 — Transitions disabled with reduced motion

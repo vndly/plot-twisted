@@ -21,7 +21,12 @@ Create the ToastContainer and ModalDialog overlay components that render the toa
 
 ## Decisions
 
-None specific to this sub-phase (composable decision was in 01e).
+| Decision                  | Choice                        | Rationale                                                                                           |
+| :------------------------ | :---------------------------- | :-------------------------------------------------------------------------------------------------- |
+| Toast z-index above modal | Toast `z-50`, Modal `z-40`    | Toasts should remain visible during modal interactions for error feedback and action confirmations. |
+| Dismiss button icon       | X icon (lucide-vue-next)      | Consistent with common UI patterns and the project's icon library.                                  |
+| Max toast limit           | Fixed at 5 (not configurable) | Prevents UI clutter; configurability deferred to future enhancement if user feedback requests it.   |
+| Modal button order        | Cancel left, Confirm right    | Primary action rightmost follows common web conventions.                                            |
 
 ## Scope
 
@@ -39,11 +44,11 @@ None specific to this sub-phase (composable decision was in 01e).
 
 ## Functional Requirements
 
-| ID    | Requirement                  | Description                                                                                                                                                                                                                                                                                                                                                                                     | Priority |
-| :---- | :--------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
-| SC-14 | Toast container              | Fixed top-right container (`z-50`) rendering the toast queue with `<TransitionGroup>` using the `toast-*` CSS transition classes (300 ms slide-in from the right, 200 ms fade-out on dismiss). Each toast has a dismiss button and an optional action button (text-style, positioned left of the dismiss button). Maximum 5 simultaneous toasts; when exceeded, the oldest toast is evicted.    | P0       |
-| SC-15 | Modal/dialog                 | `modal-dialog.vue` with backdrop (`bg-black/50`), centered content card, title, optional content, confirm/cancel buttons. Escape key listener registered on `document` when the modal is open, removed on close. Confirm defaults to `$t('modal.confirm')`, cancel defaults to `$t('modal.cancel')` when labels are not provided. Opening a new modal while one is active replaces the current. | P1       |
-| SC-24 | UI primitive tests (partial) | Component tests for ToastContainer (SC-24-04: renders toast queue, dismiss, positioning) and ModalDialog (SC-24-05: renders title/content/buttons, closes on backdrop click and Escape). Remaining SC-24 coverage (ErrorBoundary) is in R-01h.                                                                                                                                                  | P0       |
+| ID    | Requirement                  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Priority |
+| :---- | :--------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
+| SC-14 | Toast container              | Fixed top-right container (`z-50`) rendering the toast queue with `<TransitionGroup>` using the `toast-*` CSS transition classes (300 ms slide-in from the right, 200 ms fade-out on dismiss). Each toast has a dismiss button (X icon from lucide-vue-next) and an optional action button (text-style, positioned left of the dismiss button). Maximum 5 simultaneous toasts (fixed limit); when exceeded, the oldest toast is evicted. Supported toast types: `error`, `success`, `info` (warning type out of scope for this phase).                                                                                                   | P0       |
+| SC-15 | Modal/dialog                 | `modal-dialog.vue` with backdrop (`bg-black/50`), centered content card, title, optional content, confirm/cancel buttons (cancel left, confirm right). Escape key listener registered on `document` when the modal is open, removed on close. Confirm defaults to `$t('modal.confirm')`, cancel defaults to `$t('modal.cancel')` when labels are not provided. Opening a new modal while one is active replaces the current. Clicks on the content card do not propagate to the backdrop (only backdrop clicks close the modal). Modal content scrolls internally (`overflow-y-auto max-h-[80vh]`) when content exceeds viewport height. | P1       |
+| SC-24 | UI primitive tests (partial) | Component tests for ToastContainer (SC-24-04: renders toast queue, dismiss, positioning) and ModalDialog (SC-24-05: renders title/content/buttons, closes on backdrop click and Escape). Remaining SC-24 coverage (ErrorBoundary) is in R-01h.                                                                                                                                                                                                                                                                                                                                                                                           | P0       |
 
 ## Non-Functional Requirements
 
@@ -58,6 +63,7 @@ Overlay elements introduced by this feature use the following z-index scale. Nav
 ### Accessibility
 
 - Toast and modal transitions must respect `prefers-reduced-motion` by setting transition duration to 0ms when the user preference is `reduce`.
+- Dismiss and action buttons must meet minimum touch target size of 44×44px per ui-ux.md guidelines.
 
 ## Risks & Assumptions
 
@@ -84,5 +90,8 @@ Overlay elements introduced by this feature use the following z-index scale. Nav
 - [ ] Confirm button invokes `onConfirm` callback and closes the modal (SC-15)
 - [ ] Cancel button invokes `onCancel` callback and closes the modal (SC-15)
 - [ ] Opening a new modal replaces any currently active modal (SC-15)
+- [ ] Modal confirm button defaults to `$t('modal.confirm')` and cancel button defaults to `$t('modal.cancel')` when labels are not provided (SC-15)
+- [ ] Clicking inside the modal content card does not close the modal (SC-15)
+- [ ] Modal content scrolls internally when content exceeds viewport height (SC-15)
 - [ ] Component tests for ToastContainer pass (SC-24)
 - [ ] Component tests for ModalDialog pass (SC-24)

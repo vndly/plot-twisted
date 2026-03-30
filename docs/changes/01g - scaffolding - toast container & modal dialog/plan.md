@@ -12,7 +12,8 @@
 - **SC-14-02** — Container is fixed top-right with `z-50`
 - **SC-14-03** — Dismiss button removes toast
 - **SC-14-04** — Oldest toast evicted when max (5) exceeded
-- **SC-14-05** — Toast enter/leave transitions (slide-in, fade-out)
+- **SC-14-05a** — Toast enter transition (slide-in from right, 300 ms)
+- **SC-14-05b** — Toast leave transition (fade-out, 200 ms)
 - **SC-14-06** — Type-colored left borders per toast type
 - **SC-14-07** — Toast auto-dismisses after `TOAST_DISMISS_MS`
 - **SC-14-08** — Transitions disabled when `prefers-reduced-motion: reduce`
@@ -33,7 +34,10 @@
 - **SC-15-04** — Confirm button invokes `onConfirm` callback
 - **SC-15-05** — Cancel button invokes `onCancel` callback
 - **SC-15-06** — Opening a new modal replaces the current one
-- **SC-15-07** — Modal open/close transitions (fade backdrop, scale content)
+- **SC-15-07a** — Modal open transition (fade backdrop in, scale content up)
+- **SC-15-07b** — Modal close transition (fade backdrop out, scale content down)
+- **SC-15-10** — Clicking inside modal content card does not close modal
+- **SC-15-11** — Modal with empty/missing optional content renders correctly
 - **SC-15-08** — Modal text renders in non-default locale
 - **SC-15-09** — Modal transitions disabled with reduced motion
 - **SC-24-05** — ModalDialog component test suite exists and passes
@@ -50,9 +54,10 @@
 - Fixed `top-4 right-4 z-50`, flex column with `gap-3`
 - Uses `useToast()` to read the toast queue
 - Each toast item keyed by `toast.id` for correct `<TransitionGroup>` animation
-- Each toast: dark surface card, type-colored left border mapping: `error` → `--color-error`, `success` → `--color-success`, `info` → `--color-accent`
-- Dismiss X button + optional action button (text-style, left of dismiss)
-- All user-facing text via `$t()` with `toast.*` i18n keys
+- Each toast: `bg-surface` card, type-colored left border mapping: `error` → `--color-error`, `success` → `--color-success`, `info` → `--color-accent`
+- Dismiss button: X icon from lucide-vue-next, minimum 44×44px touch target
+- Optional action button (text-style, left of dismiss), minimum 44×44px touch target
+- i18n keys: `toast.dismiss` for dismiss button aria-label
 - `<TransitionGroup>` using `toast-*` CSS transition classes (300 ms enter, 200 ms leave, ease-in-out); transitions disabled when `prefers-reduced-motion: reduce` is active
 
 ### Step 4 — Create modal-dialog component
@@ -62,7 +67,8 @@
 - Uses `useModal()` to read open/close state and props
 - Rendered with `v-if` on `isOpen` (no DOM presence when closed)
 - Backdrop: `fixed inset-0 z-40 bg-black/50`, click-to-close
-- Content card: centered, `bg-surface rounded-lg`
+- Content card: centered, `bg-surface rounded-lg p-6 max-w-md shadow-lg overflow-y-auto max-h-[80vh]`
+- Click on content card stops propagation (does not trigger backdrop close)
 - Title, optional content (from `ModalProps.content`), confirm and cancel buttons
 - Confirm defaults to `$t('modal.confirm')`, cancel defaults to `$t('modal.cancel')` when labels not provided
 - Escape key listener registered on `document` via `onMounted`/`onUnmounted`

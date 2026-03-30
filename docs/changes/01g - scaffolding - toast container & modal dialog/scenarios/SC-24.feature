@@ -1,5 +1,6 @@
-Feature: SC-24 — UI primitive tests (partial)
+Feature: SC-24 — UI primitive tests (partial: ToastContainer and ModalDialog)
   UI primitive component tests SHALL verify rendering and behavior.
+  Note: This feature covers ToastContainer and ModalDialog only. ErrorBoundary tests are in R-01h.
 
   @coverage: toast queue rendering, dismiss button removal, type-colored borders,
   @coverage: enter/leave transitions, max-toast eviction, auto-dismiss, container positioning
