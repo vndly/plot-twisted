@@ -1,6 +1,6 @@
-Feature: SC-24 — UI primitive tests (partial)
+Feature: SC-24 — UI primitive tests
   UI primitive component tests SHALL verify rendering and behavior.
-  This feature covers SC-24-01 and SC-24-02; sibling features 01g and 01h cover remaining scenarios.
+  Note: This feature covers EmptyState, SkeletonLoader, ToastContainer, and ModalDialog. ErrorBoundary tests are in R-01h.
 
   Scenario: SC-24-01 — EmptyState component test suite
     Given the EmptyState test file exists at tests/presentation/components/common/empty-state.test.ts
@@ -18,3 +18,17 @@ Feature: SC-24 — UI primitive tests (partial)
     And it verifies custom rounded prop
     And it verifies default prop values
     And it verifies aria-hidden="true" on the rendered div
+
+  @coverage: toast queue rendering, dismiss button removal, type-colored borders,
+  @coverage: enter/leave transitions, max-toast eviction, auto-dismiss, container positioning
+  Scenario: SC-24-04 — ToastContainer component test
+    Given the test file tests/presentation/components/common/toast-container.test.ts exists
+    When the test suite runs
+    Then all tests pass
+
+  @coverage: title/content/buttons rendering, backdrop click close, Escape key close,
+  @coverage: confirm/cancel callbacks, modal replacement, open/close transitions
+  Scenario: SC-24-05 — ModalDialog component test
+    Given the test file tests/presentation/components/common/modal-dialog.test.ts exists
+    When the test suite runs
+    Then all tests pass

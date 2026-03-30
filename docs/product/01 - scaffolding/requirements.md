@@ -22,6 +22,7 @@ tags:
     state,
     components,
     ui-primitives,
+    overlay,
   ]
 ---
 
@@ -36,6 +37,8 @@ Configure Vue Router with 4 lazy-loaded routes, catch-all redirect, scroll-to-to
 Create the `useToast` and `useModal` composables — module-level singleton reactive state for toast notifications and modal dialogs — along with their unit tests.
 
 Create the SkeletonLoader and EmptyState reusable UI primitives with their component tests.
+
+Create the ToastContainer and ModalDialog overlay components that render the toast queue and modal state managed by the composables.
 
 ## Context & Background
 
@@ -92,6 +95,10 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 | SkeletonLoader `aria-hidden`      | Apply `aria-hidden="true"`                                | Intentional exception to ui-ux.md section 11 ("No ARIA beyond semantic HTML defaults"). Decorative shimmer placeholders should be hidden from screen readers.                                                         |
 | `rounded` prop type               | Accept raw Tailwind border-radius class string            | Simpler API for an internal project — consumers already use Tailwind classes.                                                                                                                                         |
 | String prop i18n                  | Props receive pre-translated values                       | Primitives stay translation-agnostic; consuming components call `$t()`.                                                                                                                                               |
+| Toast z-index above modal         | Toast `z-50`, Modal `z-40`                                | Toasts should remain visible during modal interactions for error feedback and action confirmations.                                                                                                                   |
+| Dismiss button icon               | X icon (lucide-vue-next)                                  | Consistent with common UI patterns and the project's icon library.                                                                                                                                                    |
+| Max toast limit                   | Fixed at 5 (not configurable)                             | Prevents UI clutter; configurability deferred to future enhancement if user feedback requests it.                                                                                                                     |
+| Modal button order                | Cancel left, Confirm right                                | Primary action rightmost follows common web conventions.                                                                                                                                                              |
 
 ## Scope
 
@@ -117,6 +124,9 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - Define `MAX_VISIBLE_TOASTS` constant in `src/domain/constants.ts`.
 - Create `src/presentation/components/common/skeleton-loader.vue` and `empty-state.vue`.
 - Write component tests for both SkeletonLoader and EmptyState.
+- Create `src/presentation/components/common/toast-container.vue` (consumes `toast-*` CSS transition classes).
+- Create `src/presentation/components/common/modal-dialog.vue` (consumes `modal-*` CSS transition classes).
+- Write component tests: `tests/presentation/components/common/toast-container.test.ts` and `tests/presentation/components/common/modal-dialog.test.ts`.
 
 > **Note:** `nav.recommendations` and `page.recommendations.title` are included for forward compatibility with the Recommendations feature phase, even though no scaffolding sibling currently consumes them.
 
@@ -144,6 +154,7 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - Skeleton composition variants (card skeleton, hero skeleton, detail skeleton, grid skeleton) — deferred to consuming features.
 - i18n integration within SkeletonLoader/EmptyState primitives — consuming components pass pre-translated strings via props.
 - Responsive-specific skeleton behavior beyond standard Tailwind responsiveness.
+- Toast/modal integration into App.vue (handled by 01k).
 
 > All subsequent scaffolding features (01b through 01k) depend on the infrastructure established here.
 
@@ -175,7 +186,9 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 | SC-23 | Composable unit tests | `useToast`: add/remove toast, auto-dismiss after timeout, toast types. `useModal`: open/close state, callback storage in props. | P0 |
 | SC-16 | Empty state component | Centered layout with optional lucide icon, title (white bold), description (muted), optional CTA button styled as a primary teal button (`bg-accent text-white rounded-md px-4 py-2`) per ui-ux.md section 9. Props: `icon` (Vue `Component` type, optional), `title` (string), `description` (string, optional), `ctaLabel` (string, optional), `ctaAction` (() => void, optional). All string props receive pre-translated values from the consuming component — this primitive does not call `$t()` internally. | P0 |
 | SC-17 | Skeleton loader | Reusable shimmer placeholder. Props: `width` (string, default `'100%'`), `height` (string, default `'1rem'`), `rounded` (string, default `'rounded-md'`). Renders a div with `animate-pulse bg-surface`. | P1 |
-| SC-24 | UI primitive tests (partial) | Component tests for EmptyState (renders icon/title/description/CTA props) and SkeletonLoader (renders with width/height/rounded props). This feature covers scenarios SC-24-01 and SC-24-02; sibling features 01g and 01h cover the remaining SC-24 scenarios. | P0 |
+| SC-14 | Toast container | Fixed top-right container (`z-50`) rendering the toast queue with `<TransitionGroup>` using the `toast-*` CSS transition classes (300 ms slide-in from the right, 200 ms fade-out on dismiss). Each toast has a dismiss button (X icon from lucide-vue-next) and an optional action button (text-style, positioned left of the dismiss button). Maximum 5 simultaneous toasts (fixed limit); when exceeded, the oldest toast is evicted. Supported toast types: `error`, `success`, `info` (warning type out of scope for this phase). | P0 |
+| SC-15 | Modal/dialog | `modal-dialog.vue` with backdrop (`bg-black/50`), centered content card, title, optional content, confirm/cancel buttons (cancel left, confirm right). Escape key listener registered on `document` when the modal is open, removed on close. Confirm defaults to `$t('modal.confirm')`, cancel defaults to `$t('modal.cancel')` when labels are not provided. Opening a new modal while one is active replaces the current. Clicks on the content card do not propagate to the backdrop (only backdrop clicks close the modal). Modal content scrolls internally (`overflow-y-auto max-h-[80vh]`) when content exceeds viewport height. | P1 |
+| SC-24 | UI primitive tests | Component tests for EmptyState (SC-24-01: renders icon/title/description/CTA props), SkeletonLoader (SC-24-02: renders with width/height/rounded props), ToastContainer (SC-24-04: renders toast queue, dismiss, positioning), and ModalDialog (SC-24-05: renders title/content/buttons, closes on backdrop click and Escape). Remaining SC-24 coverage (ErrorBoundary) is in R-01h. | P0 |
 
 > **Note:** `src/domain/constants.ts` is created in this phase with `TOAST_DISMISS_MS` only (additional constants will be added in their respective feature phases). See Decisions table for rationale.
 
@@ -200,6 +213,14 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - **NFR-01c-06 — Motion sensitivity:** All transitions and `animate-pulse` animation disabled when `prefers-reduced-motion` is set.
 - **NFR-01c-07 — Duration cap:** No transition exceeds 300ms.
 
+### Stacking Order
+
+Overlay elements use the following z-index scale. Navigation component z-indices are defined in R-01i.
+
+- Modal backdrop: `z-40`
+- Modal content card: `z-40` (same layer as backdrop; stacks above via DOM order)
+- Toast container: `z-50` (renders above modals — toasts remain visible when a modal is open)
+
 ### Architecture Compliance
 
 - **CSS centralization:** No CSS files other than `src/assets/main.css` shall exist in the project. All transition and animation styles are centralized in the single Tailwind entry point.
@@ -212,6 +233,8 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - SkeletonLoader div uses `aria-hidden="true"` since it is purely decorative (see Decisions). Verifiable by inspecting rendered HTML.
 - EmptyState CTA uses a native `<button>` element. Optional icon is treated as decorative (`aria-hidden="true"` on the icon wrapper). Verifiable by inspecting rendered HTML.
 - `animate-pulse` on SkeletonLoader is disabled when `prefers-reduced-motion: reduce` is active, handled by the existing CSS rule in `src/assets/main.css`. Verifiable by toggling the media query in dev tools.
+- Toast and modal transitions must respect `prefers-reduced-motion` by setting transition duration to 0ms when the user preference is `reduce`.
+- Dismiss and action buttons must meet minimum touch target size of 44×44px per ui-ux.md guidelines.
 
 ### Performance
 
@@ -244,6 +267,9 @@ Visual contracts per `docs/technical/ui-ux.md`:
 - `animate-pulse` is sufficient for the shimmer effect (no custom keyframe needed).
 - The `bg-surface` theme color (`--color-surface`) is already defined in `src/assets/main.css` (from base project setup) before SkeletonLoader is implemented.
 - `@vue/test-utils` is available from prerequisite 01a for component testing.
+- `useToast` and `useModal` composables are implemented and tested (01e dependency).
+- Transition CSS classes (`toast-*`, `modal-*`) exist in `main.css` (delivered in 01c).
+- No accessibility focus trapping is required for the modal (per ui-ux.md § 11: minimal scope).
 
 ### Risks
 
@@ -320,6 +346,26 @@ Visual contracts per `docs/technical/ui-ux.md`:
 - [ ] [SC-17] SkeletonLoader renders with `aria-hidden="true"`
 - [ ] [SC-17] SkeletonLoader renders with default width, height, and rounded when props are omitted
 - [ ] [SC-24] Component tests for SkeletonLoader pass
+- [ ] [SC-14] Toast container is fixed top-right with `z-50`
+- [ ] [SC-14] Toasts stack vertically (flex column, `gap-3`) without overlapping
+- [ ] [SC-14] Each toast has a dismiss button; clicking it removes the toast
+- [ ] [SC-14] Toasts display type-colored left borders (error -> `--color-error`, success -> `--color-success`, info -> `--color-accent`)
+- [ ] [SC-14] Toast enter/leave uses `<TransitionGroup>` animation (300 ms slide-in, 200 ms fade-out)
+- [ ] [SC-14] When toast queue exceeds 5, oldest toast is evicted
+- [ ] [SC-14] Optional action button renders left of dismiss button and invokes callback when clicked
+- [ ] [SC-14, SC-15] Toast and modal transitions are disabled when `prefers-reduced-motion: reduce` is active
+- [ ] [SC-15] Modal renders backdrop overlay (`bg-black/50`) and centered content card
+- [ ] [SC-15] Modal displays title, optional content (hidden when not provided), confirm and cancel buttons
+- [ ] [SC-15] Modal closes on backdrop click
+- [ ] [SC-15] Modal closes on Escape key (document-level listener)
+- [ ] [SC-15] Confirm button invokes `onConfirm` callback and closes the modal
+- [ ] [SC-15] Cancel button invokes `onCancel` callback and closes the modal
+- [ ] [SC-15] Opening a new modal replaces any currently active modal
+- [ ] [SC-15] Modal confirm button defaults to `$t('modal.confirm')` and cancel button defaults to `$t('modal.cancel')` when labels are not provided
+- [ ] [SC-15] Clicking inside the modal content card does not close the modal
+- [ ] [SC-15] Modal content scrolls internally when content exceeds viewport height
+- [ ] [SC-24] Component tests for ToastContainer pass
+- [ ] [SC-24] Component tests for ModalDialog pass
 
 ## Constraints
 

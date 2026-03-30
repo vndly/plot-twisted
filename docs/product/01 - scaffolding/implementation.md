@@ -8,6 +8,8 @@ Configured Vue Router with 4 lazy-loaded routes, a catch-all redirect, scroll-to
 
 Created two reusable UI primitives — `SkeletonLoader` and `EmptyState` — in the Presentation layer's `common/` directory, following a test-first approach. Both components are stateless, translation-agnostic primitives that receive all content via props.
 
+Created the `ToastContainer` and `ModalDialog` overlay components that render the toast queue and modal state managed by the composables. The toast container renders a queue of notifications in the top-right corner with type-colored borders, dismiss buttons, and optional action buttons. The modal dialog renders a centered confirmation dialog with backdrop overlay, title, optional content, and confirm/cancel buttons with i18n-driven default labels.
+
 Implemented the `useToast` and `useModal` composables as module-level singleton reactive state managers for toast notifications and modal dialogs. Both composables live in `src/presentation/composables/` — a new directory in the Presentation layer for UI-only state composables that have no domain or infrastructure dependencies. The module-level pattern ensures both composables work outside Vue component `setup()`, which is required by the global error handler (01h). Unit tests were written test-first in `tests/presentation/composables/`, covering all functional requirements. Architecture and reference documentation was updated to reflect the new `composables/` directory and the distinction between Application-layer and Presentation-layer composables.
 
 ## Files Changed
@@ -32,6 +34,10 @@ Implemented the `useToast` and `useModal` composables as module-level singleton 
 - `src/presentation/components/common/empty-state.vue` — Centered empty state layout with optional icon (dynamic `<component :is>`), required title, optional description, and optional CTA button. CTA renders only when both `ctaLabel` and `ctaAction` are provided.
 - `tests/presentation/components/common/skeleton-loader.test.ts` — 3 tests covering SC-17-01, SC-17-02, SC-17-03, and SC-24-02.
 - `tests/presentation/components/common/empty-state.test.ts` — 7 tests covering SC-16-01 through SC-16-06, SC-24-01, and the implementation-detail case (ctaAction without ctaLabel).
+- `src/presentation/components/common/toast-container.vue` — Fixed top-right container (`z-50`) rendering the toast queue with `<TransitionGroup name="toast">`. Each toast displays a type-colored left border (`border-l-error`, `border-l-success`, `border-l-accent`), message text, optional action button, and dismiss button with X icon from lucide-vue-next.
+- `src/presentation/components/common/modal-dialog.vue` — Modal overlay component with backdrop (`fixed inset-0 z-40 bg-black/50`) and centered content card. Uses `<Transition name="modal">` for enter/leave animations. Escape key listener is registered/unregistered via `watch` on `isOpen` state to avoid stale listeners.
+- `tests/presentation/components/common/toast-container.test.ts` — Component test suite covering SC-14 scenarios: container positioning, toast stacking, dismiss button, type-colored borders, transition classes, auto-dismiss timing, i18n labels, and action button callbacks.
+- `tests/presentation/components/common/modal-dialog.test.ts` — Component test suite covering SC-15 scenarios: backdrop click close, Escape key close, confirm/cancel callbacks, modal replacement, transition classes, i18n labels, and content card click propagation stop.
 
 ### Modified
 
@@ -50,6 +56,10 @@ Implemented the `useToast` and `useModal` composables as module-level singleton 
 - `docs/technical/testing.md` — Added `tests/presentation/composables/` to the test directory tree example.
 - `docs/technical/data-model.md` — Added `MAX_VISIBLE_TOASTS` to the constants table.
 - `docs/reference/glossary.md` — Updated "Composable" entry to distinguish Application-layer and Presentation-layer composables.
+- `src/presentation/i18n/locales/en.json` — Added `modal.confirm` and `modal.cancel` keys for default button labels.
+- `src/presentation/i18n/locales/es.json` — Added Spanish translations: `modal.confirm: "Confirmar"`, `modal.cancel: "Cancelar"`.
+- `src/presentation/i18n/locales/fr.json` — Added French translations: `modal.confirm: "Confirmer"`, `modal.cancel: "Annuler"`.
+- `tests/presentation/i18n/locale-keys.test.ts` — Updated `EXPECTED_KEYS` array to include `modal.confirm` and `modal.cancel`; updated test description to reflect 21 keys.
 
 ## Key Decisions
 
@@ -70,6 +80,10 @@ Implemented the `useToast` and `useModal` composables as module-level singleton 
 - **EmptyState CTA guard**: Button renders only when both `ctaLabel` and `ctaAction` are truthy (`v-if="ctaLabel && ctaAction"`), matching requirements that a label without an action or an action without a label should not show a button.
 - **Optional prop defaults**: All optional props default to `undefined` rather than empty strings or no-ops, keeping the component's conditional rendering clean with simple truthiness checks.
 - **Icon rendering**: Used Vue's dynamic `<component :is="icon">` for the icon prop, allowing consumers to pass any Vue component (e.g., lucide-vue-next icons).
+- **Escape key handling via watch**: The modal registers and unregisters the document-level `keydown` listener using a `watch` on `isOpen` state, ensuring the listener is properly cleaned up when the modal closes and avoiding stale listener issues when the modal reopens.
+- **Click propagation stop on content card**: The modal content card uses `@click.stop` to prevent clicks inside the card from bubbling to the backdrop. The backdrop uses `@click.self="close"` to only respond to direct clicks on itself.
+- **Type-to-border-class mapping function**: Toast border colors are mapped via a `getBorderClass` function that returns Tailwind classes (`border-l-error`, `border-l-success`, `border-l-accent`) rather than inline styles, maintaining Tailwind-only styling convention.
+- **Minimum touch targets**: Both dismiss and action buttons on toasts, as well as modal buttons, use `min-h-11` (44px) to meet the 44×44px touch target requirement from ui-ux.md § 11.
 
 ## Deviations from Plan
 
@@ -143,9 +157,15 @@ Format (`prettier`), lint (`eslint`), and type-check (`vue-tsc`) all pass indivi
 - **`empty-state.test.ts`** (7 tests): Verifies full props rendering (icon, title, description), title-only rendering, CTA button rendering with both props, no CTA without `ctaAction`, click handler invocation, empty title string, and no CTA without `ctaLabel`. Covers SC-16-01 through SC-16-06, SC-24-01.
 - All 55 tests across 7 test files pass. `npm run type-check`, `npm run lint`, and `npm run build` all pass.
 
+### Toast Container & Modal Dialog
+
+- **`toast-container.test.ts`** (18 tests): Covers all SC-14 scenarios plus implementation details (empty state, keying, action button presence).
+- **`modal-dialog.test.ts`** (18 tests): Covers all SC-15 scenarios plus additional edge cases (optional callbacks, listener cleanup).
+- All 95 tests across 9 test files pass. `npm run type-check` — PASS (zero errors). `npm run test` — PASS.
+
 ## Verification Results
 
-- `npx vitest run` — PASS (5 files, 45 tests)
+- `npx vitest run` — PASS (9 files, 95 tests)
 - `npm run check` — PASS (format, lint, type-check, test, build all clean)
 
 ## Dependencies
@@ -162,26 +182,28 @@ No new dependencies were added for the router phase. `vue-router` (^5.0.4) and `
 
 ## Requirement Coverage
 
-| Requirement                         | Implementation                                                                                                     |
-| :---------------------------------- | :----------------------------------------------------------------------------------------------------------------- |
-| SC-01c-21 (Theme additions)         | `--color-success` and `--color-error` added to `@theme` block in `src/assets/main.css:9-10`                        |
-| SC-01c-09 (Fade transition)         | `.fade-*` classes at `src/assets/main.css:13-21`                                                                   |
-| SC-01c-22 (Toast transition)        | `.toast-*` classes at `src/assets/main.css:23-37`                                                                  |
-| SC-01c-23 (Modal transition)        | `.modal-*` classes at `src/assets/main.css:39-53`                                                                  |
-| SC-01c-24 (Reduced-motion)          | `@media (prefers-reduced-motion: reduce)` block at `src/assets/main.css:55-68`                                     |
-| SC-01c-25 (Domain constants)        | `TOAST_DISMISS_MS` exported from `src/domain/constants.ts:2`                                                       |
-| SC-01d-29 (Vue Router setup)        | `createWebHistory()` in `src/presentation/router.ts`, registered in `src/main.ts`                                  |
-| SC-01d-02 (Route definitions)       | 4 named routes + catch-all redirect in `src/presentation/router.ts`                                                |
-| SC-01d-03 (Route lazy loading)      | Dynamic `import()` for all 4 route components                                                                      |
-| SC-01d-10 (Document title)          | `afterEach` guard with i18n `t()` in `src/presentation/router.ts`                                                  |
-| SC-01d-11 (Scroll-to-top)           | `scrollBehavior` returning `{ top: 0 }` in `src/presentation/router.ts`                                            |
-| SC-01d-22 (Router unit tests)       | 16 tests in `tests/presentation/router.test.ts`                                                                    |
-| SC-13 (Toast notification)          | `src/presentation/composables/use-toast.ts` with `addToast()`, `removeToast()`, auto-dismiss, eviction             |
-| SC-12 (Modal/dialog)                | `src/presentation/composables/use-modal.ts` with `open()`, `close()`, single-instance replacement                  |
-| SC-23 (Composable unit tests)       | 21 tests in `tests/presentation/composables/` (13 toast + 8 modal)                                                 |
-| SC-16 (Empty state component)       | `empty-state.vue` — centered layout, optional icon/description/CTA, all string props pre-translated                |
-| SC-17 (Skeleton loader)             | `skeleton-loader.vue` — shimmer div with `animate-pulse bg-surface`, configurable dimensions, `aria-hidden="true"` |
-| SC-24 (UI primitive tests, partial) | `empty-state.test.ts` (SC-24-01) and `skeleton-loader.test.ts` (SC-24-02)                                          |
+| Requirement                    | Implementation                                                                                                                                                                                                    |
+| :----------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SC-01c-21 (Theme additions)    | `--color-success` and `--color-error` added to `@theme` block in `src/assets/main.css:9-10`                                                                                                                       |
+| SC-01c-09 (Fade transition)    | `.fade-*` classes at `src/assets/main.css:13-21`                                                                                                                                                                  |
+| SC-01c-22 (Toast transition)   | `.toast-*` classes at `src/assets/main.css:23-37`                                                                                                                                                                 |
+| SC-01c-23 (Modal transition)   | `.modal-*` classes at `src/assets/main.css:39-53`                                                                                                                                                                 |
+| SC-01c-24 (Reduced-motion)     | `@media (prefers-reduced-motion: reduce)` block at `src/assets/main.css:55-68`                                                                                                                                    |
+| SC-01c-25 (Domain constants)   | `TOAST_DISMISS_MS` exported from `src/domain/constants.ts:2`                                                                                                                                                      |
+| SC-01d-29 (Vue Router setup)   | `createWebHistory()` in `src/presentation/router.ts`, registered in `src/main.ts`                                                                                                                                 |
+| SC-01d-02 (Route definitions)  | 4 named routes + catch-all redirect in `src/presentation/router.ts`                                                                                                                                               |
+| SC-01d-03 (Route lazy loading) | Dynamic `import()` for all 4 route components                                                                                                                                                                     |
+| SC-01d-10 (Document title)     | `afterEach` guard with i18n `t()` in `src/presentation/router.ts`                                                                                                                                                 |
+| SC-01d-11 (Scroll-to-top)      | `scrollBehavior` returning `{ top: 0 }` in `src/presentation/router.ts`                                                                                                                                           |
+| SC-01d-22 (Router unit tests)  | 16 tests in `tests/presentation/router.test.ts`                                                                                                                                                                   |
+| SC-13 (Toast notification)     | `src/presentation/composables/use-toast.ts` with `addToast()`, `removeToast()`, auto-dismiss, eviction                                                                                                            |
+| SC-12 (Modal/dialog)           | `src/presentation/composables/use-modal.ts` with `open()`, `close()`, single-instance replacement                                                                                                                 |
+| SC-23 (Composable unit tests)  | 21 tests in `tests/presentation/composables/` (13 toast + 8 modal)                                                                                                                                                |
+| SC-16 (Empty state component)  | `empty-state.vue` — centered layout, optional icon/description/CTA, all string props pre-translated                                                                                                               |
+| SC-17 (Skeleton loader)        | `skeleton-loader.vue` — shimmer div with `animate-pulse bg-surface`, configurable dimensions, `aria-hidden="true"`                                                                                                |
+| SC-14 (Toast container)        | `toast-container.vue` — fixed top-right positioning, z-50, TransitionGroup with `toast-*` classes, type-colored borders, dismiss button with X icon, optional action button, max 5 toasts (handled by composable) |
+| SC-15 (Modal/dialog)           | `modal-dialog.vue` — backdrop with `bg-black/50`, centered content card, Escape key listener, confirm/cancel buttons with i18n defaults, `@click.stop` on content card                                            |
+| SC-24 (UI primitive tests)     | `empty-state.test.ts` (SC-24-01), `skeleton-loader.test.ts` (SC-24-02), `toast-container.test.ts` (SC-24-04), `modal-dialog.test.ts` (SC-24-05)                                                                   |
 
 ## Known Limitations
 
@@ -196,3 +218,6 @@ No new dependencies were added for the router phase. `vue-router` (^5.0.4) and `
 - The `afterEach` title guard depends on `meta.titleKey` existing on each route. Routes added by future features must include this meta property to get document title updates.
 - Skeleton composition variants (card skeleton, hero skeleton, etc.) are out of scope — deferred to consuming features.
 - No responsive-specific skeleton behavior beyond standard Tailwind responsiveness.
+- **Accessibility**: Per ui-ux.md § 11, no focus trapping is implemented for the modal. Focus remains on the element that triggered the modal.
+- **Reduced motion**: Transition disabling for `prefers-reduced-motion` is handled entirely by CSS media queries in `main.css`. The components do not programmatically detect or respond to motion preferences.
+- **Integration**: ToastContainer and ModalDialog components are not yet integrated into `App.vue`. That integration is handled by R-01k (App Shell & Assembly).

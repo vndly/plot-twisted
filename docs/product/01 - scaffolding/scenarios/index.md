@@ -20,9 +20,11 @@
 16. **[SC-01d-29](./SC-01d-29.feature)**: Vue Router setup with HTML5 history mode and app registration.
 17. **[SC-12](./SC-12.feature)**: Modal composable behavior — open, close, single-instance replacement, and edge cases.
 18. **[SC-13](./SC-13.feature)**: Toast composable behavior — toast queue management, auto-dismiss, action buttons, and eviction.
-19. **[SC-23](./SC-23.feature)**: Composable unit tests — toast and modal state management verification.
-20. **[SC-16](./SC-16.feature)**: Empty state component rendering and props.
-21. **[SC-17](./SC-17.feature)**: Skeleton loader animation and dimensions.
-22. **[SC-24](./SC-24.feature)**: UI primitive component tests.
+19. **[SC-14](./SC-14.feature)**: Toast container component — rendering, stacking, transitions, and interactions.
+20. **[SC-15](./SC-15.feature)**: Modal dialog component — rendering, backdrop, callbacks, and transitions.
+21. **[SC-16](./SC-16.feature)**: Empty state component rendering and props.
+22. **[SC-17](./SC-17.feature)**: Skeleton loader animation and dimensions.
+23. **[SC-23](./SC-23.feature)**: Composable unit tests — toast and modal state management verification.
+24. **[SC-24](./SC-24.feature)**: UI primitive component tests (EmptyState, SkeletonLoader, ToastContainer, ModalDialog).
 
 > **i18n note:** Theme, transitions, and constants deliver CSS definitions and a numeric constant with no user-facing text. i18n coverage is not applicable for those scenarios.
