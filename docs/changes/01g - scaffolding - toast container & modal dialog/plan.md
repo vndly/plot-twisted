@@ -17,6 +17,7 @@
 - **SC-14-07** — Toast auto-dismisses after `TOAST_DISMISS_MS`
 - **SC-14-08** — Transitions disabled when `prefers-reduced-motion: reduce`
 - **SC-14-09** — Toast text renders in non-default locale
+- **SC-14-10** — Action button triggers callback
 - **SC-24-04** — ToastContainer component test suite exists and passes
 - `(implementation detail)` — Renders nothing when toast queue is empty; renders toast items when present
 - `(implementation detail)` — Each toast shows message, dismiss button, type-colored border, and optional action button (renders when provided, triggers handler on click)
@@ -34,6 +35,7 @@
 - **SC-15-06** — Opening a new modal replaces the current one
 - **SC-15-07** — Modal open/close transitions (fade backdrop, scale content)
 - **SC-15-08** — Modal text renders in non-default locale
+- **SC-15-09** — Modal transitions disabled with reduced motion
 - **SC-24-05** — ModalDialog component test suite exists and passes
 - `(implementation detail)` — Does not render when `isOpen` is false
 
@@ -48,7 +50,7 @@
 - Fixed `top-4 right-4 z-50`, flex column with `gap-3`
 - Uses `useToast()` to read the toast queue
 - Each toast item keyed by `toast.id` for correct `<TransitionGroup>` animation
-- Each toast: dark surface card, type-colored left border using theme tokens (`--color-error`, `--color-success`, `--color-accent`)
+- Each toast: dark surface card, type-colored left border mapping: `error` → `--color-error`, `success` → `--color-success`, `info` → `--color-accent`
 - Dismiss X button + optional action button (text-style, left of dismiss)
 - All user-facing text via `$t()` with `toast.*` i18n keys
 - `<TransitionGroup>` using `toast-*` CSS transition classes (300 ms enter, 200 ms leave, ease-in-out); transitions disabled when `prefers-reduced-motion: reduce` is active

@@ -46,3 +46,10 @@ Feature: SC-15 — Modal dialog component
     Given the app locale is set to "es"
     When a modal is opened without custom button labels
     Then the confirm and cancel buttons display labels in Spanish
+
+  Scenario: SC-15-09 — Modal transitions disabled with reduced motion
+    Given the user has prefers-reduced-motion set to reduce
+    When a modal is opened
+    Then it appears without fade or scale animation
+    When the modal is closed
+    Then it disappears without animation

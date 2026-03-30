@@ -42,7 +42,7 @@ Feature: SC-14 — Toast container component
 
   Scenario: SC-14-07 — Toast auto-dismisses after timeout
     Given a toast is triggered
-    When TOAST_DISMISS_MS elapses without user interaction
+    When the default dismiss timeout elapses without user interaction
     Then the toast is automatically removed from the container
 
   Scenario: SC-14-08 — Transitions disabled with reduced motion
@@ -56,3 +56,8 @@ Feature: SC-14 — Toast container component
     Given the app locale is set to "es"
     When an error toast is triggered
     Then the dismiss button label is displayed in Spanish
+
+  Scenario: SC-14-10 — Action button triggers callback
+    Given a toast is triggered with an action button labeled "Retry"
+    When I click the action button
+    Then the action callback is invoked

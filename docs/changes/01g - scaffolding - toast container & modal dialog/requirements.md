@@ -27,8 +27,8 @@ None specific to this sub-phase (composable decision was in 01e).
 
 ### In Scope
 
-- Create `src/presentation/components/common/toast-container.vue`.
-- Create `src/presentation/components/common/modal-dialog.vue`.
+- Create `src/presentation/components/common/toast-container.vue` (consumes `toast-*` CSS transition classes from 01c).
+- Create `src/presentation/components/common/modal-dialog.vue` (consumes `modal-*` CSS transition classes from 01c).
 - Write component tests: `tests/presentation/components/common/toast-container.test.ts` and `tests/presentation/components/common/modal-dialog.test.ts`.
 
 ### Out of Scope
@@ -57,7 +57,7 @@ Overlay elements introduced by this feature use the following z-index scale. Nav
 
 ### Accessibility
 
-- Toast and modal transitions must respect `prefers-reduced-motion` by disabling animations when the user preference is set.
+- Toast and modal transitions must respect `prefers-reduced-motion` by setting transition duration to 0ms when the user preference is `reduce`.
 
 ## Risks & Assumptions
 
@@ -69,17 +69,20 @@ Overlay elements introduced by this feature use the following z-index scale. Nav
 
 ## Acceptance Criteria
 
-- [ ] Toast container is fixed top-right with `z-50`
-- [ ] Toasts stack vertically (flex column, `gap-3`) without overlapping
-- [ ] Each toast has a dismiss button; clicking it removes the toast
-- [ ] Toasts display type-colored left borders (error -> `--color-error`, success -> `--color-success`, info -> `--color-accent`)
-- [ ] Toast enter/leave uses `<TransitionGroup>` animation (300 ms slide-in, 200 ms fade-out)
-- [ ] Toast and modal transitions are disabled when `prefers-reduced-motion: reduce` is active
-- [ ] Modal renders backdrop overlay (`bg-black/50`) and centered content card
-- [ ] Modal displays title, optional content, confirm and cancel buttons
-- [ ] Modal closes on backdrop click
-- [ ] Modal closes on Escape key (document-level listener)
-- [ ] Confirm button invokes `onConfirm` callback and closes the modal
-- [ ] Cancel button invokes `onCancel` callback and closes the modal
-- [ ] Component tests for ToastContainer pass
-- [ ] Component tests for ModalDialog pass
+- [ ] Toast container is fixed top-right with `z-50` (SC-14)
+- [ ] Toasts stack vertically (flex column, `gap-3`) without overlapping (SC-14)
+- [ ] Each toast has a dismiss button; clicking it removes the toast (SC-14)
+- [ ] Toasts display type-colored left borders (error -> `--color-error`, success -> `--color-success`, info -> `--color-accent`) (SC-14)
+- [ ] Toast enter/leave uses `<TransitionGroup>` animation (300 ms slide-in, 200 ms fade-out) (SC-14)
+- [ ] When toast queue exceeds 5, oldest toast is evicted (SC-14)
+- [ ] Optional action button renders left of dismiss button and invokes callback when clicked (SC-14)
+- [ ] Toast and modal transitions are disabled when `prefers-reduced-motion: reduce` is active (SC-14, SC-15)
+- [ ] Modal renders backdrop overlay (`bg-black/50`) and centered content card (SC-15)
+- [ ] Modal displays title, optional content (hidden when not provided), confirm and cancel buttons (SC-15)
+- [ ] Modal closes on backdrop click (SC-15)
+- [ ] Modal closes on Escape key (document-level listener) (SC-15)
+- [ ] Confirm button invokes `onConfirm` callback and closes the modal (SC-15)
+- [ ] Cancel button invokes `onCancel` callback and closes the modal (SC-15)
+- [ ] Opening a new modal replaces any currently active modal (SC-15)
+- [ ] Component tests for ToastContainer pass (SC-24)
+- [ ] Component tests for ModalDialog pass (SC-24)

@@ -1,4 +1,4 @@
-# Verification Scenarios: App Scaffolding — Toast Container & Modal Dialog
+# Verification Scenarios: Toast Container & Modal Dialog
 
 ## Contents
 
