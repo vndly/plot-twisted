@@ -6,7 +6,7 @@
 
 ### Step 1 — Write toast-container tests
 
-- [ ] Create `tests/presentation/components/common/toast-container.test.ts` covering:
+- [x] Create `tests/presentation/components/common/toast-container.test.ts` covering:
 
 - **SC-14-01** — Multiple toasts stack vertically without overlapping
 - **SC-14-02** — Container is fixed top-right with `z-50`
@@ -26,7 +26,7 @@
 
 ### Step 2 — Write modal-dialog tests
 
-- [ ] Create `tests/presentation/components/common/modal-dialog.test.ts` covering:
+- [x] Create `tests/presentation/components/common/modal-dialog.test.ts` covering:
 
 - **SC-15-01** — Opens and renders title, content, confirm, and cancel buttons
 - **SC-15-02** — Closes on backdrop click
@@ -49,7 +49,7 @@
 
 ### Step 3 — Create toast-container component
 
-- [ ] Create `src/presentation/components/common/toast-container.vue`:
+- [x] Create `src/presentation/components/common/toast-container.vue`:
 
 - Fixed `top-4 right-4 z-50`, flex column with `gap-3`
 - Uses `useToast()` to read the toast queue
@@ -62,7 +62,7 @@
 
 ### Step 4 — Create modal-dialog component
 
-- [ ] Create `src/presentation/components/common/modal-dialog.vue`:
+- [x] Create `src/presentation/components/common/modal-dialog.vue`:
 
 - Uses `useModal()` to read open/close state and props
 - Rendered with `v-if` on `isOpen` (no DOM presence when closed)
@@ -80,6 +80,6 @@
 
 ### Step 5 — Verify
 
-- [ ] Run `npm run type-check` — zero errors
-- [ ] Run `npm run test` — all tests pass
-- [ ] Confirm all acceptance criteria in `requirements.md` are met
+- [x] Run `npm run type-check` — zero errors
+- [x] Run `npm run test` — all tests pass
+- [x] Confirm all acceptance criteria in `requirements.md` are met

@@ -17,5 +17,7 @@
   "common.error.reload": "Recargar",
   "toast.error": "Ocurrió un error",
   "toast.dismiss": "Cerrar",
-  "toast.retry": "Reintentar"
+  "toast.retry": "Reintentar",
+  "modal.confirm": "Confirmar",
+  "modal.cancel": "Cancelar"
 }
