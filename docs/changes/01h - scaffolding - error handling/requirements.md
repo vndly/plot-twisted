@@ -1,7 +1,7 @@
 ---
 id: R-01h
 title: App Scaffolding — Error Handling
-status: approved
+status: under_test
 type: infrastructure
 importance: critical
 tags: [error-handling, error-boundary, toast]

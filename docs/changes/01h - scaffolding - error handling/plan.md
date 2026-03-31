@@ -4,7 +4,7 @@
 
 ## Step 1 — Write error-boundary tests
 
-- [ ] Create `tests/presentation/components/error/error-boundary.test.ts` covering:
+- [x] Create `tests/presentation/components/error/error-boundary.test.ts` covering:
 
 - **SC-24-03** — Renders slot content in normal state
 - **SC-18-01 / SC-24-06** — Shows the full-screen fallback UI with translated error title, description, primary reload button, and `role="alert"` when an error is captured
@@ -15,7 +15,7 @@
 
 ## Step 2 — Write global error handler test
 
-- [ ] Create `tests/main.test.ts` covering:
+- [x] Create `tests/main.test.ts` covering:
 
 - **SC-19-01** — `app.config.errorHandler` dispatches an error toast to the shared queue via `useToast()` and logs to `console.error`
 
@@ -25,7 +25,7 @@
 
 ## Step 3 — Create error boundary
 
-- [ ] Create `src/presentation/components/error/error-boundary.vue`:
+- [x] Create `src/presentation/components/error/error-boundary.vue`:
 
 - Uses `onErrorCaptured` lifecycle hook
 - Returns `false` from `onErrorCaptured` to prevent propagation to global error handler
@@ -38,7 +38,7 @@
 
 ## Step 4 — Add global error handler
 
-- [ ] Modify `src/main.ts` to add `app.config.errorHandler` (after existing plugin registrations):
+- [x] Modify `src/main.ts` to add `app.config.errorHandler` (after existing plugin registrations):
 
 - Import `useToast` from `./presentation/composables/use-toast`
 - Import `i18n` from `./presentation/i18n`
@@ -52,8 +52,8 @@
 
 ## Step 5 — Verification
 
-- [ ] Run `npm test` to verify all tests pass
-- [ ] Run `npm run lint` to verify no linting errors
-- [ ] Run `npm run type-check` to verify no type errors
-- [ ] Verify the error boundary renders the documented full-screen fallback when a child throws
-- [ ] Verify the global error handler dispatches a `toast.error` entry to the shared toast queue for uncaught component/render errors outside the ErrorBoundary
+- [x] Run `npm test` to verify all tests pass
+- [x] Run `npm run lint` to verify no linting errors
+- [x] Run `npm run type-check` to verify no type errors
+- [x] Verify the error boundary renders the documented full-screen fallback when a child throws
+- [x] Verify the global error handler dispatches a `toast.error` entry to the shared toast queue for uncaught component/render errors outside the ErrorBoundary
