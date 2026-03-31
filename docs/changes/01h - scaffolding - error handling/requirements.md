@@ -9,7 +9,7 @@ tags: [error-handling, error-boundary, toast]
 
 ## Intent
 
-Create the ErrorBoundary component (catches component errors, shows fallback UI) and the global error handler (dispatches error toasts for uncaught errors).
+Create the ErrorBoundary component (catches component errors, shows fallback UI) and the global error handler (logs and dispatches toast-queue entries for uncaught Vue component/render errors outside the ErrorBoundary).
 
 ## Prerequisites
 
@@ -37,14 +37,15 @@ Create the ErrorBoundary component (catches component errors, shows fallback UI)
 - Recovery strategies beyond page reload.
 - Error reporting to external services.
 - Custom error types or error categorization.
+- Rendering the toast UI in the root app shell; this change only dispatches to the shared toast queue.
 
 ## Functional Requirements
 
-| ID    | Requirement                  | Description                                                                                                                                                                                                                                                                                                                                                              | Priority |
-| :---- | :--------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
-| SC-18 | Error boundary               | `onErrorCaptured` wrapper component. Normal state: renders slot. Error state: centered fallback with translated heading, description, and reload button (calls `window.location.reload()`). The error boundary returns `false` from `onErrorCaptured` to prevent propagation to the global error handler (SC-19), since the boundary already handles the error visually. | P0       |
-| SC-19 | Global error handler         | `app.config.errorHandler` in `main.ts` logs errors and dispatches an error toast via `useToast()`.                                                                                                                                                                                                                                                                       | P0       |
-| SC-24 | UI primitive tests (partial) | Component test for ErrorBoundary (renders slot normally, shows fallback on error).                                                                                                                                                                                                                                                                                       | P0       |
+| ID    | Requirement                  | Description                                                                                                                                                                                                                                                                                                                                                                                     | Priority |
+| :---- | :--------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
+| SC-18 | Error boundary               | `onErrorCaptured` wrapper component. Normal state: renders slot. Error state: full-screen centered fallback UI with translated heading, description, and primary reload button (calls `window.location.reload()`). The error boundary returns `false` from `onErrorCaptured` to prevent propagation to the global error handler (SC-19), since the boundary already handles the error visually. | P0       |
+| SC-19 | Global error handler         | `app.config.errorHandler` in `main.ts` logs uncaught Vue component/render errors that are not already handled by the ErrorBoundary and dispatches an error toast to the shared `useToast()` queue using the translated `toast.error` message. API request failures remain handled by their request-specific flows.                                                                              | P0       |
+| SC-24 | UI primitive tests (partial) | Component test for ErrorBoundary (renders slot normally, shows fallback on error).                                                                                                                                                                                                                                                                                                              | P0       |
 
 ## Non-Functional Requirements
 
@@ -54,16 +55,16 @@ Create the ErrorBoundary component (catches component errors, shows fallback UI)
 
 ### Accessibility
 
-- **NFR-01h-02 — Fallback UI accessibility:** The error boundary fallback UI should use `role="alert"` to announce the error to screen readers. _Threshold: Error message is announced by assistive technology when displayed._
+- **NFR-01h-02 — Fallback UI accessibility:** The error boundary fallback UI should use `role="alert"` to announce the error to screen readers. This is an intentional exception to the default UI/UX guidance of relying on semantic HTML alone because the fallback represents an unexpected app crash. _Threshold: Error message is announced by assistive technology when displayed._
 
 ## Acceptance Criteria
 
 - [ ] [SC-18] Error boundary renders slot content in normal state
-- [ ] [SC-18] Error boundary shows fallback UI with translated error heading, description, and "Reload" button when a child component throws
+- [ ] [SC-18] Error boundary shows a full-screen centered fallback UI with translated error heading, description, and primary "Reload" button when a child component throws
 - [ ] [SC-18] Error boundary returns `false` from `onErrorCaptured` to prevent propagation
 - [ ] [SC-18] Reload button calls `window.location.reload()`
-- [ ] [SC-19] Global error handler logs errors to `console.error`
-- [ ] [SC-19] Global error handler dispatches an error toast via `useToast()`
+- [ ] [SC-19] Global error handler logs uncaught component/render errors to `console.error`
+- [ ] [SC-19] Global error handler dispatches an error toast with the translated `toast.error` message to the shared `useToast()` queue
 - [ ] [SC-24] Error boundary component tests pass
 - [ ] [SC-19] Global error handler test passes
 - [ ] [NFR-01h-02] Error boundary fallback UI uses `role="alert"` for accessibility

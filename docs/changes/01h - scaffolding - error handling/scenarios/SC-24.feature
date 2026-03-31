@@ -8,7 +8,7 @@ Feature: SC-24 — UI primitive tests (partial)
     When no error occurs
     Then the child content is displayed normally
 
-  Scenario: SC-24-04 — ErrorBoundary shows fallback on error
+  Scenario: SC-24-06 — ErrorBoundary shows fallback on error
     Given the ErrorBoundary component wraps a failing child
     When the child throws an error
-    Then the fallback UI is displayed with error heading, description, and reload button
+    Then the full-screen fallback UI is displayed with error heading, description, a primary reload button, and `role="alert"`

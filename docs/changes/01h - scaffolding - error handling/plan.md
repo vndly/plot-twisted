@@ -6,20 +6,20 @@
 
 - [ ] Create `tests/presentation/components/error/error-boundary.test.ts` covering:
 
-- **SC-18-01** — Shows fallback UI with error title, description, and reload button when an error is captured
+- **SC-24-03** — Renders slot content in normal state
+- **SC-18-01 / SC-24-06** — Shows the full-screen fallback UI with translated error title, description, primary reload button, and `role="alert"` when an error is captured
 - **SC-18-02** — Reload button calls `window.location.reload()`
-- **SC-18-03** — `onErrorCaptured` returns `false` to prevent propagation to global error handler
-- `(implementation detail)` — Renders slot content in normal state
+- **SC-18-03** — `onErrorCaptured` returns `false` to prevent propagation to the global error handler, so no error toast is dispatched
 
 ---
 
 ## Step 2 — Write global error handler test
 
-- [ ] Create `tests/global-error-handler.test.ts` covering:
+- [ ] Create `tests/main.test.ts` covering:
 
-- **SC-19-01** — `app.config.errorHandler` dispatches an error toast via `useToast()` and logs to `console.error`
+- **SC-19-01** — `app.config.errorHandler` dispatches an error toast to the shared queue via `useToast()` and logs to `console.error`
 
-  **Setup:** Create a test Vue app instance, register the error handler function on it, invoke the handler with a synthetic error. Use `vi.spyOn(console, 'error')` to verify logging. Assert that `useToast().addToast` was called with type `'error'`. Call `_resetForTesting()` in `beforeEach` for test isolation.
+  **Setup:** Mock `createApp()` to capture the production `app.config.errorHandler` assigned during `src/main.ts` module initialization, then invoke that captured handler with a synthetic error. Use `vi.spyOn(console, 'error')` to verify logging. Assert that `useToast().toasts.value` contains a newly queued toast with `message: i18n.global.t('toast.error')` and `type: 'error'`. Call `_resetForTesting()` in `beforeEach` for test isolation.
 
 ---
 
@@ -30,9 +30,9 @@
 - Uses `onErrorCaptured` lifecycle hook
 - Returns `false` from `onErrorCaptured` to prevent propagation to global error handler
 - Normal state: renders `<slot />`
-- Error state: centered fallback with `$t('common.error.title')`, `$t('common.error.description')`, and reload button calling `window.location.reload()`
-- Fallback container uses `role="alert"` for accessibility
-- Style fallback UI with Tailwind classes consistent with other common components
+- Error state: full-screen centered fallback with `$t('common.error.title')`, `$t('common.error.description')`, and a primary reload button calling `window.location.reload()`
+- Fallback container uses `role="alert"` for accessibility as an intentional exception to the default semantic-only guidance
+- Style fallback UI with Tailwind classes consistent with the global error-state guidance in `docs/technical/ui-ux.md`
 
 ---
 
@@ -42,8 +42,9 @@
 
 - Import `useToast` from `./presentation/composables/use-toast`
 - Import `i18n` from `./presentation/i18n`
-- Logs the error to `console.error`
-- Calls `useToast().addToast({ message: i18n.global.t('toast.error'), type: 'error' })`
+- Logs uncaught component/render errors to `console.error`
+- Calls `useToast().addToast({ message: i18n.global.t('toast.error'), type: 'error' })` for errors not already handled by the ErrorBoundary
+- Leaves API request failures on their existing request-specific error paths
 
 > Note: `main.ts` importing from `src/presentation/composables/` is an intentional exception to typical layer boundaries, consistent with the module-level singleton decision in requirements. The `i18n.global.t()` function is used because the handler runs outside Vue component lifecycle.
 
@@ -53,6 +54,6 @@
 
 - [ ] Run `npm test` to verify all tests pass
 - [ ] Run `npm run lint` to verify no linting errors
-- [ ] Run `npm run typecheck` to verify no type errors
-- [ ] Verify error boundary fallback displays correctly when child throws
-- [ ] Verify global error handler shows toast for uncaught errors
+- [ ] Run `npm run type-check` to verify no type errors
+- [ ] Verify the error boundary renders the documented full-screen fallback when a child throws
+- [ ] Verify the global error handler dispatches a `toast.error` entry to the shared toast queue for uncaught component/render errors outside the ErrorBoundary
