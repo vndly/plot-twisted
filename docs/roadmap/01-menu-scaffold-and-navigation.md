@@ -1,5 +1,6 @@
 # Menu Scaffold and Navigation
 
+- Product spec: [App Scaffolding](../product/01%20-%20scaffolding/)
 - App shell with sidebar on desktop, bottom navigation bar on mobile
 - Route structure: `/movie/:id`, `/show/:id`, `/stats`, `/recommendations` (base routes `/`, `/library`, `/calendar`, `/settings` already scaffolded)
 - Active route is visually highlighted in both sidebar and bottom nav
@@ -9,8 +10,8 @@
 
 - [ ] `AppShell` component renders a sidebar on viewports ≥ 768 px and a bottom nav bar below 768 px
 - [ ] All 5 navigation-bar routes are navigable and render a placeholder view
-- [ ] Active route indicator updates on navigation (both sidebar and bottom nav)
-- [ ] `ErrorBoundary` wraps the router outlet and displays a fallback UI on unhandled errors
+- [x] Active route indicator updates on navigation (both sidebar and bottom nav)
+- [x] `ErrorBoundary` wraps the router outlet and displays a fallback UI on unhandled errors
 
 ## Key Decisions
 

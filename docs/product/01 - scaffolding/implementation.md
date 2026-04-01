@@ -16,6 +16,8 @@ Added an `ErrorBoundary` presentation component and wired it around the routed a
 
 `src/main.ts` now also registers `app.config.errorHandler` after plugin setup. Uncaught Vue component/render errors outside the boundary are logged to `console.error` and dispatched to the shared toast queue with `i18n.global.t('toast.error')`, giving the scaffolded shell a documented recovery path for unexpected failures.
 
+The navigation-components phase extends that scaffold with the structural navigation UI for the four currently scaffolded routes: a fixed desktop sidebar, a mobile bottom navigation bar, and a sticky page header driven by each route's `meta.titleKey`. The implementation stayed presentation-only, reused the existing `nav.*`, `page.*.title`, and `app.title` locale keys, and verified exact-match Home-route highlighting plus responsive visibility and touch-target behavior through dedicated component tests.
+
 ## Files Changed
 
 ### Created
@@ -45,6 +47,12 @@ Added an `ErrorBoundary` presentation component and wired it around the routed a
 - `src/presentation/components/error/error-boundary.vue` — Error boundary component with translated fallback UI, `role="alert"`, and reload handling.
 - `tests/presentation/components/error/error-boundary.test.ts` — Component tests for normal rendering, fallback UI, reload behavior, and propagation suppression.
 - `tests/main.test.ts` — Bootstrap test that captures `app.config.errorHandler` and verifies console logging plus toast dispatch.
+- `src/presentation/components/layout/sidebar-nav.vue` — Desktop sidebar component with localized branding, four primary links, and exact-match active styling.
+- `src/presentation/components/layout/bottom-nav.vue` — Mobile bottom navigation component with responsive visibility classes, accent active state, and 44x44 touch-target classes.
+- `src/presentation/components/layout/page-header.vue` — Sticky route-title header driven by `route.meta.titleKey`.
+- `tests/presentation/components/layout/sidebar-nav.test.ts` — Component tests for structure, icon mapping, French labels, active state, and exact-match Home behavior.
+- `tests/presentation/components/layout/bottom-nav.test.ts` — Component tests for route order, icon mapping, touch-target classes, active state, and exact-match Home behavior.
+- `tests/presentation/components/layout/page-header.test.ts` — Component tests for translated titles, route updates, sticky classes, and Spanish output.
 
 ### Modified
 
@@ -95,6 +103,10 @@ Added an `ErrorBoundary` presentation component and wired it around the routed a
 - `src/main.ts` continues to use the documented layer exception by importing `useToast()` and `i18n` directly so the global handler works outside component `setup()`.
 - `ErrorBoundary` returns `false` from `onErrorCaptured`, which prevents propagation to the global handler and avoids double-handling crashes that already show the fallback UI.
 - `ErrorBoundary` accepts an optional `reloadPage` callback with a production default of `window.location.reload()` so the required reload behavior remains directly testable in jsdom.
+- Reused the existing route metadata and locale keys instead of adding new strings or router changes, which kept the navigation implementation inside the planned presentation scope.
+- Duplicated the four-item nav definitions inside the sidebar and bottom-nav components rather than introducing a new shared module, because the approved plan did not authorize additional shared files outside the listed layout component paths.
+- Used exact `route.path === '/'` matching for Home and exact path matching for the other scaffolded routes to prevent false-positive active states.
+- Kept the navigation components presentation-only: no new async flows, storage writes, API calls, authentication changes, or environment/config changes were introduced.
 
 ## Deviations from Plan
 
@@ -103,6 +115,7 @@ Added an `ErrorBoundary` presentation component and wired it around the routed a
 - **`scrollBehavior` signature simplified**: Plan specified `scrollBehavior(_to, _from, _savedPosition)` but ESLint `no-unused-vars` flagged all three parameters. Simplified to `scrollBehavior()` since the return value is unconditional.
 - `src/App.vue` was updated in addition to the plan's originally listed files because the existing root component needed to place the router outlet inside the global error boundary.
 - The visual fallback and toast-dispatch verification items were satisfied through automated tests rather than a separate manual browser check.
+- Navigation components introduced no additional deviations from plan; the sidebar, bottom nav, and page header followed the documented test-first sequence exactly.
 
 ## Testing
 
@@ -185,12 +198,28 @@ Format (`prettier`), lint (`eslint`), and type-check (`vue-tsc`) all pass indivi
   - `npm run lint` — PASS
   - `npm run type-check` — PASS
 
+### Navigation Components
+
+- `tests/presentation/components/layout/sidebar-nav.test.ts` — 5 tests covering desktop nav structure, icon mapping, French labels, active-state styling, and exact-match Home behavior.
+- `tests/presentation/components/layout/bottom-nav.test.ts` — 5 tests covering mobile nav rendering, documented route order, icon mapping, touch targets, and exact-match active-state behavior.
+- `tests/presentation/components/layout/page-header.test.ts` — 4 tests covering translated route titles, route updates, sticky positioning, and non-default locale output.
+- Re-verified during promotion:
+  - `npx vitest run tests/presentation/components/layout/sidebar-nav.test.ts` — PASS
+  - `npx vitest run tests/presentation/components/layout/bottom-nav.test.ts` — PASS
+  - `npx vitest run tests/presentation/components/layout/page-header.test.ts` — PASS
+  - `npm run test` — PASS (14 files, 114 tests)
+  - `npm run lint` — PASS
+  - `npm run format:check` — PASS
+  - `npm run type-check` — PASS
+  - `npm run build` — PASS
+
 ## Verification Results
 
-- `npm test` — PASS (11 files, 100 tests)
+- `npm test` — PASS (14 files, 114 tests)
 - `npm run lint` — PASS
+- `npm run format:check` — PASS
 - `npm run type-check` — PASS
-- `npm run check` — PASS (format, lint, type-check, test, build all clean)
+- `npm run build` — PASS
 
 ## Dependencies
 
@@ -199,11 +228,12 @@ Format (`prettier`), lint (`eslint`), and type-check (`vue-tsc`) all pass indivi
 
 No new dependencies were added for the router phase. `vue-router` (^5.0.4) and `vue-i18n` (^11.3.0) were already installed by change 01a.
 No new dependencies were added for error handling.
+No new dependencies were added for navigation components.
 
 ## Performance
 
-- **Main bundle**: 68.80 KB gzipped (under 150 KB limit).
-- **Lazy chunks**: ~0.15 KB gzipped each (under 20 KB limit). Sizes will increase when 01j adds real view content.
+- **Main bundle**: 69.60 KB gzipped (under 150 KB limit).
+- **Lazy chunks**: ~0.18 KB gzipped each (under 20 KB limit). Sizes will increase when 01j adds real view content.
 
 ## Requirement Coverage
 
@@ -231,12 +261,17 @@ No new dependencies were added for error handling.
 | SC-18 (Error boundary)         | `src/presentation/components/error/error-boundary.vue` in `src/App.vue` catches descendant render/setup errors, renders translated fallback UI with `role="alert"`, and reloads via a primary action              |
 | SC-19 (Global error handler)   | `app.config.errorHandler` in `src/main.ts` logs uncaught component/render errors and dispatches translated error toasts through `useToast()`                                                                      |
 | SC-24 (UI primitive tests)     | `empty-state.test.ts` (SC-24-01), `skeleton-loader.test.ts` (SC-24-02), `error-boundary.test.ts` (SC-24-03, SC-24-06), `toast-container.test.ts` (SC-24-04), `modal-dialog.test.ts` (SC-24-05)                    |
+| SC-05 (Desktop sidebar)        | `src/presentation/components/layout/sidebar-nav.vue` renders the localized `app.title` branding block, the four scaffolded primary links, mapped lucide icons, and desktop-only active-state styling              |
+| SC-06 (Mobile bottom nav)      | `src/presentation/components/layout/bottom-nav.vue` renders the four scaffolded primary links with responsive visibility classes and 44x44px touch-target sizing                                                  |
+| SC-07 (Active route styling)   | `sidebar-nav.vue` and `bottom-nav.vue` apply teal active-state styling and exact-match Home detection                                                                                                             |
+| SC-08 (Page header)            | `src/presentation/components/layout/page-header.vue` translates `route.meta.titleKey`, updates on route changes, and remains sticky at the top of the content area                                                |
+| SC-25 (Layout component tests) | `sidebar-nav.test.ts`, `bottom-nav.test.ts`, and `page-header.test.ts` verify rendering, locale output, route updates, active states, and sticky/touch-target behavior                                            |
 
 ## Known Limitations
 
 - A dedicated `tsconfig.vitest.json` was added (extending `tsconfig.app.json`) to provide IDE type-checking for test files. It adds `vitest/globals` and `node` types and includes `tests/**/*.ts`. Without this, VS Code cannot resolve `describe`, `it`, `expect`, or Node.js APIs in test files.
 - **Translation accuracy**: Spanish and French translations use standard UI terminology but have not been reviewed by native speakers. This is noted as a deferred concern in the requirements.
-- **Fallback verification (AC9)**: vue-i18n fallback to English is implicitly satisfied by the `fallbackLocale: 'en'` configuration from Phase 00. Explicit runtime fallback testing is deferred to downstream features (01i, 01j) that provide rendering components to exercise the fallback chain.
+- **Fallback verification (AC9)**: vue-i18n fallback to English is implicitly satisfied by the `fallbackLocale: 'en'` configuration from Phase 00. Explicit runtime fallback testing beyond the current component coverage remains deferred to downstream routed-view work (01j) and assembled-shell testing (01k).
 - Theme colors target the dark theme only; light-theme counterparts are deferred to a future theme-switching feature phase.
 - Behavioral verification of transitions requires downstream components (R-01g, R-01k) and is deferred to those phases.
 - View placeholder files are minimal stubs. They will be replaced by 01j with full implementations.
@@ -247,3 +282,6 @@ No new dependencies were added for error handling.
 - **Accessibility**: Per ui-ux.md § 11, no focus trapping is implemented for the modal. Focus remains on the element that triggered the modal.
 - **Reduced motion**: Transition disabling for `prefers-reduced-motion` is handled entirely by CSS media queries in `main.css`. The components do not programmatically detect or respond to motion preferences.
 - **Integration**: ToastContainer and ModalDialog components are not yet integrated into `App.vue`. That integration is handled by R-01k (App Shell & Assembly).
+- Recommendations remains intentionally absent from both navigation components until its route exists in a later feature phase.
+- App-shell assembly, content-area bottom clearance, and overlay stacking validation for the navigation components remain owned by R-01k.
+- Sidebar branding uses the existing localized `app.title` text only; a dedicated logo asset is still deferred.
