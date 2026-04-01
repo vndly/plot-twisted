@@ -35,7 +35,7 @@
     - **(SC-05-01, SC-04-01)** Desktop: sidebar visible with 4 nav items, flexbox layout with sidebar + scrollable content
     - **(SC-04-02, SC-06-01)** Mobile (< 768px): sidebar hides, bottom nav appears with 4 items
     - **(SC-04-03)** Resize back to desktop: sidebar restores, bottom nav hides
-    - **(SC-06-02)** Mobile: scroll to bottom of page — content not obscured by bottom nav
+    - **(SC-04-04)** Mobile: scroll to bottom of page — content not obscured by bottom nav
     - **(SC-02-01, SC-02-02)** Navigation between pages via nav items and direct URL entry
     - **(SC-07-01, SC-07-03)** Active route highlighted in teal in both sidebar and bottom nav
     - **(SC-08-01, SC-08-02, SC-08-03)** Page header updates on navigation and remains sticky when scrolling

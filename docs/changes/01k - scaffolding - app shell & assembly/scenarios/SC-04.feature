@@ -15,3 +15,8 @@ Feature: SC-04 — App shell layout
     Given the viewport width is below 768px
     When the viewport is resized to 768px or above
     Then the sidebar shows and the bottom nav hides
+
+  Scenario: SC-04-04 — Content clears the mobile bottom nav
+    Given the viewport width is below 768px
+    When I scroll to the bottom of the content area
+    Then the final content remains visible above the fixed bottom nav

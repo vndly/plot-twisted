@@ -1,18 +1,17 @@
-Feature: SC-04/SC-05/SC-07 — Desktop sidebar navigation
-  The sidebar SHALL be visible on desktop and provide navigation to all 4 routes.
+Feature: SC-05 — Desktop sidebar
+  The desktop sidebar SHALL render the current scaffolded primary navigation set.
 
   Background:
     Given the viewport width is 768px or above
 
-  Scenario: SC-05-01 — Sidebar renders on desktop
-    When the app loads
-    Then the sidebar is visible on the left with app title and 4 nav items
+  Scenario: SC-05-01 — Sidebar renders the desktop navigation structure
+    When the sidebar navigation component is rendered
+    Then a fixed left sidebar with width `w-56` and a dark background is visible
+    And the app title is visible at the top of the sidebar
+    And navigation links for Home, Calendar, Library, and Settings are visible
 
-  Scenario: SC-07-01 — Active route highlighting in sidebar
-    When I am on the `/library` route
-    Then the Library nav item has a teal left border and background tint
-    And the other 3 nav items are muted gray
-
-  Scenario: SC-07-02 — Home exact matching
-    When I am on the `/library` route
-    Then the Home nav item is NOT highlighted (exact match only for `/`)
+  Scenario: SC-05-02 — Sidebar uses the documented icon and translation mappings
+    Given the language is "fr"
+    When the sidebar navigation component is rendered
+    Then each nav item uses its mapped lucide icon
+    And the labels are rendered from the `nav.home`, `nav.calendar`, `nav.library`, and `nav.settings` translations
