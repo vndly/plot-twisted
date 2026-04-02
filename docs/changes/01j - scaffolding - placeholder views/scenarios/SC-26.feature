@@ -1,22 +1,16 @@
 Feature: SC-26 — Placeholder view tests
-  Placeholder view tests SHALL verify each view renders an empty state.
+  Placeholder view tests SHALL verify each route renders the documented placeholder content.
 
-  Scenario: SC-26-01 — Home view renders EmptyState
-    Given the home-screen test file exists
+  Scenario Outline: SC-26-01 — Route view test verifies placeholder content
+    Given the `<test_file>` component test mounts the `<route>` view with locale `<locale>`
     When the test suite runs
-    Then it verifies the view renders `<EmptyState>` with the Home icon and translated title
+    Then it verifies the placeholder view shows the <icon> icon
+    And it verifies the heading is "<page_title>"
+    And it verifies the supporting text is "<description>"
 
-  Scenario: SC-26-02 — Calendar view renders EmptyState
-    Given the calendar-screen test file exists
-    When the test suite runs
-    Then it verifies the view renders `<EmptyState>` with the CalendarDays icon and translated title
-
-  Scenario: SC-26-03 — Library view renders EmptyState
-    Given the library-screen test file exists
-    When the test suite runs
-    Then it verifies the view renders `<EmptyState>` with the Bookmark icon and translated title
-
-  Scenario: SC-26-04 — Settings view renders EmptyState
-    Given the settings-screen test file exists
-    When the test suite runs
-    Then it verifies the view renders `<EmptyState>` with the Settings icon and translated title
+    Examples:
+      | test_file                 | route      | icon         | locale | page_title | description                      |
+      | home-screen.test.ts       | /          | House        | en     | Home       | This page is under construction. |
+      | calendar-screen.test.ts   | /calendar  | CalendarDays | en     | Calendar   | This page is under construction. |
+      | library-screen.test.ts    | /library   | Bookmark     | en     | Library    | This page is under construction. |
+      | settings-screen.test.ts   | /settings  | Settings     | en     | Settings   | This page is under construction. |
