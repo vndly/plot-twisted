@@ -90,7 +90,7 @@ The `@` path alias (`@ → ./src`) is inherited from `vite.config.ts` via `merge
 > - SC-01b-12-01 → deferred to 01i (navigation component tests for Home, Calendar, Library, and Settings label rendering); Recommendations remains deferred to the future change that introduces that route and nav item
 > - SC-01b-12-02 → deferred to 01i (page-header component tests for Home, Calendar, Library, and Settings title rendering); Recommendations remains deferred to the future change that introduces that route
 > - SC-01b-12-07, SC-01b-12-08 → deferred to the future change that introduces the Recommendations route and nav item
-> - SC-01b-12-04, SC-01b-12-05, SC-01b-12-06 → deferred to downstream integration tests that render `toast.*` and `common.error.*` keys; AC9 (fallback verification) is implicitly satisfied by the `fallbackLocale: 'en'` configuration in Phase 00 and will be explicitly exercised by the later toast/error-handling phases rather than by 01i/01j
+> - SC-01b-12-04, SC-01b-12-05, SC-01b-12-06 → deferred to downstream integration tests that render `toast.*` and `common.error.*` keys; AC9 (fallback verification) is implicitly satisfied by the `fallbackLocale: 'en'` configuration in Phase 00 and will be explicitly exercised by the later toast/error-handling and assembled-shell phases rather than by the navigation or placeholder-view phases
 
 ---
 
@@ -361,7 +361,7 @@ export const TOAST_DISMISS_MS = 4000
 
   > **Note:** View files use kebab-case (`home-screen.vue`, `calendar-screen.vue`, etc.) per `conventions.md`. The `architecture.md` example uses PascalCase (`LibraryScreen.vue`) which is inconsistent — conventions take precedence.
 
-  > **Note:** View files are created by change 01j. Until 01j is implemented, dynamic imports will reference non-existent files. TypeScript will not error on dynamic `import()` targets, but `npm run dev` will fail if those routes are navigated to.
+  > **Note:** These route view files are completed later in this plan's placeholder-view phases. Before that upgrade lands, the router can point to minimal stubs to satisfy Vite's import analysis.
 
   **Routes:**
 
@@ -802,3 +802,51 @@ Tests use `@vue/test-utils` `mount()` (provided by prerequisite 01a). Type-check
   - `npm run build`
 
 > App-shell integration checks for responsive switching and content-area clearance remain in `01k`, after `AppShell` assembles these components.
+
+## Phase 29 — Placeholder Views: Test Coverage
+
+### Step 12 — Write placeholder-view tests
+
+- [x] Add one component test file per scaffolded route view in `tests/presentation/views/` before changing the implementations. Each test includes both `en` and `fr` cases to prove the placeholder copy is sourced from vue-i18n.
+
+  | Test File                 | Covers                 | Verifies                                                                                                                                                 |
+  | :------------------------ | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | `home-screen.test.ts`     | `SC-20-01`, `SC-26-01` | `/` renders the `House` icon, translated `common.empty.title`, and `common.empty.description` in the active locale for both `en` and `fr`                |
+  | `calendar-screen.test.ts` | `SC-20-01`, `SC-26-01` | `/calendar` renders the `CalendarDays` icon, translated `common.empty.title`, and `common.empty.description` in the active locale for both `en` and `fr` |
+  | `library-screen.test.ts`  | `SC-20-01`, `SC-26-01` | `/library` renders the `Bookmark` icon, translated `common.empty.title`, and `common.empty.description` in the active locale for both `en` and `fr`      |
+  | `settings-screen.test.ts` | `SC-20-01`, `SC-26-01` | `/settings` renders the `Settings` icon, translated `common.empty.title`, and `common.empty.description` in the active locale for both `en` and `fr`     |
+
+### Step 13 — Confirm tests fail against the original stubs
+
+- [x] Run the targeted route-view tests and confirm they fail against the original stub implementations before editing the view files:
+
+  `npm run test -- tests/presentation/views/home-screen.test.ts tests/presentation/views/calendar-screen.test.ts tests/presentation/views/library-screen.test.ts tests/presentation/views/settings-screen.test.ts`
+
+## Phase 30 — Placeholder Views: Implementation
+
+### Step 14 — Upgrade the scaffolded route views
+
+- [x] Update the existing placeholder view SFCs in `src/presentation/views/` to replace the current stubs with `EmptyState`-based implementations:
+
+  | File                  | Icon Import    | Title Key            | Description Key            |
+  | :-------------------- | :------------- | :------------------- | :------------------------- |
+  | `home-screen.vue`     | `House`        | `common.empty.title` | `common.empty.description` |
+  | `calendar-screen.vue` | `CalendarDays` | `common.empty.title` | `common.empty.description` |
+  | `library-screen.vue`  | `Bookmark`     | `common.empty.title` | `common.empty.description` |
+  | `settings-screen.vue` | `Settings`     | `common.empty.title` | `common.empty.description` |
+
+Each view follows the same pattern: `<script setup lang="ts">` imports `EmptyState`, the mapped lucide icon, and `useI18n`. The template renders `<EmptyState>` with the icon, the shared translated heading from `common.empty.title`, and the shared supporting text from `common.empty.description`. Route-title rendering remains owned by route `meta.titleKey` and `PageHeader`.
+
+## Phase 31 — Placeholder Views: Verification
+
+### Step 15 — Re-run targeted and project verification
+
+- [x] Re-run the targeted placeholder-view tests and confirm all documented route cases pass:
+
+  `npm run test -- tests/presentation/views/home-screen.test.ts tests/presentation/views/calendar-screen.test.ts tests/presentation/views/library-screen.test.ts tests/presentation/views/settings-screen.test.ts`
+
+- [x] Inspect `home-screen.vue`, `calendar-screen.vue`, `library-screen.vue`, and `settings-screen.vue` to verify `<script setup lang="ts">` appears before `<template>`, no local `<style>` block was added, and placeholder copy is sourced from `common.empty.title` plus `common.empty.description`.
+
+- [x] Run project verification commands after the view updates:
+  - `npm run test`
+  - `npm run type-check`

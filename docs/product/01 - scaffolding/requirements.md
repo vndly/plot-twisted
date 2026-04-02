@@ -28,6 +28,8 @@ tags:
     layout,
     sidebar,
     responsive,
+    views,
+    placeholder,
   ]
 ---
 
@@ -48,6 +50,8 @@ Create the ToastContainer and ModalDialog overlay components that render the toa
 Add an `ErrorBoundary` component that catches descendant Vue render/setup errors and shows a translated full-screen fallback UI with a reload action. Register `app.config.errorHandler` in `src/main.ts` so uncaught component/render errors outside the boundary are logged and surfaced to the shared toast queue.
 
 Create the navigation framing components for the currently scaffolded routes: a fixed desktop sidebar, a mobile bottom navigation bar, and a sticky page header that renders translated route titles from `meta.titleKey`.
+
+Update the 4 scaffolded route views so Home, Calendar, Library, and Settings render the shared `EmptyState` with their mapped icons plus the translated `common.empty.title` and `common.empty.description`, while route-title rendering remains owned by route metadata and the shared `PageHeader`.
 
 ## Context & Background
 
@@ -81,13 +85,14 @@ This phase is part of the Phase 01 scaffolding sequence. It delivers the visual 
 - R-01c — `TOAST_DISMISS_MS` constant in `src/domain/constants.ts`.
 - R-01b — `common.error.*` and `toast.error` locale keys exist in all supported locales.
 - R-01e — `useToast()` is available as a module-level singleton outside component `setup()`.
+- SC-01b-12 — `common.empty.title` and `common.empty.description` locale keys exist for the scaffolded route placeholders.
+- SC-16 — `EmptyState` exists as the shared presentation primitive for scaffolded route placeholders.
 
 ### Dependents
 
 - **01e (Composables)** — consumes `TOAST_DISMISS_MS` from `src/domain/constants.ts`.
 - **01g (Toast Container & Modal Dialog)** — consumes `--color-success` and `--color-error` theme colors.
 - **01i (Navigation Components)** — uses `nav.*` keys for sidebar and bottom nav labels.
-- **01j (Placeholder Views)** — uses `page.*.title` and `common.empty.*` keys.
 - **01k (App Shell & Assembly)** — wires the fade transition CSS into `<Transition>` around `<RouterView>`.
 
 ### Phase Sequencing
@@ -157,6 +162,8 @@ The navigation components in this scaffolded phase target the four routes alread
 - Render navigation items for Home, Calendar, Library, and Settings using the existing `nav.*` and `page.*.title` i18n keys.
 - Write component tests for `sidebar-nav.vue`, `bottom-nav.vue`, and `page-header.vue`.
 - Implement the documented exact-match Home active state plus the required z-index and touch-target behavior for the navigation components.
+- Update `src/presentation/views/home-screen.vue`, `calendar-screen.vue`, `library-screen.vue`, and `settings-screen.vue` to render `EmptyState` with the mapped route icon plus the shared translated placeholder copy.
+- Write component tests in `tests/presentation/views/` covering each scaffolded route view in both English and French.
 
 > **Note:** `nav.recommendations` and `page.recommendations.title` are included for forward compatibility with the Recommendations feature phase, even though no scaffolding sibling currently consumes them.
 
@@ -174,7 +181,6 @@ The navigation components in this scaffolded phase target the four routes alread
 - `/stats` and `/recommendations` routes — deferred to their respective feature phases. These are primary nav destinations but depend on feature-specific views and composables not yet built.
 - Navigation guards beyond the catch-all redirect.
 - Route-level middleware or authentication guards.
-- Placeholder view content for the scaffolded routes (`01j`).
 - App-shell assembly, content-area bottom padding clearance, and responsive shell switching verification (`01k`).
 - Final overlay stacking verification against toasts and modals in the assembled shell (`01k`).
 - Adding the Recommendations nav item before its route and view exist.
@@ -188,6 +194,7 @@ The navigation components in this scaffolded phase target the four routes alread
 - Custom error types or error categorization.
 - API request failures beyond their existing request-specific handling.
 - Rendering the toast UI in the root shell; this phase only dispatches to the shared toast queue.
+- Route-title rendering beyond the shared `PageHeader` and existing route `meta.titleKey` wiring.
 
 > The scaffolding sequence builds cumulatively on the infrastructure, shared UI primitives, overlays, and error handling documented here.
 
@@ -228,6 +235,8 @@ The navigation components in this scaffolded phase target the four routes alread
 | SC-07     | Active route highlighting | Active nav item highlighted with accent color (left border + background tint in sidebar, accent-colored icon/text in bottom nav). Home route uses exact matching.                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | P0       |
 | SC-08     | Page header               | Sticky header at the top of the content area showing the current page name, translated via route `meta.titleKey`, and updating when the active route changes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | P0       |
 | SC-25     | Layout component tests    | Component tests cover sidebar rendering and active-state behavior, bottom-nav rendering and touch-target sizing, and page-header title rendering, locale output, route updates, and sticky positioning.                                                                                                                                                                                                                                                                                                                                                                                                                                  | P0       |
+| SC-20     | Placeholder views         | 4 route view components update the scaffolded screens to render `<EmptyState>` with the mapped lucide icon (`House`, `CalendarDays`, `Bookmark`, `Settings`), translated `common.empty.title` heading, and translated `common.empty.description` supporting text. Route-title rendering remains owned by route metadata and the shared `PageHeader`.                                                                                                                                                                                                                                                                                     | P0       |
+| SC-26     | Placeholder view tests    | Each of the 4 route view component tests verifies the mapped icon, translated `common.empty.title` heading, and translated `common.empty.description` supporting text. Each test includes at least 1 non-default locale case to prove the rendered strings come from vue-i18n rather than hardcoded English literals.                                                                                                                                                                                                                                                                                                                    | P1       |
 
 > **Note:** `src/domain/constants.ts` is introduced in this scaffolding sequence with `TOAST_DISMISS_MS`, and later scaffold phases extend it with additional constants such as `MAX_VISIBLE_TOASTS`.
 
@@ -274,6 +283,8 @@ Overlay elements use the following z-index scale. Navigation component z-indices
 - **Composable location:** Toast and modal composables live in `src/presentation/composables/` rather than `src/application/` because they manage UI-only state with no domain or infrastructure dependencies. This introduces a `composables/` subdirectory under `src/presentation/` not currently defined in `architecture.md` — both `architecture.md` and the glossary entry for "Composable" should be updated to acknowledge that purely UI-state composables may reside in the Presentation layer.
 - **NFR-01h-01 — `main.ts` exception:** `src/main.ts` importing from `src/presentation/composables/` is an intentional exception to typical layer boundaries because the global handler must call `useToast()` outside component `setup()`. _Threshold: No additional cross-layer imports beyond this documented exception._
 - **SFC block order:** `<script setup>` then `<template>` then `<style>` (rare). Verifiable by linting SFC files.
+- **NFR-01j-01 — Placeholder-view SFC structure:** All 4 scaffolded route view SFCs use `<script setup lang="ts">` followed by `<template>`, with no local `<style>` block added in this phase.
+- **NFR-01j-02 — Placeholder-view localization:** All user-facing placeholder copy in the scaffolded route views is sourced from `common.empty.title` and `common.empty.description`, with no hardcoded locale-specific strings in the implementations.
 - **File naming:** kebab-case for all component files. Verifiable by checking file names match `[a-z0-9-]+\.vue`.
 
 ### Accessibility
@@ -300,6 +311,7 @@ Visual contracts per `docs/technical/ui-ux.md`:
 - **Sidebar navigation:** Fixed left rail (`w-56`, dark background) with localized `app.title` branding and exactly four primary items: Home (`House`), Calendar (`CalendarDays`), Library (`Bookmark`), and Settings (`Settings`).
 - **Bottom navigation:** Fixed bottom bar below `md` with the same four primary items, teal active-state treatment, and 44x44px minimum touch targets.
 - **Page header:** Sticky header at the top of the content area that renders the translated route `meta.titleKey` and updates when navigation changes.
+- **Route placeholder views:** Each scaffolded route view renders `EmptyState` with its mapped icon (`House`, `CalendarDays`, `Bookmark`, `Settings`) plus the shared translated `common.empty.title` and `common.empty.description` copy.
 
 ## Risks & Assumptions
 
@@ -327,8 +339,8 @@ Visual contracts per `docs/technical/ui-ux.md`:
 
 - **`globals: true` may conflict with explicit Vitest imports:** If a downstream test file explicitly imports `describe`/`it`/`expect` from `vitest` while globals are enabled, TypeScript may flag duplicate declarations. Likelihood: Low. Impact: Medium (TypeScript compile errors in downstream tests). Mitigation: project convention should mandate using globals without imports; the code example in `docs/technical/testing.md` will be updated as part of this phase to remove the explicit import and align with this convention.
 - **TypeScript global type recognition:** Enabling `globals: true` in Vitest does not automatically make `describe`/`it`/`expect` visible to the TypeScript compiler. Likelihood: Low. Impact: High (all downstream test files would fail type-checking). Mitigation: add `/// <reference types="vitest/globals" />` directive at the top of `tests/setup.ts` (specified in SC-01a-03).
-- **Translation accuracy** (low likelihood, low impact): Translations cannot be verified in context until downstream features (01i, 01j) render the keys in UI components. Mitigation: translations use standard, well-known UI terms.
-- **Key path mismatch** (medium likelihood, medium impact): Downstream features (01d, 01h, 01i, 01j) may reference key paths that do not match the exact paths defined here. Mitigation: downstream requirements explicitly list the keys they consume; the locale key parity test catches missing keys.
+- **Translation accuracy** (low likelihood, low impact): Navigation labels, route titles, and placeholder copy are now verified in rendered UI, but toast and error copy still rely on later integration and assembled-shell testing. Mitigation: continue verifying the remaining shared strings in the phases that render them.
+- **Key path mismatch** (medium likelihood, medium impact): Later shell-assembly and integration work may reference key paths that do not match the exact paths defined here. Mitigation: this product spec lists the consumed keys explicitly; locale parity and placeholder-view tests catch missing keys early.
 - **Low likelihood, low impact:** If Tailwind v4 changes the `@theme` block syntax in a future update, the custom property declarations may need to be moved. Mitigation: pin Tailwind version in `package.json`.
 - **Firebase SPA fallback** (low likelihood, high impact): `createWebHistory()` requires Firebase SPA rewrite. Mitigation: verify `hosting.rewrites` from Phase 00.
 - **Leaked timers during HMR** (low likelihood, low impact): Tests validate timer cleanup; HMR invalidation replaces module state.
@@ -435,13 +447,17 @@ Visual contracts per `docs/technical/ui-ux.md`:
 - [ ] [SC-08] Page header uses sticky positioning and `z-10` content-layer stacking at the top of the content area
 - [ ] [SC-25] At least one navigation component test verifies translated output in a non-default locale
 - [ ] [SC-25] `sidebar-nav.test.ts`, `bottom-nav.test.ts`, and `page-header.test.ts` pass for the documented scenarios
+- [ ] [SC-20] Each route view renders `EmptyState` with the mapped icon, translated `common.empty.title`, and translated `common.empty.description`, while route-title rendering remains owned by the shared `PageHeader`
+- [ ] [SC-26] Component tests cover all 4 route views and verify the mapped icon, translated title, and shared description in at least 1 non-default locale case per view
+- [ ] [NFR-01j-01] The 4 placeholder view SFCs follow the required block order and do not add a local `<style>` block
+- [ ] [NFR-01j-02] The 4 placeholder view implementations contain no hardcoded user-facing strings and source placeholder copy from `common.empty.title` plus `common.empty.description`
 
 ## Constraints
 
 - **Runtime dependencies:** No new runtime dependencies beyond `vue-router@^5.0.4`. All other tools (Tailwind, vue-i18n, lucide-vue-next, Zod) are already installed from Phase 00.
 - **Dev dependencies:** `@vue/test-utils@^2.4.6` is the only new dev dependency.
 - Must use `createWebHistory()` (no hash mode) — requires Firebase SPA rewrite for server-side fallback.
-- View component files (`*-screen.vue`) are provided by change 01j — router configuration will reference them before they exist.
+- View component files (`*-screen.vue`) are implemented in this scaffolding feature and referenced by the router; route-title rendering remains owned by route metadata and `page-header.vue`.
 - Existing bootstrap files modified in this scaffolding sequence are limited to `src/main.ts` and `src/App.vue`; most new implementation lives under `src/presentation/`.
 - Composables must work both inside and outside Vue component `setup()` context (needed by the global error handler in 01h).
 - `MAX_VISIBLE_TOASTS` must be defined as a named constant in `src/domain/constants.ts`.

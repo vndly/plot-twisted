@@ -4,7 +4,7 @@
 
 This implementation covers the foundational scaffolding layers for the application. It installs the two remaining runtime and dev dependencies (`vue-router`, `@vue/test-utils`), configures the Vitest test infrastructure, and adds 18 i18n keys across 5 namespaces to all three locale files. It also establishes the visual foundation with Tailwind theme color tokens for success/error states, Vue `<Transition>` CSS classes for route fades, toast notifications, and modal dialogs, a `prefers-reduced-motion` override for accessibility, and the `TOAST_DISMISS_MS` domain constant. All CSS is centralized in `src/assets/main.css` as an acknowledged exception to the Tailwind-only rule, since Vue's `<Transition>` component requires class-based CSS.
 
-Configured Vue Router with 4 lazy-loaded routes, a catch-all redirect, scroll-to-top behavior, and i18n-based document title updates. The router uses `createWebHistory()` for clean URLs and is registered in `main.ts` after the i18n plugin. An `afterEach` guard sets `document.title` using the i18n instance's `t()` function, reading each route's `meta.titleKey` to produce translated page titles in the format `"Page Title — Plot Twisted"`. Placeholder view files were created in `src/presentation/views/` to satisfy Vite's import analysis during testing.
+Configured Vue Router with 4 lazy-loaded routes, a catch-all redirect, scroll-to-top behavior, and i18n-based document title updates. The router uses `createWebHistory()` for clean URLs and is registered in `main.ts` after the i18n plugin. An `afterEach` guard sets `document.title` using the i18n instance's `t()` function, reading each route's `meta.titleKey` to produce translated page titles in the format `"Page Title — Plot Twisted"`. The route view files in `src/presentation/views/` were introduced early to satisfy Vite's import analysis and are now implemented as `EmptyState`-based screens for Home, Calendar, Library, and Settings.
 
 Created two reusable UI primitives — `SkeletonLoader` and `EmptyState` — in the Presentation layer's `common/` directory, following a test-first approach. Both components are stateless, translation-agnostic primitives that receive all content via props.
 
@@ -18,6 +18,8 @@ Added an `ErrorBoundary` presentation component and wired it around the routed a
 
 The navigation-components phase extends that scaffold with the structural navigation UI for the four currently scaffolded routes: a fixed desktop sidebar, a mobile bottom navigation bar, and a sticky page header driven by each route's `meta.titleKey`. The implementation stayed presentation-only, reused the existing `nav.*`, `page.*.title`, and `app.title` locale keys, and verified exact-match Home-route highlighting plus responsive visibility and touch-target behavior through dedicated component tests.
 
+The placeholder-view phase upgrades those 4 routed screens to render `EmptyState` with the mapped Lucide icons (`House`, `CalendarDays`, `Bookmark`, `Settings`) and the shared translated `common.empty.title` plus `common.empty.description` copy. Dedicated component tests verify both English and French output so the canonical scaffold now covers the routed placeholder UI rather than temporary stub content.
+
 ## Files Changed
 
 ### Created
@@ -28,10 +30,14 @@ The navigation-components phase extends that scaffold with the structural naviga
 - `tests/domain/constants.test.ts` — Unit tests verifying `TOAST_DISMISS_MS` is exported with value `4000` and is of type `number`.
 - `src/presentation/router.ts` — Router configuration with `createWebHistory()`, 4 named routes with lazy-loaded components, catch-all redirect, `scrollBehavior` returning `{ top: 0 }`, `RouteMeta` module augmentation for `titleKey`, and `afterEach` guard setting `document.title` via i18n.
 - `tests/presentation/router.test.ts` — 16 unit tests covering route definitions, catch-all redirect, lazy loading verification, `meta.titleKey` per route, scroll behavior, and document title updates via i18n mock.
-- `src/presentation/views/home-screen.vue` — Minimal placeholder view (replaced by 01j).
-- `src/presentation/views/calendar-screen.vue` — Minimal placeholder view (replaced by 01j).
-- `src/presentation/views/library-screen.vue` — Minimal placeholder view (replaced by 01j).
-- `src/presentation/views/settings-screen.vue` — Minimal placeholder view (replaced by 01j).
+- `src/presentation/views/home-screen.vue` — Home route view, introduced as a router stub and upgraded to render `EmptyState` with the `House` icon plus shared translated placeholder copy.
+- `src/presentation/views/calendar-screen.vue` — Calendar route view, introduced as a router stub and upgraded to render `EmptyState` with the `CalendarDays` icon plus shared translated placeholder copy.
+- `src/presentation/views/library-screen.vue` — Library route view, introduced as a router stub and upgraded to render `EmptyState` with the `Bookmark` icon plus shared translated placeholder copy.
+- `src/presentation/views/settings-screen.vue` — Settings route view, introduced as a router stub and upgraded to render `EmptyState` with the `Settings` icon plus shared translated placeholder copy.
+- `tests/presentation/views/home-screen.test.ts` — Component tests covering English and French placeholder rendering for the Home route.
+- `tests/presentation/views/calendar-screen.test.ts` — Component tests covering English and French placeholder rendering for the Calendar route.
+- `tests/presentation/views/library-screen.test.ts` — Component tests covering English and French placeholder rendering for the Library route.
+- `tests/presentation/views/settings-screen.test.ts` — Component tests covering English and French placeholder rendering for the Settings route.
 - `src/presentation/composables/use-toast.ts` — Toast notification composable with `addToast()`, `removeToast()`, auto-dismiss timers, and `MAX_VISIBLE_TOASTS` eviction.
 - `src/presentation/composables/use-modal.ts` — Modal dialog composable with `open()`, `close()`, single-instance replacement, and callback storage.
 - `tests/presentation/composables/use-toast.test.ts` — 13 unit tests covering add, remove, auto-dismiss, eviction, timer cleanup, type variants, and ID uniqueness.
@@ -84,7 +90,7 @@ The navigation-components phase extends that scaffold with the structural naviga
 - **Test uses `fs.readFileSync`**: The test reads locale files directly from disk rather than importing them as modules. This provides explicit file existence validation and avoids potential interference from the `@intlify/unplugin-vue-i18n` Vite plugin that transforms locale files during build.
 - **Theme colors appended to existing `@theme` block**: Kept all theme tokens in a single block rather than creating a separate one, maintaining the existing pattern established in R-00.
 - **Modal leave duration at 150ms**: Intentionally below the UI/UX spec's 200–300ms guideline for a snappier leave feel, as documented in NFR-01c-05.
-- **Placeholder view files**: Vite's `vite:import-analysis` plugin validates dynamic import targets at transform time, before Vitest's `vi.mock()` can intercept. Created minimal `<template><div>Name</div></template>` stubs so tests and builds pass before 01j provides real views.
+- **Placeholder view bootstrap**: Vite's `vite:import-analysis` plugin validates dynamic import targets at transform time, before Vitest's `vi.mock()` can intercept. The route views were bootstrapped as minimal stubs first, then upgraded to their canonical `EmptyState` implementations once the placeholder-view phase landed.
 - **`router.options.routes` for lazy-loading test**: Used `router.options.routes` instead of `router.getRoutes()` to verify lazy-loaded component functions. Vue Router replaces lazy functions with resolved components in normalized route records after navigation, making `getRoutes()` unreliable when other tests navigate first.
 - **`router.push()` for catch-all test**: `router.resolve()` does not follow redirects in Vue Router, so the catch-all redirect test uses `router.push()` and asserts on `router.currentRoute.value`.
 - **Parameterless `scrollBehavior()`**: Removed unused `_to`, `_from`, `_savedPosition` parameters to satisfy ESLint `no-unused-vars` rule, since all parameters are ignored per SC-01d-11.
@@ -107,15 +113,18 @@ The navigation-components phase extends that scaffold with the structural naviga
 - Duplicated the four-item nav definitions inside the sidebar and bottom-nav components rather than introducing a new shared module, because the approved plan did not authorize additional shared files outside the listed layout component paths.
 - Used exact `route.path === '/'` matching for Home and exact path matching for the other scaffolded routes to prevent false-positive active states.
 - Kept the navigation components presentation-only: no new async flows, storage writes, API calls, authentication changes, or environment/config changes were introduced.
+- Shared placeholder text remains bound to `common.empty.title` and `common.empty.description` in every route view so localization stays centralized and no route-specific placeholder strings are introduced.
+- Each route-view test mounts the screen with its own minimal vue-i18n instance in both English and French, which proves the rendered placeholder strings come from translation lookup rather than hardcoded English literals.
 
 ## Deviations from Plan
 
 - **tsconfig.vitest.json fix**: The vitest TypeScript config only included `tests/**/*.ts` in its `include` array, which meant source files imported by tests were outside the project boundary. Added `src/**/*` and `src/**/*.vue` to fix TS error 6307. This was a pre-existing config issue that surfaced when the first test importing from `src/` was introduced.
-- **Placeholder view files added**: The plan expected view files from 01j and noted that "TypeScript will not error on dynamic `import()` targets." While true for TypeScript, Vite's import analysis also validates dynamic imports at transform time, blocking both tests and builds. Created minimal stubs to unblock.
+- **Placeholder view files added**: The router plan assumed the route view files would land in a later placeholder-view phase and noted that "TypeScript will not error on dynamic `import()` targets." While true for TypeScript, Vite's import analysis also validates dynamic imports at transform time, blocking both tests and builds. Created minimal stubs first, then upgraded them once the placeholder-view phase was implemented.
 - **`scrollBehavior` signature simplified**: Plan specified `scrollBehavior(_to, _from, _savedPosition)` but ESLint `no-unused-vars` flagged all three parameters. Simplified to `scrollBehavior()` since the return value is unconditional.
 - `src/App.vue` was updated in addition to the plan's originally listed files because the existing root component needed to place the router outlet inside the global error boundary.
 - The visual fallback and toast-dispatch verification items were satisfied through automated tests rather than a separate manual browser check.
 - Navigation components introduced no additional deviations from plan; the sidebar, bottom nav, and page header followed the documented test-first sequence exactly.
+- Placeholder views introduced no additional deviations from plan; the route screens and their tests followed the documented test-first sequence exactly.
 
 ## Testing
 
@@ -213,9 +222,19 @@ Format (`prettier`), lint (`eslint`), and type-check (`vue-tsc`) all pass indivi
   - `npm run type-check` — PASS
   - `npm run build` — PASS
 
+### Placeholder Views
+
+- `tests/presentation/views/home-screen.test.ts`, `calendar-screen.test.ts`, `library-screen.test.ts`, and `settings-screen.test.ts` cover the documented routed placeholder cases in both English and French.
+- The placeholder-view tests were added before the route-view implementations changed, failed against the original stubs, then passed after the `EmptyState` upgrades were completed.
+- Source inspection of `src/presentation/views/home-screen.vue`, `calendar-screen.vue`, `library-screen.vue`, and `settings-screen.vue` confirmed `<script setup lang="ts">` appears before `<template>`, no local `<style>` block was added, and placeholder copy is sourced from `common.empty.title` plus `common.empty.description`.
+- Re-verified during promotion:
+  - `npm run test -- tests/presentation/views/home-screen.test.ts tests/presentation/views/calendar-screen.test.ts tests/presentation/views/library-screen.test.ts tests/presentation/views/settings-screen.test.ts` — PASS (4 files, 8 tests)
+  - `npm run test` — PASS (18 files, 122 tests)
+  - `npm run type-check` — PASS
+
 ## Verification Results
 
-- `npm test` — PASS (14 files, 114 tests)
+- `npm test` — PASS (18 files, 122 tests)
 - `npm run lint` — PASS
 - `npm run format:check` — PASS
 - `npm run type-check` — PASS
@@ -229,11 +248,12 @@ Format (`prettier`), lint (`eslint`), and type-check (`vue-tsc`) all pass indivi
 No new dependencies were added for the router phase. `vue-router` (^5.0.4) and `vue-i18n` (^11.3.0) were already installed by change 01a.
 No new dependencies were added for error handling.
 No new dependencies were added for navigation components.
+No new dependencies were added for placeholder views.
 
 ## Performance
 
 - **Main bundle**: 69.60 KB gzipped (under 150 KB limit).
-- **Lazy chunks**: ~0.18 KB gzipped each (under 20 KB limit). Sizes will increase when 01j adds real view content.
+- **Lazy chunks**: ~0.18 KB gzipped each (under 20 KB limit).
 
 ## Requirement Coverage
 
@@ -266,16 +286,16 @@ No new dependencies were added for navigation components.
 | SC-07 (Active route styling)   | `sidebar-nav.vue` and `bottom-nav.vue` apply teal active-state styling and exact-match Home detection                                                                                                             |
 | SC-08 (Page header)            | `src/presentation/components/layout/page-header.vue` translates `route.meta.titleKey`, updates on route changes, and remains sticky at the top of the content area                                                |
 | SC-25 (Layout component tests) | `sidebar-nav.test.ts`, `bottom-nav.test.ts`, and `page-header.test.ts` verify rendering, locale output, route updates, active states, and sticky/touch-target behavior                                            |
+| SC-20 (Placeholder views)      | `home-screen.vue`, `calendar-screen.vue`, `library-screen.vue`, and `settings-screen.vue` render `EmptyState` with the mapped icon plus shared translated placeholder copy                                        |
+| SC-26 (Placeholder view tests) | `home-screen.test.ts`, `calendar-screen.test.ts`, `library-screen.test.ts`, and `settings-screen.test.ts` verify icon mapping plus English and French placeholder rendering                                       |
 
 ## Known Limitations
 
 - A dedicated `tsconfig.vitest.json` was added (extending `tsconfig.app.json`) to provide IDE type-checking for test files. It adds `vitest/globals` and `node` types and includes `tests/**/*.ts`. Without this, VS Code cannot resolve `describe`, `it`, `expect`, or Node.js APIs in test files.
 - **Translation accuracy**: Spanish and French translations use standard UI terminology but have not been reviewed by native speakers. This is noted as a deferred concern in the requirements.
-- **Fallback verification (AC9)**: vue-i18n fallback to English is implicitly satisfied by the `fallbackLocale: 'en'` configuration from Phase 00. Explicit runtime fallback testing beyond the current component coverage remains deferred to downstream routed-view work (01j) and assembled-shell testing (01k).
+- **Fallback verification (AC9)**: vue-i18n fallback to English is implicitly satisfied by the `fallbackLocale: 'en'` configuration from Phase 00. Explicit runtime fallback testing beyond the current component coverage remains deferred to assembled-shell testing (01k).
 - Theme colors target the dark theme only; light-theme counterparts are deferred to a future theme-switching feature phase.
 - Behavioral verification of transitions requires downstream components (R-01g, R-01k) and is deferred to those phases.
-- View placeholder files are minimal stubs. They will be replaced by 01j with full implementations.
-- `npm run dev` will render placeholder divs when navigating to routes until 01j provides real views.
 - The `afterEach` title guard depends on `meta.titleKey` existing on each route. Routes added by future features must include this meta property to get document title updates.
 - Skeleton composition variants (card skeleton, hero skeleton, etc.) are out of scope — deferred to consuming features.
 - No responsive-specific skeleton behavior beyond standard Tailwind responsiveness.

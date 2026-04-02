@@ -1,9 +1,9 @@
 Feature: SC-01d-02 — Route definitions
   The router SHALL define 4 named routes and a catch-all redirect.
 
-  # Note: Scenarios SC-01d-02-01 and SC-01d-02-02 require navigation components from 01i
-  # and placeholder views from 01j. They are integration-level scenarios verifiable
-  # after those changes are complete.
+  # Note: Scenarios SC-01d-02-01 and SC-01d-02-02 require the navigation components
+  # and scaffolded placeholder views documented in this product spec. They are
+  # integration-level scenarios verifiable once those phases are complete.
 
   Scenario Outline: SC-01d-02-01 — Navigation between pages
     Given the app is running

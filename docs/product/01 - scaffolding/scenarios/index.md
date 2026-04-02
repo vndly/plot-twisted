@@ -33,5 +33,7 @@
 29. **[SC-07](./SC-07.feature)**: Active-route highlighting rules for desktop and mobile nav.
 30. **[SC-08](./SC-08.feature)**: Page-header titles, sticky positioning, and locale behavior.
 31. **[SC-25](./SC-25.feature)**: Component-test coverage for sidebar, bottom nav, and page header.
+32. **[SC-20](./SC-20.feature)**: Placeholder view rendering for the 4 scaffolded routes.
+33. **[SC-26](./SC-26.feature)**: Placeholder view component-test coverage.
 
 > **i18n note:** Theme, transitions, and constants deliver CSS definitions and a numeric constant with no user-facing text. i18n coverage is not applicable for those scenarios.
