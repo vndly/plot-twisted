@@ -26,10 +26,13 @@ tags:
     ui-primitives,
     overlay,
     layout,
+    app-shell,
+    assembly,
     sidebar,
     responsive,
     views,
     placeholder,
+    verification,
   ]
 ---
 
@@ -38,6 +41,8 @@ tags:
 Install vue-router and @vue/test-utils, configure the Vitest test infrastructure so all subsequent scaffolding phases can write and run tests. Add all i18n keys needed by the scaffolding phases (navigation labels, page titles, empty state text, error text, toast labels) to all three locale files.
 
 Add Tailwind theme color tokens (success, error), all transition/animation CSS (fade, toast, modal, reduced-motion), and the domain constant for toast auto-dismiss, preparing the visual foundation for subsequent components.
+
+Assemble the current scaffolded routes into a responsive app shell that combines the fixed desktop sidebar, mobile bottom navigation, sticky page header, routed content outlet, global overlays, and root-level error recovery.
 
 Configure Vue Router with 4 lazy-loaded routes, catch-all redirect, scroll-to-top, and i18n-based document title updates.
 
@@ -71,7 +76,7 @@ The scaffolding layer also needs a consistent crash path for unexpected Vue comp
 
 ### Visual Foundation
 
-This phase is part of the Phase 01 scaffolding sequence. It delivers the visual foundation that downstream phases depend on:
+This feature was delivered incrementally across the Phase 01 scaffolding sequence. The released scaffold shell relies on these foundational subfeatures:
 
 - **R-01e** (Composables): Consumes `TOAST_DISMISS_MS` from `src/domain/constants.ts`.
 - **R-01g** (Toast Container & Modal Dialog): Consumes `--color-success` and `--color-error` theme colors.
@@ -126,6 +131,8 @@ The navigation components in this scaffolded phase target the four routes alread
 | Modal button order                | Cancel left, Confirm right                                | Primary action rightmost follows common web conventions.                                                                                                                                                                                          |
 | `main.ts` layer exception         | Allow `src/main.ts` to import Presentation composables    | The global error handler must call `useToast()` outside component `setup()`, so the bootstrap layer uses a documented exception for this single import path.                                                                                      |
 | Error boundary propagation        | Return `false` from `onErrorCaptured`                     | Prevents double-handling: the boundary already renders the fallback UI, so the global handler should not also emit an error toast for the same crash.                                                                                             |
+| Desktop-first responsive shell    | `max-md:` breakpoints                                     | Per conventions section 10, base styles target desktop and `max-md:` overrides adapt the scaffolded shell for mobile.                                                                                                                             |
+| Current scaffolded nav set        | Home, Calendar, Library, Settings                         | Matches the routes currently delivered by the released scaffold. Recommendations stays deferred until its route and view exist.                                                                                                                   |
 
 ## Scope
 
@@ -162,6 +169,10 @@ The navigation components in this scaffolded phase target the four routes alread
 - Render navigation items for Home, Calendar, Library, and Settings using the existing `nav.*` and `page.*.title` i18n keys.
 - Write component tests for `sidebar-nav.vue`, `bottom-nav.vue`, and `page-header.vue`.
 - Implement the documented exact-match Home active state plus the required z-index and touch-target behavior for the navigation components.
+- Create `src/presentation/components/layout/app-shell.vue`.
+- Wrap routed application content in `src/App.vue` with `ErrorBoundary` and `AppShell`.
+- Assemble the current scaffolded navigation chrome, routed content, shared page header, and global overlays in one responsive shell.
+- Add local shell scenarios plus test-first verification for shell assembly.
 - Update `src/presentation/views/home-screen.vue`, `calendar-screen.vue`, `library-screen.vue`, and `settings-screen.vue` to render `EmptyState` with the mapped route icon plus the shared translated placeholder copy.
 - Write component tests in `tests/presentation/views/` covering each scaffolded route view in both English and French.
 
@@ -174,26 +185,23 @@ The navigation components in this scaffolded phase target the four routes alread
 - vue-i18n instance configuration or locale switching logic (fallback verification for scaffolded keys is in scope).
 - i18n keys beyond the scaffolding namespaces listed above (e.g., `library.*`, `details.*`).
 - Light-theme color variants (deferred to a future theme-switching phase).
-- `<Transition>` wiring in the assembled app shell (covered by R-01k).
 - Additional domain constants beyond `TOAST_DISMISS_MS` and `MAX_VISIBLE_TOASTS` (added in their respective feature phases).
 - Modal backdrop transition CSS beyond the current content-card transition support.
 - Detail routes (`/movie/:id`, `/show/:id`) — deferred to their respective feature phases.
 - `/stats` and `/recommendations` routes — deferred to their respective feature phases. These are primary nav destinations but depend on feature-specific views and composables not yet built.
 - Navigation guards beyond the catch-all redirect.
 - Route-level middleware or authentication guards.
-- App-shell assembly, content-area bottom padding clearance, and responsive shell switching verification (`01k`).
-- Final overlay stacking verification against toasts and modals in the assembled shell (`01k`).
-- Adding the Recommendations nav item before its route and view exist.
+- Adding the Recommendations route, view, or nav item before its feature phase exists.
+- Changing router definitions, navigation-component internals, or overlay implementations outside shell assembly.
+- New motion systems beyond the existing `fade`, `toast`, and `modal` transition contracts.
 - Adding a dedicated logo asset to the sidebar branding block.
 - Skeleton composition variants (card skeleton, hero skeleton, detail skeleton, grid skeleton) — deferred to consuming features.
 - i18n integration within SkeletonLoader/EmptyState primitives — consuming components pass pre-translated strings via props.
 - Responsive-specific skeleton behavior beyond standard Tailwind responsiveness.
-- Toast/modal integration into `App.vue` (handled by `01k`).
 - Recovery strategies beyond page reload.
 - Error reporting to external services.
 - Custom error types or error categorization.
 - API request failures beyond their existing request-specific handling.
-- Rendering the toast UI in the root shell; this phase only dispatches to the shared toast queue.
 - Route-title rendering beyond the shared `PageHeader` and existing route `meta.titleKey` wiring.
 
 > The scaffolding sequence builds cumulatively on the infrastructure, shared UI primitives, overlays, and error handling documented here.
@@ -209,7 +217,7 @@ The navigation components in this scaffolded phase target the four routes alread
 | SC-01a-03 | Test setup file           | Create `tests/setup.ts` with `/// <reference types="vitest/globals" />` at the top for TypeScript global recognition and `localStorage.clear()` in `beforeEach`. Note: `localStorage.clear()` is a direct call, intentionally exempt from the [conventions.md](../../technical/conventions.md) guardrail requiring all localStorage access to go through the typed storage service (section 6) — this is test-infrastructure teardown, not application data access.                                                                                                                                                                      | P0       |
 | SC-01b-12 | i18n keys                 | Add 18 i18n keys across 5 namespaces to `en.json`, `es.json`, `fr.json`: **nav** — `home`, `recommendations`, `calendar`, `library`, `settings`; **page.\*.title** — `home`, `recommendations`, `calendar`, `library`, `settings`; **common.empty** — `title`, `description`; **common.error** — `title`, `description`, `reload`; **toast** — `error`, `dismiss`, `retry`. Existing `app.title` key must be preserved.                                                                                                                                                                                                                  | P0       |
 | SC-01c-21 | Tailwind theme additions  | Add `--color-success: #22c55e` and `--color-error: #ef4444` to the `@theme` block for toast type accents. Note: these colors target the current dark theme only; light-theme counterparts will be added in the future theme-switching feature phase.                                                                                                                                                                                                                                                                                                                                                                                     | P1       |
-| SC-01c-09 | Fade transition CSS       | Define `.fade-*` CSS classes for route transitions: 200ms opacity fade with `ease-in-out`. Note: this phase covers only the CSS definitions — the `<Transition>` wiring in the app shell is in R-01k.                                                                                                                                                                                                                                                                                                                                                                                                                                    | P1       |
+| SC-01c-09 | Fade transition CSS       | Define `.fade-*` CSS classes for route transitions: 200ms opacity fade with `ease-in-out`. The released scaffold wires these classes through `AppShell` route transitions (SC-09).                                                                                                                                                                                                                                                                                                                                                                                                                                                       | P1       |
 | SC-01c-22 | Toast transition CSS      | Define `.toast-*` CSS classes: slide in horizontally from off-screen right with simultaneous opacity fade on enter (300ms `ease-out`), fade out on leave (200ms `ease-in`).                                                                                                                                                                                                                                                                                                                                                                                                                                                              | P1       |
 | SC-01c-23 | Modal transition CSS      | Define `.modal-*` CSS classes for the content card: fade in with slight scale-up on enter (200ms `ease-out`), reverse on leave (150ms `ease-in`). Backdrop transition is managed separately by the modal component (R-01g).                                                                                                                                                                                                                                                                                                                                                                                                              | P1       |
 | SC-01c-24 | Reduced-motion override   | Add `@media (prefers-reduced-motion: reduce)` block that disables all `.fade-*`, `.toast-*`, `.modal-*` transitions and `animate-pulse` animations.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | P1       |
@@ -237,6 +245,9 @@ The navigation components in this scaffolded phase target the four routes alread
 | SC-25     | Layout component tests    | Component tests cover sidebar rendering and active-state behavior, bottom-nav rendering and touch-target sizing, and page-header title rendering, locale output, route updates, and sticky positioning.                                                                                                                                                                                                                                                                                                                                                                                                                                  | P0       |
 | SC-20     | Placeholder views         | 4 route view components update the scaffolded screens to render `<EmptyState>` with the mapped lucide icon (`House`, `CalendarDays`, `Bookmark`, `Settings`), translated `common.empty.title` heading, and translated `common.empty.description` supporting text. Route-title rendering remains owned by route metadata and the shared `PageHeader`.                                                                                                                                                                                                                                                                                     | P0       |
 | SC-26     | Placeholder view tests    | Each of the 4 route view component tests verifies the mapped icon, translated `common.empty.title` heading, and translated `common.empty.description` supporting text. Each test includes at least 1 non-default locale case to prove the rendered strings come from vue-i18n rather than hardcoded English literals.                                                                                                                                                                                                                                                                                                                    | P1       |
+| SC-04     | App shell layout          | `AppShell` renders a fixed desktop sidebar and a mobile bottom nav around the current scaffolded routes (Home, Calendar, Library, Settings). At `md` and above, the routed content column is offset so it does not render beneath the fixed sidebar.                                                                                                                                                                                                                                                                                                                                                                                     | P0       |
+| SC-09     | Route transitions         | Route changes between scaffolded views use the existing `fade` transition contract for a 200ms opacity-only fade. When `prefers-reduced-motion: reduce` is enabled, route changes occur without animated fade.                                                                                                                                                                                                                                                                                                                                                                                                                           | P1       |
+| SC-10     | Root shell assembly       | `App.vue` boots the routed experience through `ErrorBoundary` and `AppShell`. `AppShell` renders `PageHeader`, the routed view outlet, `ToastContainer`, and `ModalDialog` so navigation, content, and global overlays can be verified together.                                                                                                                                                                                                                                                                                                                                                                                         | P0       |
 
 > **Note:** `src/domain/constants.ts` is introduced in this scaffolding sequence with `TOAST_DISMISS_MS`, and later scaffold phases extend it with additional constants such as `MAX_VISIBLE_TOASTS`.
 
@@ -246,6 +257,8 @@ The navigation components in this scaffolded phase target the four routes alread
 
 - **NFR-01a-01 (CI integration):** `npm run check` must pass with zero failures. This script runs the following sub-commands in sequence: `format`, `lint:fix`, `type-check`, `test`, `build`. It applies auto-formatting and auto-linting before type-check, test, and build — it mutates files on disk rather than performing read-only verification.
 - **NFR-01a-02 (File naming):** All test files must use the `*.test.ts` naming convention under a dedicated `tests/` directory at the project root, mirroring the `src/` directory structure.
+- **Automated shell coverage:** `tests/App.test.ts` and `tests/presentation/components/layout/app-shell.test.ts` cover shell assembly, responsive switching, overlay stacking, and route-transition behavior in Vitest + jsdom.
+- **Verification commands:** Final non-mutating verification runs `npm run type-check`, `npm run lint`, `npm run format:check`, `npm run test`, and `npm run build`.
 
 ### NFR-01b-01 — Key Structure Compliance
 
@@ -263,8 +276,9 @@ The navigation components in this scaffolded phase target the four routes alread
 
 ### Stacking Order
 
-Overlay elements use the following z-index scale. Navigation component z-indices are defined in R-01i.
+Shell and overlay elements use the following z-index scale.
 
+- Page content: default (`z-0`)
 - Page header: `z-10` within the content area so translated route titles remain visible while the content scrolls beneath them
 - Bottom nav: `z-10` so the mobile navigation stays above page content and below overlays
 - Modal backdrop: `z-40`
@@ -274,6 +288,7 @@ Overlay elements use the following z-index scale. Navigation component z-indices
 ### Responsive Design
 
 - **Breakpoint behavior:** Below `md` (768px): sidebar hidden, bottom nav visible. At `md` and above: sidebar visible, bottom nav hidden.
+- **Content clearance:** Below `md`, the routed content keeps bottom padding so final content remains visible above the fixed bottom nav. At `md` and above, the content column is offset so routed content does not render beneath the fixed sidebar.
 - **Touch targets:** All bottom-nav items meet the 44x44px minimum touch target on mobile.
 - **Header persistence:** The page header remains sticky at the top of the content area as the active route changes.
 
@@ -311,6 +326,7 @@ Visual contracts per `docs/technical/ui-ux.md`:
 - **Sidebar navigation:** Fixed left rail (`w-56`, dark background) with localized `app.title` branding and exactly four primary items: Home (`House`), Calendar (`CalendarDays`), Library (`Bookmark`), and Settings (`Settings`).
 - **Bottom navigation:** Fixed bottom bar below `md` with the same four primary items, teal active-state treatment, and 44x44px minimum touch targets.
 - **Page header:** Sticky header at the top of the content area that renders the translated route `meta.titleKey` and updates when navigation changes.
+- **App shell assembly:** `AppShell` combines the fixed desktop sidebar, mobile bottom nav, sticky page header, routed view outlet, fade transition wrapper, modal dialog, and toast container into the released scaffold shell.
 - **Route placeholder views:** Each scaffolded route view renders `EmptyState` with its mapped icon (`House`, `CalendarDays`, `Bookmark`, `Settings`) plus the shared translated `common.empty.title` and `common.empty.description` copy.
 
 ## Risks & Assumptions
@@ -449,6 +465,14 @@ Visual contracts per `docs/technical/ui-ux.md`:
 - [ ] [SC-25] `sidebar-nav.test.ts`, `bottom-nav.test.ts`, and `page-header.test.ts` pass for the documented scenarios
 - [ ] [SC-20] Each route view renders `EmptyState` with the mapped icon, translated `common.empty.title`, and translated `common.empty.description`, while route-title rendering remains owned by the shared `PageHeader`
 - [ ] [SC-26] Component tests cover all 4 route views and verify the mapped icon, translated title, and shared description in at least 1 non-default locale case per view
+- [ ] [SC-10] `App.vue` renders the current scaffolded routes through `ErrorBoundary` and `AppShell`, with `PageHeader`, routed content, `ToastContainer`, and `ModalDialog` mounted in the assembled shell
+- [ ] [SC-04] Desktop (`>= 768px`) renders the sidebar; mobile (`< 768px`) hides the sidebar, shows the bottom nav, and keeps the final routed content visible above the fixed bottom nav
+- [ ] [SC-04] The current scaffolded nav items `Home`, `Calendar`, `Library`, and `Settings` navigate correctly in both shell navs; Recommendations remains deferred until its prerequisite route/view feature exists
+- [ ] [SC-09] Route changes between scaffolded views use a 200ms opacity-only fade, and `prefers-reduced-motion: reduce` removes the animated fade
+- [ ] [SC-10] With a modal open, the modal overlays page content and shell chrome, and a toast remains visible above the modal
+- [ ] [SC-10] `tests/App.test.ts` and `tests/presentation/components/layout/app-shell.test.ts` pass and cover the local shell scenarios
+- [ ] [SC-04, SC-09, SC-10] `npm run type-check`, `npm run lint`, `npm run format:check`, `npm run test`, and `npm run build` pass without mutating the worktree
+- [ ] [SC-04, SC-09, SC-10, NFR Performance] Running `npm run build` followed by gzip inspection of the emitted main entry and route-view chunks confirms the main entry remains under 150 KB and each lazy-loaded route chunk remains under 20 KB
 - [ ] [NFR-01j-01] The 4 placeholder view SFCs follow the required block order and do not add a local `<style>` block
 - [ ] [NFR-01j-02] The 4 placeholder view implementations contain no hardcoded user-facing strings and source placeholder copy from `common.empty.title` plus `common.empty.description`
 

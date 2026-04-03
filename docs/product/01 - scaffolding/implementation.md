@@ -20,6 +20,8 @@ The navigation-components phase extends that scaffold with the structural naviga
 
 The placeholder-view phase upgrades those 4 routed screens to render `EmptyState` with the mapped Lucide icons (`House`, `CalendarDays`, `Bookmark`, `Settings`) and the shared translated `common.empty.title` plus `common.empty.description` copy. Dedicated component tests verify both English and French output so the canonical scaffold now covers the routed placeholder UI rather than temporary stub content.
 
+The final shell-assembly phase composes those released pieces in `src/presentation/components/layout/app-shell.vue` and updates `src/App.vue` so the routed experience boots through `ErrorBoundary` and `AppShell`. The assembled shell now combines the fixed desktop sidebar, mobile bottom nav, sticky page header, routed content outlet, shared fade transition contract, toast container, and modal dialog in one recoverable scaffold.
+
 ## Files Changed
 
 ### Created
@@ -56,9 +58,12 @@ The placeholder-view phase upgrades those 4 routed screens to render `EmptyState
 - `src/presentation/components/layout/sidebar-nav.vue` — Desktop sidebar component with localized branding, four primary links, and exact-match active styling.
 - `src/presentation/components/layout/bottom-nav.vue` — Mobile bottom navigation component with responsive visibility classes, accent active state, and 44x44 touch-target classes.
 - `src/presentation/components/layout/page-header.vue` — Sticky route-title header driven by `route.meta.titleKey`.
+- `src/presentation/components/layout/app-shell.vue` — Shared shell component that assembles navigation chrome, routed content, fade transitions, and global overlays.
 - `tests/presentation/components/layout/sidebar-nav.test.ts` — Component tests for structure, icon mapping, French labels, active state, and exact-match Home behavior.
 - `tests/presentation/components/layout/bottom-nav.test.ts` — Component tests for route order, icon mapping, touch-target classes, active state, and exact-match Home behavior.
 - `tests/presentation/components/layout/page-header.test.ts` — Component tests for translated titles, route updates, sticky classes, and Spanish output.
+- `tests/presentation/components/layout/app-shell.test.ts` — Component tests for shell layout, route transitions, reduced-motion behavior, bottom-nav clearance, and overlay stacking.
+- `tests/App.test.ts` — Root-assembly tests confirming `App.vue` renders the routed scaffold through `ErrorBoundary` and `AppShell`.
 
 ### Modified
 
@@ -72,7 +77,7 @@ The placeholder-view phase upgrades those 4 routed screens to render `EmptyState
 - `src/assets/main.css` — Added `--color-success: #22c55e` and `--color-error: #ef4444` to the existing `@theme` block. Added `.fade-*` transition classes (200ms opacity, ease-in-out), `.toast-*` transition classes (300ms enter with translateX slide + opacity, 200ms leave fade), `.modal-*` transition classes (200ms enter with scale + opacity, 150ms leave), and a `@media (prefers-reduced-motion: reduce)` block disabling all transitions and `animate-pulse` animation.
 - `tsconfig.vitest.json` — Added `src/**/*` and `src/**/*.vue` to the `include` array so that test files can import source modules without TypeScript project boundary errors.
 - `src/main.ts` — Registers the router after i18n and configures the global Vue error handler that logs uncaught component/render errors and dispatches translated error toasts via `useToast()`.
-- `src/App.vue` — Wraps routed application content in `ErrorBoundary` so component crashes surface the documented fallback UI.
+- `src/App.vue` — Boots the routed experience through `ErrorBoundary` and `AppShell` so the shared shell, overlays, and fallback UI render together at the root.
 - `src/domain/constants.ts` — Added `MAX_VISIBLE_TOASTS = 5` constant.
 - `docs/technical/architecture.md` — Added `composables/` to the Presentation-layer folder structure and description.
 - `docs/technical/testing.md` — Added `tests/presentation/composables/` to the test directory tree example.
@@ -115,16 +120,20 @@ The placeholder-view phase upgrades those 4 routed screens to render `EmptyState
 - Kept the navigation components presentation-only: no new async flows, storage writes, API calls, authentication changes, or environment/config changes were introduced.
 - Shared placeholder text remains bound to `common.empty.title` and `common.empty.description` in every route view so localization stays centralized and no route-specific placeholder strings are introduced.
 - Each route-view test mounts the screen with its own minimal vue-i18n instance in both English and French, which proves the rendered placeholder strings come from translation lookup rather than hardcoded English literals.
+- `AppShell` offsets the routed content column with `md:pl-56` and gives the route region `pb-16 md:pb-0` so the fixed `SidebarNav` and fixed `BottomNav` do not cover the active view.
+- Route changes reuse the existing `fade` transition contract from `src/assets/main.css`, including the existing `prefers-reduced-motion: reduce` override, instead of introducing a new animation system.
+- `PageHeader`, `ModalDialog`, and `ToastContainer` are mounted inside `AppShell` so the root experience renders through a recoverable shell and overlay layers stay ordered above page content and navigation chrome.
 
 ## Deviations from Plan
 
 - **tsconfig.vitest.json fix**: The vitest TypeScript config only included `tests/**/*.ts` in its `include` array, which meant source files imported by tests were outside the project boundary. Added `src/**/*` and `src/**/*.vue` to fix TS error 6307. This was a pre-existing config issue that surfaced when the first test importing from `src/` was introduced.
 - **Placeholder view files added**: The router plan assumed the route view files would land in a later placeholder-view phase and noted that "TypeScript will not error on dynamic `import()` targets." While true for TypeScript, Vite's import analysis also validates dynamic imports at transform time, blocking both tests and builds. Created minimal stubs first, then upgraded them once the placeholder-view phase was implemented.
 - **`scrollBehavior` signature simplified**: Plan specified `scrollBehavior(_to, _from, _savedPosition)` but ESLint `no-unused-vars` flagged all three parameters. Simplified to `scrollBehavior()` since the return value is unconditional.
-- `src/App.vue` was updated in addition to the plan's originally listed files because the existing root component needed to place the router outlet inside the global error boundary.
+- `src/App.vue` was updated in addition to the earlier subfeature plans because the existing root component needed to place the router outlet inside the global error boundary and shared `AppShell`.
 - The visual fallback and toast-dispatch verification items were satisfied through automated tests rather than a separate manual browser check.
 - Navigation components introduced no additional deviations from plan; the sidebar, bottom nav, and page header followed the documented test-first sequence exactly.
 - Placeholder views introduced no additional deviations from plan; the route screens and their tests followed the documented test-first sequence exactly.
+- No router changes were required for shell assembly because `src/presentation/router.ts` already limited the scaffold to Home, Calendar, Library, and Settings.
 
 ## Testing
 
@@ -161,7 +170,7 @@ Format (`prettier`), lint (`eslint`), and type-check (`vue-tsc`) all pass indivi
 
 - `tests/domain/constants.test.ts` — 2 tests covering SC-01c-25-01: value assertion (`4000`) and type assertion (`number`). Both pass.
 - CSS structural verification performed manually against `src/assets/main.css` content: all theme tokens, transition classes, and reduced-motion overrides confirmed present and correct.
-- Behavioral scenarios (SC-01c-22-02, SC-01c-22-03, SC-01c-23-02, SC-01c-24-01 through SC-01c-24-03) are deferred to R-01g and R-01k integration testing, as they require the toast component, modal component, and app shell wiring that those phases deliver.
+- Behavioral scenarios (SC-01c-22-02, SC-01c-23-02, SC-01c-24-01 through SC-01c-24-03) are now covered by the released toast, modal, and app-shell integrations. Route fade, reduced-motion behavior, and overlay stacking were re-verified through the final shell tests.
 
 ### Router
 
@@ -232,9 +241,22 @@ Format (`prettier`), lint (`eslint`), and type-check (`vue-tsc`) all pass indivi
   - `npm run test` — PASS (18 files, 122 tests)
   - `npm run type-check` — PASS
 
+### App Shell & Assembly
+
+- `tests/presentation/components/layout/app-shell.test.ts` covers `SC-04-01`, `SC-04-02`, `SC-04-03`, `SC-04-04`, `SC-09-01`, `SC-09-02`, and `SC-10-03`.
+- `tests/App.test.ts` covers `SC-10-01` and `SC-10-02`.
+- Re-verified during promotion:
+  - `npm run type-check` — PASS
+  - `npm run lint` — PASS
+  - `npm run format:check` — PASS
+  - `npm run test` — PASS (20 files, 130 tests)
+  - `npm run build` — PASS
+- Performance verification passed with the current build output. The initial non-lazy payload is 77.70 KB gzipped (`index-BkTy7rxi.js` 14.75 KB, `createLucideIcon-tpZhrWTu.js` 58.49 KB, `index-KAVinTIh.css` 4.46 KB), and each route-view chunk remains well below the 20 KB limit.
+- Manual browser verification confirmed the assembled-shell checklist: header + routed content on first load, the documented four-item nav order, responsive shell switching, mobile bottom-nav clearance, 200ms fade behavior, reduced-motion fallback, modal-over-chrome stacking, toast-over-modal stacking, and the dependent router/navigation behaviors from 01d and 01i.
+
 ## Verification Results
 
-- `npm test` — PASS (18 files, 122 tests)
+- `npm test` — PASS (20 files, 130 tests)
 - `npm run lint` — PASS
 - `npm run format:check` — PASS
 - `npm run type-check` — PASS
@@ -249,11 +271,12 @@ No new dependencies were added for the router phase. `vue-router` (^5.0.4) and `
 No new dependencies were added for error handling.
 No new dependencies were added for navigation components.
 No new dependencies were added for placeholder views.
+No new dependencies were added for app shell assembly.
 
 ## Performance
 
-- **Main bundle**: 69.60 KB gzipped (under 150 KB limit).
-- **Lazy chunks**: ~0.18 KB gzipped each (under 20 KB limit).
+- **Initial non-lazy payload**: 77.70 KB gzipped (under 150 KB limit).
+- **Lazy chunks**: route-view chunks are 0.27 KB gzipped each, and the shared `empty-state` chunk is 0.54 KB gzipped (all under 20 KB).
 
 ## Requirement Coverage
 
@@ -288,20 +311,20 @@ No new dependencies were added for placeholder views.
 | SC-25 (Layout component tests) | `sidebar-nav.test.ts`, `bottom-nav.test.ts`, and `page-header.test.ts` verify rendering, locale output, route updates, active states, and sticky/touch-target behavior                                            |
 | SC-20 (Placeholder views)      | `home-screen.vue`, `calendar-screen.vue`, `library-screen.vue`, and `settings-screen.vue` render `EmptyState` with the mapped icon plus shared translated placeholder copy                                        |
 | SC-26 (Placeholder view tests) | `home-screen.test.ts`, `calendar-screen.test.ts`, `library-screen.test.ts`, and `settings-screen.test.ts` verify icon mapping plus English and French placeholder rendering                                       |
+| SC-04 (App shell layout)       | `src/presentation/components/layout/app-shell.vue` provides the fixed desktop shell, responsive mobile bottom-nav layout, and routed-content clearance                                                            |
+| SC-09 (Route transitions)      | `AppShell` wraps `RouterView` in `<Transition name="fade" mode="out-in">`, reusing the shared fade contract and reduced-motion override                                                                           |
+| SC-10 (Root shell assembly)    | `src/App.vue` boots through `ErrorBoundary` and `AppShell`, which renders `PageHeader`, the routed outlet, `ToastContainer`, and `ModalDialog` together                                                           |
 
 ## Known Limitations
 
 - A dedicated `tsconfig.vitest.json` was added (extending `tsconfig.app.json`) to provide IDE type-checking for test files. It adds `vitest/globals` and `node` types and includes `tests/**/*.ts`. Without this, VS Code cannot resolve `describe`, `it`, `expect`, or Node.js APIs in test files.
 - **Translation accuracy**: Spanish and French translations use standard UI terminology but have not been reviewed by native speakers. This is noted as a deferred concern in the requirements.
-- **Fallback verification (AC9)**: vue-i18n fallback to English is implicitly satisfied by the `fallbackLocale: 'en'` configuration from Phase 00. Explicit runtime fallback testing beyond the current component coverage remains deferred to assembled-shell testing (01k).
+- **Fallback verification (AC9)**: vue-i18n fallback to English is implicitly satisfied by the `fallbackLocale: 'en'` configuration from Phase 00. Explicit runtime fallback testing beyond the current component coverage remains deferred to a future localization-focused verification pass.
 - Theme colors target the dark theme only; light-theme counterparts are deferred to a future theme-switching feature phase.
-- Behavioral verification of transitions requires downstream components (R-01g, R-01k) and is deferred to those phases.
 - The `afterEach` title guard depends on `meta.titleKey` existing on each route. Routes added by future features must include this meta property to get document title updates.
 - Skeleton composition variants (card skeleton, hero skeleton, etc.) are out of scope — deferred to consuming features.
 - No responsive-specific skeleton behavior beyond standard Tailwind responsiveness.
 - **Accessibility**: Per ui-ux.md § 11, no focus trapping is implemented for the modal. Focus remains on the element that triggered the modal.
 - **Reduced motion**: Transition disabling for `prefers-reduced-motion` is handled entirely by CSS media queries in `main.css`. The components do not programmatically detect or respond to motion preferences.
-- **Integration**: ToastContainer and ModalDialog components are not yet integrated into `App.vue`. That integration is handled by R-01k (App Shell & Assembly).
 - Recommendations remains intentionally absent from both navigation components until its route exists in a later feature phase.
-- App-shell assembly, content-area bottom clearance, and overlay stacking validation for the navigation components remain owned by R-01k.
 - Sidebar branding uses the existing localized `app.title` text only; a dedicated logo asset is still deferred.

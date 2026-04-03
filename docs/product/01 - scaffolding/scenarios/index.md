@@ -28,12 +28,15 @@
 24. **[SC-19](./SC-19.feature)**: Global error handler toast dispatch and boundary interaction.
 25. **[SC-23](./SC-23.feature)**: Composable unit tests — toast and modal state management verification.
 26. **[SC-24](./SC-24.feature)**: UI primitive component tests for EmptyState, SkeletonLoader, ErrorBoundary, ToastContainer, and ModalDialog.
-27. **[SC-05](./SC-05.feature)**: Desktop sidebar structure, icons, and translated labels.
-28. **[SC-06](./SC-06.feature)**: Mobile bottom-nav rendering and touch targets.
-29. **[SC-07](./SC-07.feature)**: Active-route highlighting rules for desktop and mobile nav.
-30. **[SC-08](./SC-08.feature)**: Page-header titles, sticky positioning, and locale behavior.
-31. **[SC-25](./SC-25.feature)**: Component-test coverage for sidebar, bottom nav, and page header.
-32. **[SC-20](./SC-20.feature)**: Placeholder view rendering for the 4 scaffolded routes.
-33. **[SC-26](./SC-26.feature)**: Placeholder view component-test coverage.
+27. **[SC-04](./SC-04.feature)**: App-shell layout across desktop sidebar, mobile bottom nav, and content clearance.
+28. **[SC-05](./SC-05.feature)**: Desktop sidebar structure, icons, and translated labels.
+29. **[SC-06](./SC-06.feature)**: Mobile bottom-nav rendering and touch targets.
+30. **[SC-07](./SC-07.feature)**: Active-route highlighting rules for desktop and mobile nav.
+31. **[SC-08](./SC-08.feature)**: Page-header titles, sticky positioning, and locale behavior.
+32. **[SC-09](./SC-09.feature)**: Route-transition fade behavior and reduced-motion fallback.
+33. **[SC-10](./SC-10.feature)**: Root shell assembly, current nav composition, and overlay stacking.
+34. **[SC-25](./SC-25.feature)**: Component-test coverage for sidebar, bottom nav, and page header.
+35. **[SC-20](./SC-20.feature)**: Placeholder view rendering for the 4 scaffolded routes.
+36. **[SC-26](./SC-26.feature)**: Placeholder view component-test coverage.
 
 > **i18n note:** Theme, transitions, and constants deliver CSS definitions and a numeric constant with no user-facing text. i18n coverage is not applicable for those scenarios.

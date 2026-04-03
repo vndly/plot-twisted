@@ -8,7 +8,7 @@
 
 ## Acceptance Criteria
 
-- [ ] `AppShell` component renders a sidebar on viewports ≥ 768 px and a bottom nav bar below 768 px
+- [x] `AppShell` component renders a sidebar on viewports ≥ 768 px and a bottom nav bar below 768 px
 - [ ] All 5 navigation-bar routes are navigable and render a placeholder view
 - [x] Active route indicator updates on navigation (both sidebar and bottom nav)
 - [x] `ErrorBoundary` wraps the router outlet and displays a fallback UI on unhandled errors
