@@ -1,7 +1,7 @@
 ---
 id: R-01k
 title: App Scaffolding — App Shell & Assembly
-status: draft
+status: review
 type: infrastructure
 importance: critical
 tags: [layout, app-shell, assembly, transitions]
