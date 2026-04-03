@@ -2,4 +2,4 @@
 
 ## Contents
 
-1. **[Requirements](./requirements.md)**: Placeholder routing and navigation requirements for the unfinished shell surface.
+1. **[Requirements](./requirements.md)**: Requirements for placeholder routes and App Shell navigation completion.

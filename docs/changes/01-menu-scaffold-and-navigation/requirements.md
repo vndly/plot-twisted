@@ -1,7 +1,7 @@
 ---
 id: R-01b
 title: Menu Scaffold and Navigation
-status: review
+status: approved
 type: functional
 importance: medium
 tags: []
@@ -11,7 +11,7 @@ tags: []
 
 Complete the remaining route surface from the Menu Scaffold and Navigation roadmap item by extending the existing scaffolded shell to cover Recommendations as the fifth primary navigation route and by adding placeholder routes for Stats and Movie/Show detail pages.
 
-This change exists to finish the unfinished routing and placeholder work without pulling in the full feature behavior from the later Entry Details, Stats, and Recommendations roadmap items.
+This change exists to finish the unfinished routing and placeholder work without pulling in the full feature behavior from [Entry Details](../../roadmap/03-entry-details.md), [Stats](../../roadmap/08-stats.md), and [Recommendations](../../roadmap/09-recommendations.md).
 
 ## Context & Background
 
@@ -40,18 +40,21 @@ As a result, the app shell and router are only partially complete: the primary n
 
 ### Affected Existing Product Docs
 
-- `docs/product/01 - scaffolding/requirements.md` currently treats `/recommendations`, `/stats`, and detail routes as deferred. If this change is implemented and promoted, that product spec will need to be updated to reflect the new route surface.
+- `docs/product/01 - scaffolding/requirements.md` will need promotion updates for the assertions that currently keep this route surface deferred: `SC-01d-02` defines only 4 named routes and defers `/recommendations`, `/stats`, `/movie/:id`, and `/show/:id`; `SC-05` and `SC-06` keep the desktop and mobile navs at exactly 4 primary items; and the related acceptance criteria still say Recommendations, Stats, and detail routes are absent or deferred in the released scaffold.
 
 ## Decisions
 
-| Decision                   | Choice                                                                                                                                                | Rationale                                                                                                                 |
-| :------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------ |
-| Route ownership            | This change adds route definitions, placeholder views, Recommendations nav integration, and tests only.                                               | Keeps scope aligned with the unfinished roadmap item and avoids accidentally implementing full future features.           |
-| Primary navigation surface | Recommendations becomes the fifth primary nav item. Stats and detail routes remain non-nav destinations.                                              | Matches `docs/technical/ui-ux.md`, which explicitly excludes Stats and detail routes from primary navigation.             |
-| Recommendations nav order  | Home, Recommendations, Calendar, Library, Settings                                                                                                    | The released scaffolding docs already reserved this insertion point for Recommendations.                                  |
-| Placeholder strategy       | New routes reuse the existing `EmptyState` primitive with shared translated placeholder copy and route-specific icons.                                | Keeps the implementation consistent with the existing scaffold and avoids inventing feature-specific placeholder content. |
-| Detail route validation    | `/movie/:id` and `/show/:id` accept numeric IDs only; non-numeric params redirect to `/`.                                                             | Aligns with `docs/technical/architecture.md` and prevents invalid placeholder URLs from becoming valid app states.        |
-| Route titles               | Recommendations reuses `page.recommendations.title`. Stats and detail placeholders add `page.stats.title`, `page.movie.title`, and `page.show.title`. | Preserves the existing `PageHeader` and `document.title` contract across all routes.                                      |
+| Decision                   | Choice                                                                                                                                                                                                                                                                    | Rationale                                                                                                                       |
+| :------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------ |
+| Route ownership            | This change adds route definitions, placeholder views, Recommendations nav integration, and tests only.                                                                                                                                                                   | Keeps scope aligned with the unfinished roadmap item and avoids accidentally implementing full future features.                 |
+| Primary navigation surface | Recommendations becomes the fifth primary nav item. Stats and detail routes remain non-nav destinations.                                                                                                                                                                  | Matches `docs/technical/ui-ux.md`, which explicitly excludes Stats and detail routes from primary navigation.                   |
+| Recommendations nav order  | Home, Recommendations, Calendar, Library, Settings                                                                                                                                                                                                                        | The released scaffolding docs already reserved this insertion point for Recommendations.                                        |
+| Recommendations data path  | `/recommendations` becomes a nav-visible placeholder route in this change; provider-backed seed selection, fetching, and deduplication remain deferred to [Recommendations](../../roadmap/09-recommendations.md).                                                         | Preserves the canonical route surface and nav order without pulling recommendation logic into this scaffold-only change.        |
+| Stats access path          | `/stats` is intentionally direct-URL-only in this change; the Library "View Stats" entry path remains deferred to [Stats](../../roadmap/08-stats.md).                                                                                                                     | Keeps the route surface available without coupling this change to watched-entry gating or Library UI work.                      |
+| Placeholder strategy       | New routes reuse the existing `EmptyState` primitive with shared translated placeholder copy and route-specific icons.                                                                                                                                                    | Keeps the implementation consistent with the existing scaffold and avoids inventing feature-specific placeholder content.       |
+| Detail route validation    | `/movie/:id` and `/show/:id` accept numeric IDs only; non-numeric params redirect to `/`.                                                                                                                                                                                 | Aligns with `docs/technical/architecture.md` and prevents invalid placeholder URLs from becoming valid app states.              |
+| Detail route exception     | Numeric `/movie/:id` and `/show/:id` URLs render placeholder screens without provider fetches or provider-existence validation in this change; [Entry Details](../../roadmap/03-entry-details.md) owns restoring the canonical detail-data and inline-not-found contract. | Documents the temporary deviation from the canonical detail-route behavior while keeping stable route names for follow-on work. |
+| Route titles               | Recommendations reuses `page.recommendations.title`. Stats and detail placeholders add `page.stats.title`, `page.movie.title`, and `page.show.title`.                                                                                                                     | Preserves the existing `PageHeader` and `document.title` contract across all routes.                                            |
 
 ## Scope
 
@@ -69,9 +72,9 @@ As a result, the app shell and router are only partially complete: the primary n
 
 ### Out of Scope
 
-- Recommendation fetching, seed selection, deduplication, or fallback content from roadmap 09.
-- Stats computation, charts, reactive library analytics, or a Library-to-Stats entry point from roadmap 08.
-- Detail-page metadata, trailers, providers, ratings, favorites, watch status, or share behavior from roadmap 03.
+- Recommendation fetching, seed selection, deduplication, or fallback content from [Recommendations](../../roadmap/09-recommendations.md).
+- Stats computation, charts, reactive library analytics, or a Library-to-Stats entry point from [Stats](../../roadmap/08-stats.md).
+- Detail-page metadata, trailers, providers, ratings, favorites, watch status, or share behavior from [Entry Details](../../roadmap/03-entry-details.md).
 - Wiring Home or Library cards to navigate to detail routes in this change.
 - New application, infrastructure, or domain abstractions for placeholder-only screens.
 - New dependencies, chart libraries, TMDB API calls, or persisted placeholder-route data.
@@ -95,7 +98,7 @@ As a result, the app shell and router are only partially complete: the primary n
 ### Responsive Design
 
 - `NFR-01b-01` — On viewports below `md`, the Recommendations bottom-nav item must keep the same 44x44px minimum touch target already required for the current nav items.
-- `NFR-01b-02` — On viewports `md` and above, the content column for Recommendations, Stats, and detail placeholders must remain offset from the fixed sidebar exactly as the current shell does for existing routes.
+- `NFR-01b-02` — On viewports `md` and above, Recommendations, Stats, and detail placeholders must render inside the shared `AppShell` content column with the existing desktop sidebar offset (`md:pl-56`) and the shared `PageHeader` above the route content region.
 - `NFR-01b-03` — No new route may bypass the shared shell chrome; sidebar/header/bottom-nav visibility must continue to follow the existing breakpoint rules.
 
 ### Internationalization
@@ -133,23 +136,28 @@ As a result, the app shell and router are only partially complete: the primary n
 ## Risks & Assumptions
 
 - **Risk:** The roadmap file mixes primary-nav routes with non-nav/detail routes, which can cause accidental over-scoping. **Likelihood:** High. **Impact:** Medium. **Mitigation:** This change explicitly limits primary navigation changes to Recommendations and keeps Stats/detail routes direct-only.
-- **Risk:** Future roadmap items 03, 08, and 09 may want different title keys or icon choices. **Likelihood:** Medium. **Impact:** Low. **Mitigation:** Keep placeholder requirements minimal and isolated to route scaffolding rather than feature-specific content.
+- **Risk:** This change intentionally introduces temporary exceptions to the canonical detail-route and Stats-access contracts in `docs/technical/architecture.md` and `docs/technical/ui-ux.md`. **Likelihood:** Medium. **Impact:** Medium. **Mitigation:** [Entry Details](../../roadmap/03-entry-details.md) owns replacing placeholder detail routes with provider-backed detail loading and inline not-found handling, and [Stats](../../roadmap/08-stats.md) owns the Library "View Stats" entry path.
+- **Risk:** [Entry Details](../../roadmap/03-entry-details.md), [Stats](../../roadmap/08-stats.md), and [Recommendations](../../roadmap/09-recommendations.md) may want different title keys or icon choices. **Likelihood:** Medium. **Impact:** Low. **Mitigation:** Keep placeholder requirements minimal and isolated to route scaffolding rather than feature-specific content.
 - **Assumption:** `nav.recommendations` and `page.recommendations.title` remain the correct localization keys for the Recommendations route.
 - **Assumption:** `page.stats.title`, `page.movie.title`, and `page.show.title` are the correct localization keys for the new placeholder routes.
-- **Assumption:** Direct URL access is sufficient to count `/stats`, `/movie/:id`, and `/show/:id` as navigable within this roadmap-completion change.
-- **Assumption:** Route-level overlap with future roadmap items 03, 08, and 09 is intentional so long as this change stays placeholder-only.
+- **Assumption:** In this placeholder-only phase, `/stats` is considered navigable once direct URL access works; [Stats](../../roadmap/08-stats.md) will add the Library "View Stats" entry path later.
+- **Assumption:** In this placeholder-only phase, any numeric `:id` value is treated as routable placeholder input; [Entry Details](../../roadmap/03-entry-details.md) will add provider-backed existence checks and inline not-found handling later.
+- **Assumption:** Route-level overlap with [Entry Details](../../roadmap/03-entry-details.md), [Stats](../../roadmap/08-stats.md), and [Recommendations](../../roadmap/09-recommendations.md) is intentional so long as this change stays placeholder-only.
 
 ## Acceptance Criteria
 
 - [ ] `/recommendations` resolves as a lazy-loaded named route and renders a placeholder view inside the existing shell.
 - [ ] Desktop sidebar and mobile bottom nav both render Recommendations between Home and Calendar, using translated labels and existing active-state behavior.
 - [ ] The Recommendations mobile nav item preserves the existing 44x44px minimum touch target behavior.
-- [ ] `/stats` resolves by direct URL, renders a placeholder inside the existing shell, and does not appear in primary navigation.
+- [ ] `/stats` resolves by direct URL, renders a placeholder inside the existing shell, does not appear in primary navigation, and remains outside the Library UI in this phase while the Library "View Stats" entry path stays deferred to [Stats](../../roadmap/08-stats.md).
 - [ ] `/movie/550` and `/show/1396` resolve by direct URL and render placeholder screens inside the existing shell.
+- [ ] Numeric detail URLs continue to the placeholder routes in this phase without provider-existence validation; provider-backed fetches and inline not-found handling remain deferred to [Entry Details](../../roadmap/03-entry-details.md).
 - [ ] `/movie/abc` and `/show/abc` redirect to `/` instead of rendering a placeholder screen.
 - [ ] `PageHeader` and `document.title` update correctly for Recommendations, Stats, Movie, and Show placeholder routes using translated page-title keys.
 - [ ] All new page-title keys exist in `en.json`, `es.json`, and `fr.json`, and automated tests verify the key structure without relying on fallback output.
 - [ ] All four new placeholder views render `EmptyState` with translated `common.empty.title` and `common.empty.description` copy, using Lucide `Compass`, `ChartColumn`, `Film`, and `Tv` icons respectively, with no hardcoded user-facing strings in the view implementations.
 - [ ] Navigating to any new placeholder route keeps the existing shell chrome and overlays visible and performs zero TMDB API requests and zero localStorage writes.
+- [ ] Route changes between the existing scaffolded routes and the new placeholder routes reuse the shared 200ms opacity-only fade and disable the animated fade when `prefers-reduced-motion: reduce` is active.
 - [ ] New placeholder screens are route-level lazy imports rather than eager additions to the initial route bundle.
+- [ ] New and updated tests for this change live under `tests/` in paths mirroring `src/`, and each new or updated test follows the AAA (Arrange-Act-Assert) structure documented in `docs/technical/testing.md`.
 - [ ] Automated tests cover the new router definitions, invalid-ID guard behavior, nav composition/order, and placeholder view rendering, and `npm run type-check`, `npm run lint`, `npm run format:check`, and `npm run test` pass after implementation.
