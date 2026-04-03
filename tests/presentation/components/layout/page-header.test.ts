@@ -24,6 +24,11 @@ const routes = [
     component: { template: '<div>Settings</div>' },
     meta: { titleKey: 'page.settings.title' },
   },
+  {
+    path: '/fallback',
+    component: { template: '<div>Fallback</div>' },
+    meta: {},
+  },
 ]
 
 async function renderPageHeader(routePath: string, locale: 'en' | 'es' = 'en') {
@@ -93,5 +98,13 @@ describe('PageHeader', () => {
 
     // Assert
     expect(wrapper.text()).toContain('Biblioteca')
+  })
+
+  it('falls back to the application title when route meta.titleKey is missing', async () => {
+    // Arrange & Act
+    const { wrapper } = await renderPageHeader('/fallback')
+
+    // Assert
+    expect(wrapper.text()).toContain('Plot Twisted')
   })
 })

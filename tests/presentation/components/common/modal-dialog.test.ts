@@ -126,6 +126,29 @@ describe('ModalDialog', () => {
     expect(isOpen.value).toBe(false)
   })
 
+  it('does not close modal when a non-Escape key is pressed', async () => {
+    // Arrange
+    const i18n = createTestI18n()
+    const { open, isOpen } = useModal()
+    open({ title: 'Test' })
+    expect(isOpen.value).toBe(true)
+
+    const wrapper = mount(ModalDialog, {
+      global: { plugins: [i18n] },
+      attachTo: document.body,
+    })
+
+    // Act
+    const event = new KeyboardEvent('keydown', { key: 'Enter' })
+    document.dispatchEvent(event)
+    await flushPromises()
+
+    // Assert
+    expect(isOpen.value).toBe(true)
+
+    wrapper.unmount()
+  })
+
   // SC-15-04 — Confirm button invokes onConfirm callback
   it('invokes onConfirm callback when confirm button is clicked', async () => {
     // Arrange
