@@ -42,3 +42,10 @@ Feature: Empty State
     When the user types "inception" in the SearchBar
     And the API returns results
     Then the empty state is replaced by search results
+
+  Scenario: HS-06-07 — Empty state displays translated text in Spanish locale
+    Given the user's language setting is "es"
+    And the API returns zero results for the query
+    When the user searches for "xyznonexistent123"
+    Then the empty state heading is displayed in Spanish
+    And the empty state subtitle is displayed in Spanish

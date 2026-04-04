@@ -40,7 +40,7 @@
 
 ### 1.1 Write Search Schema Tests
 
-- [ ] Create `tests/domain/search.schema.test.ts` (covering: HS-03, implementation detail)
+- [ ] Create `tests/domain/search.schema.test.ts` (covering: HS-03; scenario IDs: HS-03-01 through HS-03-05, plus schema parsing tests as implementation detail)
   - Test `SearchResultItemSchema` parses valid movie result
   - Test `SearchResultItemSchema` parses valid TV result
   - Test `SearchResultItemSchema` parses valid person result (before filtering)
@@ -68,7 +68,7 @@
 
 ### 2.1 Write Search API Tests
 
-- [ ] Create `tests/infrastructure/provider.client.search.test.ts` (covering: HS-02-01, HS-02-02, HS-02-03, HS-02-04, HS-02-05, HS-02-06, HS-08-06, HS-08-07, implementation detail)
+- [ ] Create `tests/infrastructure/provider.client.search.test.ts` (covering: HS-02, HS-08; scenario IDs: HS-02-01 through HS-02-06, HS-08-06, HS-08-07)
   - Test `searchMulti()` constructs correct URL with all query params (HS-02-01, HS-02-02, HS-02-03, HS-02-04, HS-02-06)
   - Test `searchMulti()` returns validated response
   - Test `searchMulti()` rejects empty/whitespace query (HS-02-05)
@@ -89,7 +89,7 @@
 
 ### 3.1 Write Search Composable Tests
 
-- [ ] Create `tests/application/use-search.test.ts` (covering: HS-01-01, HS-01-02, HS-01-03, HS-01-04, HS-01-05, HS-03-01, HS-03-02, HS-03-03, HS-03-04, HS-03-05, HS-06-01, HS-07-01, HS-07-05, HS-07-06, HS-07-08, HS-08-01, HS-08-03, HS-08-04, HS-08-08, HS-08-09, HS-09-01, HS-09-03, HS-10-01, HS-10-02, HS-11-01, HS-11-06)
+- [ ] Create `tests/application/use-search.test.ts` (covering: HS-01, HS-03, HS-06, HS-07, HS-08, HS-09, HS-10, HS-11; scenario IDs: HS-01-01 through HS-01-05, HS-03-01 through HS-03-05, HS-06-01, HS-07-01, HS-07-05, HS-07-06, HS-07-08, HS-08-01, HS-08-03, HS-08-04, HS-08-08, HS-08-09, HS-09-01, HS-09-03, HS-10-01, HS-10-02, HS-11-01, HS-11-06)
   - Test debounce behavior: multiple rapid inputs trigger single API call (HS-01-02)
   - Test debounce timer reset on continued typing (HS-01-03)
   - Test no API call before debounce completes (HS-01-04)
@@ -130,7 +130,7 @@
 
 ### 4.1 Write SearchBar Component Tests
 
-- [ ] Create `tests/presentation/components/home/search-bar.test.ts` (covering: HS-01-01, HS-11-02, HS-11-03, implementation detail)
+- [ ] Create `tests/presentation/components/home/search-bar.test.ts` (covering: HS-01, HS-11; scenario IDs: HS-01-01, HS-11-02, HS-11-03)
   - Test v-model binding updates on input
   - Test clear button appears when input non-empty
   - Test clear button click emits empty string (HS-11-03)
@@ -155,7 +155,7 @@
 
 ### 4.3 Write SearchResults Component Tests
 
-- [ ] Create `tests/presentation/components/home/search-results.test.ts` (covering: HS-04-01, HS-04-02, HS-04-03, HS-04-04, HS-04-05, HS-04-06, HS-04-07, HS-04-08, HS-05-01, HS-05-02, HS-05-04, HS-06-01, HS-06-02, HS-06-03, HS-06-05, HS-06-06, HS-07-01, HS-07-02, HS-07-03, HS-07-07, HS-07-09, HS-08-01, HS-08-02, HS-08-05)
+- [ ] Create `tests/presentation/components/home/search-results.test.ts` (covering: HS-04, HS-05, HS-06, HS-07, HS-08; scenario IDs: HS-04-01 through HS-04-08, HS-05-01, HS-05-02, HS-05-04, HS-06-01 through HS-06-07, HS-07-01 through HS-07-09, HS-08-01, HS-08-02, HS-08-05)
   - Test renders skeleton grid when loading (HS-07-01)
   - Test skeleton grid has responsive columns (HS-07-02, HS-07-07)
   - Test skeleton has 2:3 aspect ratio (HS-07-03)
@@ -189,7 +189,7 @@
 
 ### 4.5 Write MovieCardSkeleton Component Tests
 
-- [ ] Create `tests/presentation/components/common/movie-card-skeleton.test.ts` (covering: HS-07-03, HS-07-04, HS-07-09, implementation detail)
+- [ ] Create `tests/presentation/components/common/movie-card-skeleton.test.ts` (covering: HS-07; scenario IDs: HS-07-03, HS-07-04, HS-07-09)
   - Test skeleton has 2:3 aspect ratio
   - Test skeleton has shimmer animation class
   - Test skeleton component can be rendered 8 times for loading grid (HS-07-09)
@@ -198,6 +198,7 @@
 ### 4.6 Create MovieCardSkeleton Component
 
 - [ ] Create `src/presentation/components/common/movie-card-skeleton.vue`
+  - Note: This is a specialized skeleton for MovieCard's 2:3 poster aspect ratio, distinct from R-01a's generic SkeletonLoader. R-01a's SkeletonLoader provides basic shimmer primitives; MovieCardSkeleton composes them into the specific card layout.
   - Matches MovieCard dimensions (2:3 aspect ratio poster, title/year text lines)
   - Shimmer animation using `animate-pulse` or custom shimmer keyframe
   - No props needed
@@ -205,7 +206,7 @@
 
 ### 4.7 Write HomeScreen Integration Tests
 
-- [ ] Update `tests/presentation/views/home-screen.test.ts` (covering: HS-05-03, HS-06-04, HS-09-01, HS-09-02, HS-09-03, HS-09-04, HS-10-01, HS-10-02, HS-10-03, HS-10-04, HS-10-05, HS-11-01, HS-11-04, HS-11-05)
+- [ ] Update `tests/presentation/views/home-screen.test.ts` (covering: HS-05, HS-06, HS-09, HS-10, HS-11; scenario IDs: HS-05-03, HS-06-04, HS-09-01 through HS-09-04, HS-10-01 through HS-10-05, HS-11-01, HS-11-04, HS-11-05)
   - Test browse sections visible on initial load (HS-09-01)
   - Test SearchBar visible in browse mode (HS-09-02)
   - Test no search results in browse mode (HS-09-03)
@@ -254,6 +255,7 @@
 - [ ] Run `npm run lint` — no ESLint errors
 - [ ] Run `npm run build` — production build succeeds
 - [ ] Run `npm run test` — all tests pass
+- [ ] Verify touch targets: SearchBar clear button and MovieCard components are at least 44x44px on mobile viewports (HS-NFR-05)
 - [ ] Manual verification:
   - Type in SearchBar, observe 300 ms debounce before results appear
   - Verify only movie/TV results shown (no person cards)

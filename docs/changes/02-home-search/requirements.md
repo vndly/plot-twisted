@@ -36,7 +36,7 @@ Users need a way to find specific movies and TV shows by name. The home screen c
 ### Dependencies
 
 - **R-01a (Scaffolding)**: Provides routing, SkeletonLoader, EmptyState, useToast composable
-- **Browse mode components** (TrendingCarousel, PopularGrid, FilterBar, ViewToggle): Required for HS-09 — may be stubbed if not yet implemented
+- **Browse mode components** (TrendingCarousel, PopularGrid, FilterBar, ViewToggle): Required for HS-09. These components are planned for a future home-browse feature; stub implementations will be used during initial development and replaced when the browse feature is implemented.
 - **MovieCard component**: Required for HS-04 — created as part of this change if not already implemented
 - **useSettings composable**: Required for HS-02 to access `Settings.language` — created as part of this change if not already implemented
 
@@ -66,7 +66,7 @@ Users need a way to find specific movies and TV shows by name. The home screen c
 
 ### Out of Scope
 
-- Infinite scroll / pagination (first page only per API pagination strategy)
+- Infinite scroll / pagination (first page only per [API pagination strategy](../../technical/api.md#pagination-strategy))
 - Search history / recent searches
 - Voice search
 - Advanced filters within search (genre, year)
@@ -79,7 +79,7 @@ Users need a way to find specific movies and TV shows by name. The home screen c
 | HS-01 | Debounced Search Input  | The SearchBar component SHALL debounce user input by 300 ms before initiating an API request. Typing within the debounce window resets the timer.                                                                                                                                                                                                                   | P0       |
 | HS-02 | Multi-Search API Call   | When the debounce timer fires with a non-empty query, the app SHALL call `GET /search/multi` with the trimmed query string and current `Settings.language`.                                                                                                                                                                                                         | P0       |
 | HS-03 | Person Result Filtering | The app SHALL filter API results to include only items where `media_type === "movie"` or `media_type === "tv"`, discarding `"person"` results before rendering.                                                                                                                                                                                                     | P0       |
-| HS-04 | Search Results Display  | Search results SHALL be displayed as MovieCard components in a responsive grid, showing poster, title, year, and vote average for each result.                                                                                                                                                                                                                      | P0       |
+| HS-04 | Search Results Display  | Search results SHALL be displayed as MovieCard components in a responsive grid, showing poster, title, year, and vote average (displayed as rating badge per UI/UX spec) for each result.                                                                                                                                                                           | P0       |
 | HS-05 | Result Navigation       | Tapping a MovieCard in search results SHALL navigate to `/movie/:id` for movies or `/show/:id` for TV shows, using the item's `id` from the API response.                                                                                                                                                                                                           | P0       |
 | HS-06 | Empty State             | When the API returns zero results (after filtering), the app SHALL display an empty state message with heading "No results found" and subtitle "Try different keywords or check your spelling".                                                                                                                                                                     | P0       |
 | HS-07 | Loading Skeleton        | While the API request is in flight, the app SHALL display 8 skeleton placeholders matching the MovieCard grid layout. The SearchBar SHALL remain interactive during loading (not disabled, keyboard navigation available).                                                                                                                                          | P0       |
@@ -92,10 +92,10 @@ Users need a way to find specific movies and TV shows by name. The home screen c
 
 ### Performance
 
-| ID        | Requirement             | Threshold                                                                                                                   |
-| --------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| HS-NFR-01 | API Response Time       | Search API call SHALL complete and render results within 1000 ms under normal network conditions (excluding debounce delay) |
-| HS-NFR-02 | Debounce Implementation | Debounce implementation uses a 300 ms timeout; variance due to browser scheduling is acceptable                             |
+| ID        | Requirement             | Threshold                                                                                                                                                                  |
+| --------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| HS-NFR-01 | API Response Time       | Search API call SHALL complete and render results within 1000 ms (excluding debounce delay). Measured from request initiation to UI render on a stable network connection. |
+| HS-NFR-02 | Debounce Implementation | Debounce implementation uses a 300 ms timeout (±50 ms variance acceptable due to browser scheduling)                                                                       |
 
 ### Responsive Design
 
@@ -127,7 +127,7 @@ Users need a way to find specific movies and TV shows by name. The home screen c
 - Placeholder text: "Search movies and shows..."
 - Search icon on the left side of the input
 - Clear button (X icon) appears when input has text, clears input on click, includes `aria-label="Clear search"`
-- Dark surface background consistent with app theme (`bg-slate-800`)
+- Dark surface background consistent with app theme (surface color from design tokens, e.g., `bg-slate-800` or equivalent theme variable)
 - White text, muted placeholder text (`placeholder-slate-400`)
 - Rounded corners (`rounded-lg`)
 - No border in default state; subtle focus ring on focus

@@ -7,7 +7,7 @@
 3. **[HS-03](./HS-03.feature)**: Person result filtering from search responses.
 4. **[HS-04](./HS-04.feature)**: Search results display as MovieCard grid with poster, title, year, and rating.
 5. **[HS-05](./HS-05.feature)**: Result navigation to movie or show detail pages.
-6. **[HS-06](./HS-06.feature)**: Empty state display when no results found.
+6. **[HS-06](./HS-06.feature)**: Empty state display when no results found, including i18n verification.
 7. **[HS-07](./HS-07.feature)**: Loading skeleton display during API requests with keyboard accessibility.
 8. **[HS-08](./HS-08.feature)**: Error handling with inline messages, retry button, and exponential backoff.
 9. **[HS-09](./HS-09.feature)**: Browse mode with trending and popular sections.
