@@ -6,6 +6,7 @@ Feature: Error Handling
   Background:
     Given the app is running
     And the user is on the home screen
+    And the search query is empty
 
   Scenario: HS-08-01 — Network error displays inline error message
     Given the network is offline
@@ -58,3 +59,12 @@ Feature: Error Handling
     And the debounce timer fires
     Then the error message is cleared
     And loading skeleton is displayed
+
+  Scenario: HS-08-09 — Retry uses current query value
+    Given the API returns a server error
+    When the user searches for "matrix"
+    And the error message is displayed
+    And the user types "inception" in the SearchBar
+    And the user clicks the "Retry" button
+    Then a new API request is made to "/search/multi" with query "inception"
+    And no API request is made with query "matrix"

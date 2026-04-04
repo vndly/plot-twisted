@@ -6,6 +6,7 @@ Feature: Search Results Display
   Background:
     Given the app is running
     And the user is on the home screen
+    And the search query is empty
 
   Scenario: HS-04-01 — MovieCard displays poster image
     Given the API returns a movie with poster_path "/abc123.jpg"

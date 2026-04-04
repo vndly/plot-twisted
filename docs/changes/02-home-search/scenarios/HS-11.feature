@@ -7,6 +7,7 @@ Feature: Mode Transition
   Background:
     Given the app is running
     And the user is on the home screen
+    And the search query is empty
 
   Scenario: HS-11-01 — Clearing query restores browse sections
     Given the user has searched for "inception"

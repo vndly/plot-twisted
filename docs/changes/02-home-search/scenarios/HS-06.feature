@@ -3,9 +3,12 @@ Feature: Empty State
   When the API returns zero results after filtering, the app displays
   an empty state message with helpful guidance.
 
+  Implements HS-06.
+
   Background:
     Given the app is running
     And the user is on the home screen
+    And the search query is empty
 
   Scenario: HS-06-01 — Empty state displays for zero results
     Given the API returns zero results for the query

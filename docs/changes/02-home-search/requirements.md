@@ -1,12 +1,14 @@
 # Requirements
 
 ---
+
 id: home-search
 title: Home Screen Search
-status: draft
+status: approved
 importance: high
 type: functional
 tags: [home, search, api]
+
 ---
 
 ## Intent
@@ -24,6 +26,7 @@ Users need a way to find specific movies and TV shows by name. The home screen c
 - As a user, I want to search for movies and TV shows by title so that I can find specific content to add to my watchlist.
 - As a user, I want to see search results as I type so that I can quickly find what I'm looking for without waiting.
 - As a user, I want to easily return to browsing trending/popular content after searching so that I can discover new titles.
+- As a user, I want to retry a failed search so that temporary network issues don't prevent me from finding content.
 
 ### Personas
 
@@ -32,15 +35,17 @@ Users need a way to find specific movies and TV shows by name. The home screen c
 
 ### Dependencies
 
-- None (first feature on home screen)
+- **R-01a (Scaffolding)**: Provides routing, SkeletonLoader, EmptyState, useToast composable
+- **Browse mode components** (TrendingCarousel, PopularGrid, FilterBar, ViewToggle): Required for HS-09 — may be stubbed if not yet implemented
 
 ## Decisions
 
-| Decision | Choice | Rationale |
-| --- | --- | --- |
-| API endpoint | `/search/multi` | Single request covers both movies and TV shows, reducing API calls compared to separate `/search/movie` and `/search/tv` requests |
-| Person result filtering | Client-side | Simpler than calling two separate endpoints and merging results; `/search/multi` returns person results which are not relevant to this app |
-| Debounce duration | 300 ms | Balances responsiveness with avoiding excessive API calls during typing |
+| Decision                | Choice                                          | Rationale                                                                                                                                  |
+| ----------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| API endpoint            | `/search/multi`                                 | Single request covers both movies and TV shows, reducing API calls compared to separate `/search/movie` and `/search/tv` requests          |
+| Person result filtering | Client-side                                     | Simpler than calling two separate endpoints and merging results; `/search/multi` returns person results which are not relevant to this app |
+| Debounce duration       | 300 ms                                          | Balances responsiveness with avoiding excessive API calls during typing                                                                    |
+| Retry strategy          | 3 retries with exponential backoff (1s, 2s, 4s) | Per project API rate limit handling in `docs/technical/api.md`                                                                             |
 
 ## Scope
 
@@ -48,9 +53,9 @@ Users need a way to find specific movies and TV shows by name. The home screen c
 
 - SearchBar component with debounced input
 - API integration with `/search/multi` endpoint
-- Search results display as MovieCard grid
+- Search results display as MovieCard grid (note: MovieCard renders both movies and TV shows)
 - Client-side filtering to exclude person results
-- Loading skeleton during API requests
+- Loading skeleton during API requests (8 placeholders)
 - Empty state when no results found
 - Inline error message for API failures
 - Mode switching between browse and search states
@@ -65,38 +70,44 @@ Users need a way to find specific movies and TV shows by name. The home screen c
 
 ## Functional Requirements
 
-| ID | Requirement | Description | Priority |
-| --- | --- | --- | --- |
-| HS-01 | Debounced Search Input | The SearchBar component SHALL debounce user input by 300 ms before initiating an API request. Typing within the debounce window resets the timer. | P0 |
-| HS-02 | Multi-Search API Call | When the debounce timer fires with a non-empty query, the app SHALL call `GET /search/multi` with the trimmed query string and current `Settings.language`. | P0 |
-| HS-03 | Person Result Filtering | The app SHALL filter API results to include only items where `media_type === "movie"` or `media_type === "tv"`, discarding `"person"` results before rendering. | P0 |
-| HS-04 | Search Results Display | Search results SHALL be displayed as MovieCard components in a responsive grid, showing poster, title, year, and vote average for each result. | P0 |
-| HS-05 | Result Navigation | Tapping a MovieCard in search results SHALL navigate to `/movie/:id` for movies or `/show/:id` for TV shows, using the item's `id` from the API response. | P0 |
-| HS-06 | Empty State | When the API returns zero results (after filtering), the app SHALL display an empty state message: "No results found for '[query]'" with a suggestion to try different keywords. | P0 |
-| HS-07 | Loading Skeleton | While the API request is in flight, the app SHALL display skeleton placeholders matching the MovieCard grid layout. The SearchBar remains interactive during loading. | P0 |
-| HS-08 | Error Handling | If the API request fails (network error, server error, or rate limit after retries), the app SHALL display an inline error message below the SearchBar with a "Retry" button. The error message SHALL NOT be a full-page error. | P0 |
-| HS-09 | Browse Mode | When the search query is empty, the home screen SHALL display the TrendingCarousel, PopularGrid, FilterBar, and ViewToggle sections (browse mode). | P0 |
-| HS-10 | Search Mode | When the user types a non-empty query into the SearchBar, the home screen SHALL hide the browse sections and display only the SearchResults grid below the SearchBar (search mode). | P0 |
-| HS-11 | Mode Transition | Clearing the search query (backspace to empty or clear button) SHALL restore the browse sections. There SHALL NOT be an intermediate state where both search results and browse sections are visible simultaneously. | P0 |
+| ID    | Requirement             | Description                                                                                                                                                                                                                                                                                                                                                         | Priority |
+| ----- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| HS-01 | Debounced Search Input  | The SearchBar component SHALL debounce user input by 300 ms before initiating an API request. Typing within the debounce window resets the timer.                                                                                                                                                                                                                   | P0       |
+| HS-02 | Multi-Search API Call   | When the debounce timer fires with a non-empty query, the app SHALL call `GET /search/multi` with the trimmed query string and current `Settings.language`.                                                                                                                                                                                                         | P0       |
+| HS-03 | Person Result Filtering | The app SHALL filter API results to include only items where `media_type === "movie"` or `media_type === "tv"`, discarding `"person"` results before rendering.                                                                                                                                                                                                     | P0       |
+| HS-04 | Search Results Display  | Search results SHALL be displayed as MovieCard components in a responsive grid, showing poster, title, year, and vote average for each result.                                                                                                                                                                                                                      | P0       |
+| HS-05 | Result Navigation       | Tapping a MovieCard in search results SHALL navigate to `/movie/:id` for movies or `/show/:id` for TV shows, using the item's `id` from the API response.                                                                                                                                                                                                           | P0       |
+| HS-06 | Empty State             | When the API returns zero results (after filtering), the app SHALL display an empty state message with heading "No results found" and subtitle "Try different keywords or check your spelling".                                                                                                                                                                     | P0       |
+| HS-07 | Loading Skeleton        | While the API request is in flight, the app SHALL display 8 skeleton placeholders matching the MovieCard grid layout. The SearchBar SHALL remain interactive during loading (not disabled, keyboard navigation available).                                                                                                                                          | P0       |
+| HS-08 | Error Handling          | If the API request fails (network error, server error, or rate limit after 3 retries with exponential backoff), the app SHALL display an inline error message "Failed to load search results" below the SearchBar with a "Retry" button. The error message SHALL NOT be a full-page error. Clicking Retry SHALL re-attempt the search with the current query value. | P0       |
+| HS-09 | Browse Mode             | When the search query is empty, the home screen SHALL display the TrendingCarousel, PopularGrid, FilterBar, and ViewToggle sections (browse mode).                                                                                                                                                                                                                  | P0       |
+| HS-10 | Search Mode             | When the user types a non-empty query into the SearchBar, the home screen SHALL hide the browse sections and display only the SearchResults grid below the SearchBar (search mode).                                                                                                                                                                                 | P0       |
+| HS-11 | Mode Transition         | Clearing the search query (backspace to empty or clear button) SHALL restore the browse sections. There SHALL NOT be an intermediate state where both search results and browse sections are visible simultaneously.                                                                                                                                                | P0       |
 
 ## Non-Functional Requirements
 
 ### Performance
 
-- Search API call SHALL complete and render results within 1000 ms under normal network conditions (excluding debounce delay)
-- Debounce timer accuracy SHALL be within 50 ms of the 300 ms target
+| ID        | Requirement             | Threshold                                                                                                                   |
+| --------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| HS-NFR-01 | API Response Time       | Search API call SHALL complete and render results within 1000 ms under normal network conditions (excluding debounce delay) |
+| HS-NFR-02 | Debounce Implementation | Debounce implementation uses a 300 ms timeout; variance due to browser scheduling is acceptable                             |
 
 ### Responsive Design
 
-- Search results grid SHALL display 5-6 columns on wide desktop (base), 4-5 columns below 1280px, 3-4 columns below 1024px, 2-3 columns below 768px, and 2 columns below 640px
-- SearchBar SHALL span the full width of the content area on all breakpoints
-- Touch targets on mobile SHALL be at least 44x44px
+| ID        | Requirement            | Threshold                                                                                                                              |
+| --------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| HS-NFR-03 | Grid Columns (Desktop) | 5-6 columns on wide desktop (base), 4-5 columns below 1280px, 3-4 columns below 1024px, 2-3 columns below 768px, 2 columns below 640px |
+| HS-NFR-04 | SearchBar Width        | Full width of the content area on all breakpoints                                                                                      |
+| HS-NFR-05 | Touch Targets          | At least 44x44px on mobile                                                                                                             |
 
 ### Accessibility
 
-- SearchBar input SHALL have appropriate `type="search"` and `placeholder` attributes
-- Clear button (if present) SHALL be keyboard accessible
-- Loading state SHALL not prevent keyboard navigation away from the SearchBar
+| ID        | Requirement     | Threshold                                                                             |
+| --------- | --------------- | ------------------------------------------------------------------------------------- |
+| HS-NFR-06 | SearchBar Input | `type="search"` and `placeholder` attributes present                                  |
+| HS-NFR-07 | Clear Button    | Keyboard accessible with `aria-label="Clear search"`                                  |
+| HS-NFR-08 | Loading State   | Does not prevent keyboard navigation away from the SearchBar (Tab, Escape functional) |
 
 ## Constraints
 
@@ -111,9 +122,9 @@ Users need a way to find specific movies and TV shows by name. The home screen c
 - Full-width input field at the top of the home screen content area
 - Placeholder text: "Search movies and shows..."
 - Search icon on the left side of the input
-- Clear button (X icon) appears when input has text, clears input on click
-- Dark surface background consistent with app theme (`~slate-800`)
-- White text, muted placeholder text (`~slate-400`)
+- Clear button (X icon) appears when input has text, clears input on click, includes `aria-label="Clear search"`
+- Dark surface background consistent with app theme (`bg-slate-800`)
+- White text, muted placeholder text (`placeholder-slate-400`)
 - Rounded corners (`rounded-lg`)
 - No border in default state; subtle focus ring on focus
 
@@ -125,7 +136,7 @@ Users need a way to find specific movies and TV shows by name. The home screen c
 
 ### Empty State
 
-- Centered in the results area
+- Centered in the results area (vertically and horizontally)
 - Heading: "No results found"
 - Subtext: "Try different keywords or check your spelling"
 - No CTA button (user can simply type a new query)
@@ -133,7 +144,7 @@ Users need a way to find specific movies and TV shows by name. The home screen c
 ### Error State
 
 - Inline message below SearchBar, not full-width
-- Red accent for error icon/text
+- Red accent for error icon/text (`text-red-500`)
 - "Retry" button to re-attempt the last search
 
 ### Mode Transitions
@@ -145,29 +156,30 @@ Users need a way to find specific movies and TV shows by name. The home screen c
 
 ### Risks
 
-| Risk | Likelihood | Impact | Mitigation |
-| --- | --- | --- | --- |
-| Excessive API calls during typing | Medium | Rate limiting, degraded UX | 300 ms debounce reduces calls; exponential backoff handles 429 responses |
-| Search results include unexpected media types | Low | Irrelevant results displayed | Client-side filter ensures only movie/tv types render |
+| Risk                                          | Likelihood | Impact                       | Mitigation                                                               |
+| --------------------------------------------- | ---------- | ---------------------------- | ------------------------------------------------------------------------ |
+| Excessive API calls during typing             | Medium     | Rate limiting, degraded UX   | 300 ms debounce reduces calls; exponential backoff handles 429 responses |
+| Search results include unexpected media types | Low        | Irrelevant results displayed | Client-side filter ensures only movie/tv types render                    |
 
 ### Assumptions
 
 - The `/search/multi` endpoint is stable and returns consistent `media_type` field values
-- MovieCard component already exists and can be reused for search results
-- TrendingCarousel, PopularGrid, FilterBar, and ViewToggle components will be implemented as part of home screen browse mode (separate change or prerequisite)
+- MovieCard component already exists and can be reused for search results (from R-01a)
+- TrendingCarousel, PopularGrid, FilterBar, and ViewToggle components will be implemented as part of home screen browse mode (separate change or prerequisite) — may be stubbed for initial implementation
 
 ## Acceptance Criteria
 
-- [ ] SearchBar debounces input by 300 ms before firing an API request
-- [ ] API request uses `GET /search/multi` with trimmed query and language parameter
-- [ ] Results are filtered to `media_type === "movie"` or `media_type === "tv"` (person results discarded)
-- [ ] Each MovieCard displays poster, title, year, and vote average
-- [ ] Tapping a movie card navigates to `/movie/:id`
-- [ ] Tapping a TV show card navigates to `/show/:id`
-- [ ] Empty state displays when query returns zero results after filtering
-- [ ] Loading skeleton displays while API request is in flight
-- [ ] SearchBar remains interactive during loading
-- [ ] API errors surface an inline error message with Retry button (not full-page)
-- [ ] Browse sections (TrendingCarousel, PopularGrid, FilterBar, ViewToggle) display when query is empty
-- [ ] Browse sections hide and SearchResults display when query is non-empty
-- [ ] Clearing the query restores browse sections with no intermediate mixed state
+- [ ] SearchBar debounces input by 300 ms before firing an API request (HS-01)
+- [ ] API request uses `GET /search/multi` with trimmed query and language parameter (HS-02)
+- [ ] Results are filtered to `media_type === "movie"` or `media_type === "tv"` (person results discarded) (HS-03)
+- [ ] Each MovieCard displays poster, title, year, and vote average (HS-04)
+- [ ] Tapping a movie card navigates to `/movie/:id` (HS-05)
+- [ ] Tapping a TV show card navigates to `/show/:id` (HS-05)
+- [ ] Empty state displays heading and subtitle when query returns zero results after filtering (HS-06)
+- [ ] Loading skeleton (8 placeholders) displays while API request is in flight (HS-07)
+- [ ] SearchBar remains interactive during loading (not disabled, Tab/Escape work) (HS-07)
+- [ ] API errors surface an inline error message "Failed to load search results" with Retry button (not full-page) (HS-08)
+- [ ] Clicking Retry re-attempts search with current query value (HS-08)
+- [ ] Browse sections (TrendingCarousel, PopularGrid, FilterBar, ViewToggle) display when query is empty (HS-09)
+- [ ] Browse sections hide and SearchResults display when query is non-empty (HS-10)
+- [ ] Clearing the query restores browse sections with no intermediate mixed state (HS-11)

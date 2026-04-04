@@ -6,6 +6,7 @@ Feature: Person Result Filtering
   Background:
     Given the app is running
     And the user is on the home screen
+    And the search query is empty
 
   Scenario: HS-03-01 — Movie results are displayed
     Given the API returns results with media_type "movie"

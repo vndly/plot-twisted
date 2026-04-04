@@ -6,6 +6,7 @@ Feature: Result Navigation
   Background:
     Given the app is running
     And the user is on the home screen
+    And the search query is empty
 
   Scenario: HS-05-01 — Tapping movie card navigates to movie detail page
     Given the API returns a movie with id 550 and media_type "movie"

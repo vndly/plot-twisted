@@ -6,6 +6,7 @@ Feature: Loading Skeleton
   Background:
     Given the app is running
     And the user is on the home screen
+    And the search query is empty
 
   Scenario: HS-07-01 — Skeleton displays during API request
     Given the API response is delayed
@@ -46,3 +47,10 @@ Feature: Loading Skeleton
     And the viewport width is 375px
     When the user searches for "test"
     Then the skeleton grid displays 2 columns
+
+  Scenario: HS-07-08 — Keyboard navigation works during loading
+    Given the API response is delayed
+    When the user searches for "test"
+    And skeleton placeholders are displayed
+    Then the user can press Tab to move focus away from SearchBar
+    And the user can press Escape to blur the SearchBar

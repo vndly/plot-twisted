@@ -3,9 +3,12 @@ Feature: Multi-Search API Call
   When the debounce timer fires with a non-empty query, the app calls
   GET /search/multi with the trimmed query string and current language setting.
 
+  Implements HS-02.
+
   Background:
     Given the app is running
     And the user is on the home screen
+    And the search query is empty
 
   Scenario: HS-02-01 — API call includes trimmed query parameter
     Given the user's language setting is "en"
@@ -35,3 +38,14 @@ Feature: Multi-Search API Call
     When the user types "   " in the SearchBar
     And the debounce timer fires
     Then no API request is made
+
+  Scenario: HS-02-06 — API call includes all required parameters
+    Given the user's language setting is "fr"
+    When the user types "amélie" in the SearchBar
+    And the debounce timer fires
+    Then an API request is made to "/search/multi" with:
+      | parameter     | value   |
+      | query         | amélie  |
+      | language      | fr      |
+      | page          | 1       |
+      | include_adult | false   |

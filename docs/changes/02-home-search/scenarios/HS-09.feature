@@ -6,6 +6,7 @@ Feature: Browse Mode
   Background:
     Given the app is running
     And the user is on the home screen
+    And the search query is empty
 
   Scenario: HS-09-01 — Browse sections visible on initial load
     Given the search query is empty
