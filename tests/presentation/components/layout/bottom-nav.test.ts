@@ -4,6 +4,7 @@ import i18n from '@/presentation/i18n'
 
 vi.mock('lucide-vue-next', () => ({
   House: { template: '<svg data-icon="house" />' },
+  Compass: { template: '<svg data-icon="compass" />' },
   CalendarDays: { template: '<svg data-icon="calendar-days" />' },
   Bookmark: { template: '<svg data-icon="bookmark" />' },
   Settings: { template: '<svg data-icon="settings" />' },
@@ -13,6 +14,7 @@ import BottomNav from '@/presentation/components/layout/bottom-nav.vue'
 
 const routes = [
   { path: '/', component: { template: '<div>Home</div>' } },
+  { path: '/recommendations', component: { template: '<div>Recommendations</div>' } },
   { path: '/calendar', component: { template: '<div>Calendar</div>' } },
   { path: '/library', component: { template: '<div>Library</div>' } },
   { path: '/settings', component: { template: '<div>Settings</div>' } },
@@ -41,8 +43,8 @@ async function renderBottomNav(routePath: string, locale: 'en' | 'fr' = 'en') {
 }
 
 describe('BottomNav', () => {
-  // SC-06-01, SC-25-03 — Renders the mobile bottom nav shell with exactly four scaffolded nav links
-  it('renders the mobile bottom nav with the documented order and no extra nav items', async () => {
+  // SC-06-01, SC-25-03, R-01b-02-01 — Renders the mobile bottom nav with exactly five primary nav links
+  it('renders the mobile bottom nav with five primary nav items in documented order', async () => {
     // Arrange & Act
     const { wrapper } = await renderBottomNav('/')
 
@@ -56,21 +58,28 @@ describe('BottomNav', () => {
     expect(nav.classes()).toContain('bottom-0')
     expect(nav.classes()).toContain('inset-x-0')
     expect(nav.classes()).toContain('z-10')
-    expect(links).toHaveLength(4)
+    expect(links).toHaveLength(5)
+
+    // R-01b-02-01 — documented order: Home, Recommendations, Calendar, Library, Settings
     expect(links.map((link) => link.text().replace(/\s+/g, ' ').trim())).toEqual([
       'Home',
+      'Recommendations',
       'Calendar',
       'Library',
       'Settings',
     ])
-    expect(wrapper.text()).not.toContain('Recommendations')
+
+    // Stats and detail routes remain absent from primary navigation
     expect(wrapper.text()).not.toContain('Stats')
     expect(wrapper.find('a[href^="/movie/"]').exists()).toBe(false)
     expect(wrapper.find('a[href^="/show/"]').exists()).toBe(false)
-    expect(wrapper.get('a[href="/"] [data-icon="house"]').exists()).toBe(true)
-    expect(wrapper.get('a[href="/calendar"] [data-icon="calendar-days"]').exists()).toBe(true)
-    expect(wrapper.get('a[href="/library"] [data-icon="bookmark"]').exists()).toBe(true)
-    expect(wrapper.get('a[href="/settings"] [data-icon="settings"]').exists()).toBe(true)
+
+    // Icons present
+    expect(wrapper.find('a[href="/"] [data-icon="house"]').exists()).toBe(true)
+    expect(wrapper.find('a[href="/recommendations"] [data-icon="compass"]').exists()).toBe(true)
+    expect(wrapper.find('a[href="/calendar"] [data-icon="calendar-days"]').exists()).toBe(true)
+    expect(wrapper.find('a[href="/library"] [data-icon="bookmark"]').exists()).toBe(true)
+    expect(wrapper.find('a[href="/settings"] [data-icon="settings"]').exists()).toBe(true)
   })
 
   // SC-06-03, SC-25-04 — Each item meets the mobile minimum touch target through explicit sizing classes
@@ -95,6 +104,20 @@ describe('BottomNav', () => {
     const homeLink = wrapper.get('a[href="/"]')
 
     expect(activeLink.classes()).toContain('text-accent')
+    expect(homeLink.classes()).toContain('text-slate-400')
+    expect(homeLink.classes()).not.toContain('text-accent')
+  })
+
+  // R-01b-02-03 — Recommendations uses existing active-state treatment
+  it('highlights Recommendations with teal accent when active', async () => {
+    // Arrange & Act
+    const { wrapper } = await renderBottomNav('/recommendations')
+
+    // Assert
+    const recommendationsLink = wrapper.get('a[href="/recommendations"]')
+    const homeLink = wrapper.get('a[href="/"]')
+
+    expect(recommendationsLink.classes()).toContain('text-accent')
     expect(homeLink.classes()).toContain('text-slate-400')
     expect(homeLink.classes()).not.toContain('text-accent')
   })

@@ -10,6 +10,11 @@ const routes = [
     meta: { titleKey: 'page.home.title' },
   },
   {
+    path: '/recommendations',
+    component: { template: '<div>Recommendations</div>' },
+    meta: { titleKey: 'page.recommendations.title' },
+  },
+  {
     path: '/calendar',
     component: { template: '<div>Calendar</div>' },
     meta: { titleKey: 'page.calendar.title' },
@@ -23,6 +28,21 @@ const routes = [
     path: '/settings',
     component: { template: '<div>Settings</div>' },
     meta: { titleKey: 'page.settings.title' },
+  },
+  {
+    path: '/stats',
+    component: { template: '<div>Stats</div>' },
+    meta: { titleKey: 'page.stats.title' },
+  },
+  {
+    path: '/movie/:id',
+    component: { template: '<div>Movie</div>' },
+    meta: { titleKey: 'page.movie.title' },
+  },
+  {
+    path: '/show/:id',
+    component: { template: '<div>Show</div>' },
+    meta: { titleKey: 'page.show.title' },
   },
   {
     path: '/fallback',
@@ -106,5 +126,28 @@ describe('PageHeader', () => {
 
     // Assert
     expect(wrapper.text()).toContain('Plot Twisted')
+  })
+
+  // R-01b-03-02, R-01b-04-03 — Page header renders translated title for new routes
+  it.each([
+    { path: '/recommendations', expected: 'Recommendations' },
+    { path: '/stats', expected: 'Stats' },
+    { path: '/movie/550', expected: 'Movie' },
+    { path: '/show/1396', expected: 'Show' },
+  ])('renders the translated title for $path', async ({ path, expected }) => {
+    // Arrange & Act
+    const { wrapper } = await renderPageHeader(path)
+
+    // Assert
+    expect(wrapper.text()).toContain(expected)
+  })
+
+  // R-01b-04-03 — Page header renders translated title in non-default locale for new routes
+  it('renders translated Stats title in Spanish', async () => {
+    // Arrange & Act
+    const { wrapper } = await renderPageHeader('/stats', 'es')
+
+    // Assert
+    expect(wrapper.text()).toContain('Estadísticas')
   })
 })

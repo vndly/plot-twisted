@@ -5,6 +5,7 @@ import App from '@/App.vue'
 
 vi.mock('lucide-vue-next', () => ({
   House: { template: '<svg data-icon="house" />' },
+  Compass: { template: '<svg data-icon="compass" />' },
   CalendarDays: { template: '<svg data-icon="calendar-days" />' },
   Bookmark: { template: '<svg data-icon="bookmark" />' },
   Settings: { template: '<svg data-icon="settings" />' },
@@ -58,8 +59,8 @@ describe('App', () => {
     )
   })
 
-  // SC-10-02 — Current scaffolded nav set renders in both shell navs
-  it('renders the current four-item scaffolded nav set in both shell navigation surfaces', async () => {
+  // SC-10-02, R-01b-02-01 — Current scaffolded nav set renders in both shell navs with Recommendations
+  it('renders the current five-item scaffolded nav set in both shell navigation surfaces', async () => {
     // Arrange & Act
     const wrapper = await renderApp('/')
 
@@ -71,8 +72,7 @@ describe('App', () => {
       .findAll('nav[aria-label="Mobile navigation"] a')
       .map((link) => link.text().replace(/\s+/g, ' ').trim())
 
-    expect(sidebarLinks).toEqual(['Home', 'Calendar', 'Library', 'Settings'])
-    expect(bottomNavLinks).toEqual(['Home', 'Calendar', 'Library', 'Settings'])
-    expect(wrapper.text()).not.toContain('Recommendations')
+    expect(sidebarLinks).toEqual(['Home', 'Recommendations', 'Calendar', 'Library', 'Settings'])
+    expect(bottomNavLinks).toEqual(['Home', 'Recommendations', 'Calendar', 'Library', 'Settings'])
   })
 })

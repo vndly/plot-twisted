@@ -1,9 +1,27 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import i18n from '@/presentation/i18n'
 
 declare module 'vue-router' {
   interface RouteMeta {
     titleKey?: string
+  }
+}
+
+/**
+ * Navigation guard that validates the :id param is numeric.
+ * Redirects to home if the ID is not a valid integer string.
+ */
+function numericIdGuard(
+  to: RouteLocationNormalized,
+  _from: RouteLocationNormalized,
+  next: NavigationGuardNext,
+) {
+  const id = to.params.id
+  if (typeof id === 'string' && /^\d+$/.test(id)) {
+    next()
+  } else {
+    next('/')
   }
 }
 
@@ -18,6 +36,12 @@ const router = createRouter({
       name: 'home',
       component: () => import('./views/home-screen.vue'),
       meta: { titleKey: 'page.home.title' },
+    },
+    {
+      path: '/recommendations',
+      name: 'recommendations',
+      component: () => import('./views/recommendations-screen.vue'),
+      meta: { titleKey: 'page.recommendations.title' },
     },
     {
       path: '/calendar',
@@ -36,6 +60,26 @@ const router = createRouter({
       name: 'settings',
       component: () => import('./views/settings-screen.vue'),
       meta: { titleKey: 'page.settings.title' },
+    },
+    {
+      path: '/stats',
+      name: 'stats',
+      component: () => import('./views/stats-screen.vue'),
+      meta: { titleKey: 'page.stats.title' },
+    },
+    {
+      path: '/movie/:id',
+      name: 'movie',
+      component: () => import('./views/movie-screen.vue'),
+      meta: { titleKey: 'page.movie.title' },
+      beforeEnter: numericIdGuard,
+    },
+    {
+      path: '/show/:id',
+      name: 'show',
+      component: () => import('./views/show-screen.vue'),
+      meta: { titleKey: 'page.show.title' },
+      beforeEnter: numericIdGuard,
     },
     {
       path: '/:pathMatch(.*)*',

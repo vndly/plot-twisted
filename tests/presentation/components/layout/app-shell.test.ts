@@ -15,6 +15,7 @@ import AppShell from '@/presentation/components/layout/app-shell.vue'
 
 vi.mock('lucide-vue-next', () => ({
   House: { template: '<svg data-icon="house" />' },
+  Compass: { template: '<svg data-icon="compass" />' },
   CalendarDays: { template: '<svg data-icon="calendar-days" />' },
   Bookmark: { template: '<svg data-icon="bookmark" />' },
   Settings: { template: '<svg data-icon="settings" />' },
@@ -30,6 +31,11 @@ const routes = [
     meta: { titleKey: 'page.home.title' },
   },
   {
+    path: '/recommendations',
+    component: { template: '<div data-testid="view-recommendations">Recommendations view</div>' },
+    meta: { titleKey: 'page.recommendations.title' },
+  },
+  {
     path: '/calendar',
     component: { template: '<div data-testid="view-calendar">Calendar view</div>' },
     meta: { titleKey: 'page.calendar.title' },
@@ -43,6 +49,21 @@ const routes = [
     path: '/settings',
     component: { template: '<div data-testid="view-settings">Settings view</div>' },
     meta: { titleKey: 'page.settings.title' },
+  },
+  {
+    path: '/stats',
+    component: { template: '<div data-testid="view-stats">Stats view</div>' },
+    meta: { titleKey: 'page.stats.title' },
+  },
+  {
+    path: '/movie/:id',
+    component: { template: '<div data-testid="view-movie">Movie view</div>' },
+    meta: { titleKey: 'page.movie.title' },
+  },
+  {
+    path: '/show/:id',
+    component: { template: '<div data-testid="view-show">Show view</div>' },
+    meta: { titleKey: 'page.show.title' },
   },
 ]
 
@@ -181,5 +202,90 @@ describe('AppShell', () => {
     expect(toastContainer.classes()).toContain('z-50')
     expect(wrapper.text()).toContain('Confirm action')
     expect(wrapper.text()).toContain('Toast message')
+  })
+
+  // R-01b-07-01 — New placeholder routes render inside the shared shell
+  describe('new placeholder routes in shell', () => {
+    it.each([
+      { path: '/recommendations', testId: 'view-recommendations', title: 'Recommendations' },
+      { path: '/stats', testId: 'view-stats', title: 'Stats' },
+      { path: '/movie/550', testId: 'view-movie', title: 'Movie' },
+      { path: '/show/1396', testId: 'view-show', title: 'Show' },
+    ])(
+      'renders $path inside the shared AppShell content column',
+      async ({ path, testId, title }) => {
+        // Arrange & Act
+        const { wrapper } = await renderAppShell(path)
+
+        // Assert
+        const header = wrapper.get('header')
+        const contentColumn = wrapper.get('[data-testid="app-shell-content-column"]')
+        const routeContent = wrapper.get('[data-testid="route-content"]')
+
+        expect(header.text()).toContain(title)
+        expect(contentColumn.classes()).toContain('md:pl-56')
+        expect(routeContent.find(`[data-testid="${testId}"]`).exists()).toBe(true)
+      },
+    )
+  })
+
+  // R-01b-07-02 — New placeholder routes reuse shared fade and reduced-motion contract
+  it('uses the shared fade transition when navigating to new placeholder routes', async () => {
+    // Arrange
+    const { wrapper, router } = await renderAppShell('/')
+
+    // Act
+    await router.push('/recommendations')
+    await flushPromises()
+
+    // Assert
+    const transition = wrapper.findComponent({ name: 'Transition' })
+
+    expect(transition.exists()).toBe(true)
+    expect(transition.attributes('name')).toBe('fade')
+    expect(transition.attributes('mode')).toBe('out-in')
+    expect(wrapper.get('[data-testid="route-content"]').text()).toContain('Recommendations view')
+  })
+
+  // R-01b-07-03 — New placeholder routes avoid provider and storage side effects
+  describe('no side effects on placeholder routes', () => {
+    let fetchSpy: ReturnType<typeof vi.spyOn>
+    let setItemSpy: ReturnType<typeof vi.spyOn>
+    let removeItemSpy: ReturnType<typeof vi.spyOn>
+
+    beforeEach(() => {
+      fetchSpy = vi.spyOn(global, 'fetch')
+      setItemSpy = vi.spyOn(Storage.prototype, 'setItem')
+      removeItemSpy = vi.spyOn(Storage.prototype, 'removeItem')
+    })
+
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    it.each([
+      { path: '/recommendations', testId: 'view-recommendations' },
+      { path: '/stats', testId: 'view-stats' },
+      { path: '/movie/550', testId: 'view-movie' },
+      { path: '/show/1396', testId: 'view-show' },
+    ])(
+      'navigating to $path triggers zero fetch and zero localStorage writes',
+      async ({ path, testId }) => {
+        // Arrange
+        useModal().open({ title: 'Test modal', content: 'Modal body' })
+        useToast().addToast({ message: 'Test toast', type: 'info' })
+
+        // Act
+        const { wrapper } = await renderAppShell(path)
+
+        // Assert
+        expect(fetchSpy).not.toHaveBeenCalled()
+        expect(setItemSpy).not.toHaveBeenCalled()
+        expect(removeItemSpy).not.toHaveBeenCalled()
+        expect(wrapper.find(`[data-testid="${testId}"]`).exists()).toBe(true)
+        expect(wrapper.find('[data-testid="modal-backdrop"]').exists()).toBe(true)
+        expect(wrapper.find('[data-testid="toast-container"]').exists()).toBe(true)
+      },
+    )
   })
 })

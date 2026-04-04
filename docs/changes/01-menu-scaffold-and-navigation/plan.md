@@ -8,7 +8,7 @@
 
 ### Step 1 — Extend locale key parity test (covering: R-01b-03-02, R-01b-08-04)
 
-- [ ] Update `tests/presentation/i18n/locale-keys.test.ts`:
+- [x] Update `tests/presentation/i18n/locale-keys.test.ts`:
   - add `page.stats.title`, `page.movie.title`, and `page.show.title` to the expected key list
   - update the exact expected key count from `21` to `24`
   - preserve the existing parity, non-empty value, `app.title`, and camelCase-segment assertions
@@ -16,7 +16,7 @@
 
 ### Step 2 — Extend router contract tests (covering: R-01b-01-01, R-01b-01-02, R-01b-03-01, R-01b-03-02, R-01b-04-01, R-01b-04-03, R-01b-05-01, R-01b-08-01)
 
-- [ ] Update `tests/presentation/router.test.ts`:
+- [x] Update `tests/presentation/router.test.ts`:
   - mock `recommendations-screen.vue`, `stats-screen.vue`, `movie-screen.vue`, and `show-screen.vue`
   - assert the router resolves 8 named routes with paths `/`, `/recommendations`, `/calendar`, `/library`, `/settings`, `/stats`, `/movie/:id`, and `/show/:id`
   - assert all named routes remain lazy imports via `router.options.routes`
@@ -27,7 +27,7 @@
 
 ### Step 3 — Confirm fail-first state `(implementation detail)`
 
-- [ ] Run `npx vitest run tests/presentation/i18n/locale-keys.test.ts tests/presentation/router.test.ts` and confirm the new assertions fail before implementation.
+- [x] Run `npx vitest run tests/presentation/i18n/locale-keys.test.ts tests/presentation/router.test.ts` and confirm the new assertions fail before implementation.
 
 ---
 
@@ -35,21 +35,21 @@
 
 ### Step 1 — Add new page-title locale keys (covering: R-01b-03-02, R-01b-04-03, R-01b-08-04)
 
-- [ ] Update `src/presentation/i18n/locales/en.json`, `src/presentation/i18n/locales/es.json`, and `src/presentation/i18n/locales/fr.json` atomically:
+- [x] Update `src/presentation/i18n/locales/en.json`, `src/presentation/i18n/locales/es.json`, and `src/presentation/i18n/locales/fr.json` atomically:
   - add `page.stats.title`
   - add `page.movie.title`
   - add `page.show.title`
   - preserve flat dot-notation, exact key parity, and non-empty translated strings
-- [ ] Do not add any other new keys; `nav.recommendations` and `page.recommendations.title` already exist.
+- [x] Do not add any other new keys; `nav.recommendations` and `page.recommendations.title` already exist.
 
 ### Step 2 — Bootstrap the new route view files `(implementation detail)`
 
-- [ ] Create `src/presentation/views/recommendations-screen.vue`, `src/presentation/views/stats-screen.vue`, `src/presentation/views/movie-screen.vue`, and `src/presentation/views/show-screen.vue` as minimal valid SFC stubs using the structure `<script setup lang="ts"></script><template><div /></template>` so `src/presentation/router.ts` can import them without breaking the build before the final placeholder-view implementation phase.
-- [ ] Keep each file in the current flat `src/presentation/views/` directory to match the existing scaffolded view pattern and avoid introducing new route folders in this change.
+- [x] Create `src/presentation/views/recommendations-screen.vue`, `src/presentation/views/stats-screen.vue`, `src/presentation/views/movie-screen.vue`, and `src/presentation/views/show-screen.vue` as minimal valid SFC stubs using the structure `<script setup lang="ts"></script><template><div /></template>` so `src/presentation/router.ts` can import them without breaking the build before the final placeholder-view implementation phase.
+- [x] Keep each file in the current flat `src/presentation/views/` directory to match the existing scaffolded view pattern and avoid introducing new route folders in this change.
 
 ### Step 3 — Extend the router with new routes and numeric guards (covering: R-01b-01-01, R-01b-01-02, R-01b-03-01, R-01b-03-02, R-01b-04-01, R-01b-04-03, R-01b-05-01)
 
-- [ ] Update `src/presentation/router.ts`:
+- [x] Update `src/presentation/router.ts`:
   - keep `createWebHistory()`, `scrollBehavior()`, the existing `afterEach` title logic, and the catch-all redirect
   - insert a named `recommendations` route at `/recommendations` with `meta.titleKey: 'page.recommendations.title'`
   - add a named `stats` route at `/stats` with `meta.titleKey: 'page.stats.title'`
@@ -68,14 +68,14 @@
 
 ### Step 1 — Extend nav component tests for Recommendations (covering: R-01b-02-01, R-01b-02-02, R-01b-02-03, R-01b-02-04, R-01b-08-02)
 
-- [ ] Update `tests/presentation/components/layout/sidebar-nav.test.ts`:
+- [x] Update `tests/presentation/components/layout/sidebar-nav.test.ts`:
   - mock the `Compass` icon
   - assert the sidebar now renders 5 primary nav links in order `Home`, `Recommendations`, `Calendar`, `Library`, `Settings` (expected route names: `home`, `recommendations`, `calendar`, `library`, `settings`)
   - assert Recommendations uses the translated label in `en` and `fr`
   - assert Recommendations uses the mapped `Compass` icon
   - assert Recommendations active-state styling uses the same teal accent border/background classes as existing nav items
   - assert Stats and detail routes still do not appear in primary navigation
-- [ ] Update `tests/presentation/components/layout/bottom-nav.test.ts`:
+- [x] Update `tests/presentation/components/layout/bottom-nav.test.ts`:
   - mock the `Compass` icon
   - assert the bottom nav now renders 5 primary nav links in the same order
   - assert Recommendations uses the translated label and active accent treatment
@@ -86,10 +86,10 @@
 
 > **Note:** Touch target verification (NFR-01b-01) is tested by asserting the presence of `min-h-11 min-w-11` Tailwind classes per the existing nav test pattern, since jsdom lacks layout capabilities for pixel measurement.
 
-- [ ] Update `tests/presentation/components/layout/page-header.test.ts`:
+- [x] Update `tests/presentation/components/layout/page-header.test.ts`:
   - add route metadata cases for `/recommendations`, `/stats`, `/movie/550`, and `/show/1396`
   - assert translated header output for at least one non-default locale on a new route
-- [ ] Update `tests/presentation/components/layout/app-shell.test.ts`:
+- [x] Update `tests/presentation/components/layout/app-shell.test.ts`:
   - extend the in-memory router with the four new route paths and title keys
   - assert new routes render inside the shared `AppShell` content column beneath `PageHeader`
   - assert route transitions to the new placeholders still use `Transition name="fade" mode="out-in"` and the reduced-motion CSS contract in `src/assets/main.css`
@@ -98,20 +98,20 @@
 
 ### Step 3 — Add placeholder view tests for the four new screens (covering: R-01b-04-02, R-01b-06-01, R-01b-06-02, R-01b-08-03)
 
-- [ ] Create `tests/presentation/views/recommendations-screen.test.ts`, `tests/presentation/views/stats-screen.test.ts`, `tests/presentation/views/movie-screen.test.ts`, and `tests/presentation/views/show-screen.test.ts`:
+- [x] Create `tests/presentation/views/recommendations-screen.test.ts`, `tests/presentation/views/stats-screen.test.ts`, `tests/presentation/views/movie-screen.test.ts`, and `tests/presentation/views/show-screen.test.ts`:
   - mount each view with `en` and `fr` locales
   - assert each view renders `EmptyState`
   - assert icon mappings `Compass`, `ChartColumn`, `Film`, and `Tv`
   - assert the heading uses translated `common.empty.title`
   - assert the supporting text uses translated `common.empty.description`
-- [ ] In the same view test files, read the source file as text using `fs.readFileSync` and use string assertions to verify:
+- [x] In the same view test files, read the source file as text using `fs.readFileSync` and use string assertions to verify:
   - the file contains `common.empty.title` binding
   - the file contains `common.empty.description` binding
   - the file does not contain hardcoded locale-specific placeholder copy (e.g., no "Nothing here yet" string literals)
 
 ### Step 4 — Confirm fail-first state `(implementation detail)`
 
-- [ ] Run `npx vitest run tests/presentation/components/layout/sidebar-nav.test.ts tests/presentation/components/layout/bottom-nav.test.ts tests/presentation/components/layout/page-header.test.ts tests/presentation/components/layout/app-shell.test.ts tests/presentation/views/recommendations-screen.test.ts tests/presentation/views/stats-screen.test.ts tests/presentation/views/movie-screen.test.ts tests/presentation/views/show-screen.test.ts` and confirm the new assertions fail before final implementation.
+- [x] Run `npx vitest run tests/presentation/components/layout/sidebar-nav.test.ts tests/presentation/components/layout/bottom-nav.test.ts tests/presentation/components/layout/page-header.test.ts tests/presentation/components/layout/app-shell.test.ts tests/presentation/views/recommendations-screen.test.ts tests/presentation/views/stats-screen.test.ts tests/presentation/views/movie-screen.test.ts tests/presentation/views/show-screen.test.ts` and confirm the new assertions fail before final implementation.
 
 ---
 
@@ -119,7 +119,7 @@
 
 ### Step 1 — Upgrade the four new view stubs to final placeholder screens (covering: R-01b-04-02, R-01b-06-01, R-01b-06-02)
 
-- [ ] Update `src/presentation/views/recommendations-screen.vue`, `src/presentation/views/stats-screen.vue`, `src/presentation/views/movie-screen.vue`, and `src/presentation/views/show-screen.vue`:
+- [x] Update `src/presentation/views/recommendations-screen.vue`, `src/presentation/views/stats-screen.vue`, `src/presentation/views/movie-screen.vue`, and `src/presentation/views/show-screen.vue`:
   - use `<script setup lang="ts">`
   - import `useI18n`
   - import `EmptyState` from `@/presentation/components/common/empty-state.vue`
@@ -131,12 +131,12 @@
 
 ### Step 2 — Add Recommendations to both primary nav surfaces (covering: R-01b-02-01, R-01b-02-02, R-01b-02-03, R-01b-02-04)
 
-- [ ] Update `src/presentation/components/layout/sidebar-nav.vue`:
+- [x] Update `src/presentation/components/layout/sidebar-nav.vue`:
   - import `Compass`
   - insert the Recommendations nav item between Home and Calendar
   - keep exact-match Home logic unchanged
   - keep existing active/inactive class names unchanged apart from the new item
-- [ ] Update `src/presentation/components/layout/bottom-nav.vue`:
+- [x] Update `src/presentation/components/layout/bottom-nav.vue`:
   - import `Compass`
   - insert the Recommendations nav item between Home and Calendar
   - keep `min-h-11 min-w-11` touch-target classes
@@ -150,16 +150,16 @@
 
 ### Step 1 — Run targeted feature verification (covering: R-01b-08-01, R-01b-08-02, R-01b-08-03, R-01b-08-04)
 
-- [ ] Run `npx vitest run tests/presentation/i18n/locale-keys.test.ts tests/presentation/router.test.ts tests/presentation/components/layout/sidebar-nav.test.ts tests/presentation/components/layout/bottom-nav.test.ts tests/presentation/components/layout/page-header.test.ts tests/presentation/components/layout/app-shell.test.ts tests/presentation/views/recommendations-screen.test.ts tests/presentation/views/stats-screen.test.ts tests/presentation/views/movie-screen.test.ts tests/presentation/views/show-screen.test.ts` and require all tests to pass.
+- [x] Run `npx vitest run tests/presentation/i18n/locale-keys.test.ts tests/presentation/router.test.ts tests/presentation/components/layout/sidebar-nav.test.ts tests/presentation/components/layout/bottom-nav.test.ts tests/presentation/components/layout/page-header.test.ts tests/presentation/components/layout/app-shell.test.ts tests/presentation/views/recommendations-screen.test.ts tests/presentation/views/stats-screen.test.ts tests/presentation/views/movie-screen.test.ts tests/presentation/views/show-screen.test.ts` and require all tests to pass.
 
 ### Step 2 — Run project verification commands (covering: R-01b-08-05)
 
-- [ ] Run `npm run type-check`.
-- [ ] Run `npm run lint`.
-- [ ] Run `npm run format:check`.
-- [ ] Run `npm run test`.
+- [x] Run `npm run type-check`.
+- [x] Run `npm run lint`.
+- [x] Run `npm run format:check`.
+- [x] Run `npm run test`.
 
 ### Step 3 — Update dependent documentation `(implementation detail)`
 
-- [ ] After R-01b is released, update `docs/product/01 - scaffolding/requirements.md` to promote the assertions that previously deferred `/recommendations`, `/stats`, `/movie/:id`, and `/show/:id` routes (SC-01d-02, SC-05, SC-06).
-- [ ] Check if `CLAUDE.md` needs updating after implementation.
+- [x] After R-01b is released, update `docs/product/01 - scaffolding/requirements.md` to promote the assertions that previously deferred `/recommendations`, `/stats`, `/movie/:id`, and `/show/:id` routes (SC-01d-02, SC-05, SC-06).
+- [x] Check if `CLAUDE.md` needs updating after implementation.

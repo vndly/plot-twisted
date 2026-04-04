@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { Bookmark, CalendarDays, House, Settings } from 'lucide-vue-next'
+import { Bookmark, CalendarDays, Compass, House, Settings } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
 
 interface NavItem {
@@ -13,6 +13,7 @@ const route = useRoute()
 
 const navItems: ReadonlyArray<NavItem> = [
   { to: '/', labelKey: 'nav.home', icon: House },
+  { to: '/recommendations', labelKey: 'nav.recommendations', icon: Compass },
   { to: '/calendar', labelKey: 'nav.calendar', icon: CalendarDays },
   { to: '/library', labelKey: 'nav.library', icon: Bookmark },
   { to: '/settings', labelKey: 'nav.settings', icon: Settings },

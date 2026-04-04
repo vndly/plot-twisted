@@ -6,6 +6,10 @@ vi.mock('@/presentation/views/home-screen.vue', () => ({ default: {} }))
 vi.mock('@/presentation/views/calendar-screen.vue', () => ({ default: {} }))
 vi.mock('@/presentation/views/library-screen.vue', () => ({ default: {} }))
 vi.mock('@/presentation/views/settings-screen.vue', () => ({ default: {} }))
+vi.mock('@/presentation/views/recommendations-screen.vue', () => ({ default: {} }))
+vi.mock('@/presentation/views/stats-screen.vue', () => ({ default: {} }))
+vi.mock('@/presentation/views/movie-screen.vue', () => ({ default: {} }))
+vi.mock('@/presentation/views/show-screen.vue', () => ({ default: {} }))
 
 import router from '@/presentation/router'
 
@@ -22,13 +26,15 @@ describe('router', () => {
     })
   })
 
-  // SC-01d-02-01, SC-01d-02-02
+  // SC-01d-02-01, SC-01d-02-02, R-01b-01-01, R-01b-03-01, R-01b-04-01
   describe('route definitions', () => {
     it.each([
       { path: '/', name: 'home' },
+      { path: '/recommendations', name: 'recommendations' },
       { path: '/calendar', name: 'calendar' },
       { path: '/library', name: 'library' },
       { path: '/settings', name: 'settings' },
+      { path: '/stats', name: 'stats' },
     ])('resolves $path to named route "$name"', ({ path, name }) => {
       // Arrange & Act
       const resolved = router.resolve(path)
@@ -36,6 +42,18 @@ describe('router', () => {
       // Assert
       expect(resolved.name).toBe(name)
       expect(resolved.path).toBe(path)
+    })
+
+    // R-01b-04-01 — detail routes with numeric params
+    it.each([
+      { path: '/movie/550', name: 'movie' },
+      { path: '/show/1396', name: 'show' },
+    ])('resolves $path to named route "$name"', ({ path, name }) => {
+      // Arrange & Act
+      const resolved = router.resolve(path)
+
+      // Assert
+      expect(resolved.name).toBe(name)
     })
 
     // SC-01d-02-03
@@ -49,14 +67,14 @@ describe('router', () => {
     })
   })
 
-  // SC-01d-03-01
+  // SC-01d-03-01, R-01b-01-02
   describe('lazy loading', () => {
     it('uses lazy-loaded components for all named routes', () => {
       // Arrange — use options.routes to get the original definitions (not resolved components)
       const namedRoutes = router.options.routes.filter((r) => 'name' in r && r.name)
 
       // Act & Assert
-      expect(namedRoutes).toHaveLength(4)
+      expect(namedRoutes).toHaveLength(8)
       for (const route of namedRoutes) {
         const component = 'component' in route ? route.component : undefined
         expect(typeof component, `${String(route.name)} component`).toBe('function')
@@ -72,16 +90,20 @@ describe('router', () => {
     })
   })
 
-  // Implementation detail — meta.titleKey per route
+  // Implementation detail — meta.titleKey per route, R-01b-03-02, R-01b-04-03
   describe('route meta', () => {
     it.each([
-      { name: 'home', titleKey: 'page.home.title' },
-      { name: 'calendar', titleKey: 'page.calendar.title' },
-      { name: 'library', titleKey: 'page.library.title' },
-      { name: 'settings', titleKey: 'page.settings.title' },
-    ])('route "$name" has meta.titleKey "$titleKey"', ({ name, titleKey }) => {
+      { name: 'home', titleKey: 'page.home.title', params: {} },
+      { name: 'recommendations', titleKey: 'page.recommendations.title', params: {} },
+      { name: 'calendar', titleKey: 'page.calendar.title', params: {} },
+      { name: 'library', titleKey: 'page.library.title', params: {} },
+      { name: 'settings', titleKey: 'page.settings.title', params: {} },
+      { name: 'stats', titleKey: 'page.stats.title', params: {} },
+      { name: 'movie', titleKey: 'page.movie.title', params: { id: '550' } },
+      { name: 'show', titleKey: 'page.show.title', params: { id: '1396' } },
+    ])('route "$name" has meta.titleKey "$titleKey"', ({ name, titleKey, params }) => {
       // Arrange & Act
-      const resolved = router.resolve({ name })
+      const resolved = router.resolve({ name, params })
 
       // Assert
       expect(resolved.meta.titleKey).toBe(titleKey)
@@ -167,6 +189,51 @@ describe('router', () => {
       } finally {
         router.removeRoute('no-title')
       }
+    })
+
+    // R-01b-01-01, R-01b-03-01, R-01b-04-01
+    it.each([
+      { path: '/recommendations', expected: 'page.recommendations.title \u2014 app.title' },
+      { path: '/stats', expected: 'page.stats.title \u2014 app.title' },
+      { path: '/movie/550', expected: 'page.movie.title \u2014 app.title' },
+      { path: '/show/1396', expected: 'page.show.title \u2014 app.title' },
+    ])('sets document.title for $path', async ({ path, expected }) => {
+      // Arrange & Act
+      await router.push(path)
+
+      // Assert
+      expect(document.title).toBe(expected)
+    })
+  })
+
+  // R-01b-05-01 — non-numeric detail IDs redirect to home
+  describe('detail ID guards', () => {
+    it.each(['/movie/abc', '/show/abc', '/movie/', '/show/', '/movie/123ab', '/show/12.5'])(
+      'redirects %s to / because ID is not numeric',
+      async (path) => {
+        // Arrange & Act
+        await router.push(path)
+
+        // Assert
+        expect(router.currentRoute.value.name).toBe('home')
+        expect(router.currentRoute.value.path).toBe('/')
+      },
+    )
+
+    it('allows numeric movie ID', async () => {
+      // Arrange & Act
+      await router.push('/movie/550')
+
+      // Assert
+      expect(router.currentRoute.value.name).toBe('movie')
+    })
+
+    it('allows numeric show ID', async () => {
+      // Arrange & Act
+      await router.push('/show/1396')
+
+      // Assert
+      expect(router.currentRoute.value.name).toBe('show')
     })
   })
 })

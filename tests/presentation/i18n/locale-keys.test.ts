@@ -21,8 +21,11 @@ const EXPECTED_KEYS = [
   'page.calendar.title',
   'page.home.title',
   'page.library.title',
+  'page.movie.title',
   'page.recommendations.title',
   'page.settings.title',
+  'page.show.title',
+  'page.stats.title',
   'toast.dismiss',
   'toast.error',
   'toast.retry',
@@ -73,7 +76,7 @@ describe('locale key parity', () => {
     }
   })
 
-  it('contains exactly the expected 21 keys', () => {
+  it('contains exactly the expected 24 keys', () => {
     // Arrange
     const enKeys = Object.keys(locales['en.json']).sort()
 
