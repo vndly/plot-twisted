@@ -478,9 +478,9 @@
 - [x] Run `npm run lint` - no ESLint errors
 - [x] Run `npm run build` - production build succeeds
 - [x] Run `npm run test` - all tests pass (420 tests)
-- [ ] Verify touch targets: in Chrome DevTools mobile emulation at 375px width, verify all buttons measure at least 44x44px (ED-NFR-06)
-- [ ] Verify accessibility: run axe-core audit on detail pages, verify screen reader announces rating changes (ED-NFR-07)
-- [ ] Manual verification:
+- [x] Verify touch targets: in Chrome DevTools mobile emulation at 375px width, verify all buttons measure at least 44x44px (ED-NFR-06)
+- [x] Verify accessibility: run axe-core audit on detail pages, verify screen reader announces rating changes (ED-NFR-07)
+- [x] Manual verification:
   - Navigate to `/movie/550` (Fight Club), verify all components render
   - Navigate to `/show/1396` (Breaking Bad), verify TV-specific metadata
   - Verify backdrop image loads with gradient overlay
