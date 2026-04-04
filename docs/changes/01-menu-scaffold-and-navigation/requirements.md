@@ -1,10 +1,10 @@
 ---
 id: R-01b
 title: Menu Scaffold and Navigation
-status: planned
+status: approved
 type: functional
 importance: medium
-tags: []
+tags: [navigation, routing, placeholder, scaffold]
 ---
 
 ## Intent
@@ -160,4 +160,5 @@ As a result, the app shell and router are only partially complete: the primary n
 - [ ] Route changes between the existing scaffolded routes and the new placeholder routes reuse the shared 200ms opacity-only fade and disable the animated fade when `prefers-reduced-motion: reduce` is active.
 - [ ] New placeholder screens are route-level lazy imports rather than eager additions to the initial route bundle.
 - [ ] New and updated tests for this change live under `tests/` in paths mirroring `src/`, and each new or updated test follows the AAA (Arrange-Act-Assert) structure documented in `docs/technical/testing.md`.
+- [ ] All new routes use the existing 200ms opacity-only fade transition and honor the `prefers-reduced-motion: reduce` media query by disabling animation.
 - [ ] Automated tests cover the new router definitions, invalid-ID guard behavior, nav composition/order, and placeholder view rendering, and `npm run type-check`, `npm run lint`, `npm run format:check`, and `npm run test` pass after implementation.

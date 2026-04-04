@@ -1,6 +1,18 @@
 Feature: R-01b-04 — Detail placeholder routes
   Numeric movie and show detail URLs SHALL resolve to placeholder screens in this phase.
 
+  Scenario Outline: R-01b-04-00 — Router unit tests verify detail route contracts
+    Given the router test suite runs
+    When it inspects the `<route_name>` route definition
+    Then it confirms the route is at `<path>`
+    And it confirms the route component is lazy-loaded
+    And it confirms the route title key is `<title_key>`
+
+    Examples:
+      | route_name | path        | title_key        |
+      | movie      | /movie/:id  | page.movie.title |
+      | show       | /show/:id   | page.show.title  |
+
   Scenario Outline: R-01b-04-01 — Numeric detail URLs render placeholder screens
     Given the app is running
     When I navigate directly to "<route>"

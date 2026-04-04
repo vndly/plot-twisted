@@ -1,6 +1,13 @@
 Feature: R-01b-03 — Stats placeholder route
   Stats SHALL be directly reachable as a shell-contained placeholder route.
 
+  Scenario: R-01b-03-00 — Router unit tests verify the Stats route contract
+    Given the router test suite runs
+    When it inspects the named route definitions
+    Then it confirms a named `stats` route exists at `/stats`
+    And it confirms the route component is lazy-loaded
+    And it confirms the route title key is `page.stats.title`
+
   Scenario: R-01b-03-01 — Direct URL navigation renders the Stats placeholder
     Given the app is running
     When I navigate directly to /stats

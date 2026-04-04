@@ -6,7 +6,8 @@ Feature: R-01b-07 — New-route shell behavior
     When the route settles
     Then the shared page header is visible above the routed content
     And the routed content remains inside the shared app-shell content column
-    And the desktop sidebar and mobile bottom-nav breakpoint behavior is unchanged
+    And the desktop sidebar breakpoint behavior is unchanged
+    And the mobile bottom-nav breakpoint behavior is unchanged
 
     Examples:
       | route            |

@@ -16,6 +16,9 @@ Feature: R-01b-06 — Placeholder view rendering
       | /movie/550       | Film        | en     | Nothing here yet        | This page is under construction. |
       | /show/1396       | Tv          | en     | Nothing here yet        | This page is under construction. |
       | /recommendations | Compass     | fr     | Rien ici pour le moment | Cette page est en construction.  |
+      | /stats           | ChartColumn | fr     | Rien ici pour le moment | Cette page est en construction.  |
+      | /movie/550       | Film        | fr     | Rien ici pour le moment | Cette page est en construction.  |
+      | /show/1396       | Tv          | fr     | Rien ici pour le moment | Cette page est en construction.  |
 
   Scenario Outline: R-01b-06-02 — Placeholder view source files use shared translation bindings
     Given the `<view_file>` source file exists at `src/presentation/views/<view_file>`

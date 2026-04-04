@@ -6,7 +6,7 @@
 
 > **References:** [requirements.md](./requirements.md) · [scenarios/R-01b-01.feature](./scenarios/R-01b-01.feature) · [scenarios/R-01b-03.feature](./scenarios/R-01b-03.feature) · [scenarios/R-01b-04.feature](./scenarios/R-01b-04.feature) · [scenarios/R-01b-05.feature](./scenarios/R-01b-05.feature) · [scenarios/R-01b-08.feature](./scenarios/R-01b-08.feature)
 
-### Step 1 — Extend locale key parity test (covering: R-01b-08-04)
+### Step 1 — Extend locale key parity test (covering: R-01b-03-02, R-01b-08-04)
 
 - [ ] Update `tests/presentation/i18n/locale-keys.test.ts`:
   - add `page.stats.title`, `page.movie.title`, and `page.show.title` to the expected key list
@@ -44,7 +44,7 @@
 
 ### Step 2 — Bootstrap the new route view files `(implementation detail)`
 
-- [ ] Create `src/presentation/views/recommendations-screen.vue`, `src/presentation/views/stats-screen.vue`, `src/presentation/views/movie-screen.vue`, and `src/presentation/views/show-screen.vue` as minimal valid SFC stubs so `src/presentation/router.ts` can import them without breaking the build before the final placeholder-view implementation phase.
+- [ ] Create `src/presentation/views/recommendations-screen.vue`, `src/presentation/views/stats-screen.vue`, `src/presentation/views/movie-screen.vue`, and `src/presentation/views/show-screen.vue` as minimal valid SFC stubs using the structure `<script setup lang="ts"></script><template><div /></template>` so `src/presentation/router.ts` can import them without breaking the build before the final placeholder-view implementation phase.
 - [ ] Keep each file in the current flat `src/presentation/views/` directory to match the existing scaffolded view pattern and avoid introducing new route folders in this change.
 
 ### Step 3 — Extend the router with new routes and numeric guards (covering: R-01b-01-01, R-01b-01-02, R-01b-03-01, R-01b-03-02, R-01b-04-01, R-01b-04-03, R-01b-05-01)
@@ -55,7 +55,8 @@
   - add a named `stats` route at `/stats` with `meta.titleKey: 'page.stats.title'`
   - add named `movie` and `show` routes at `/movie/:id` and `/show/:id` with `meta.titleKey` values `page.movie.title` and `page.show.title`
   - use per-route guards for `movie` and `show` that accept digits-only `:id` values and redirect all non-numeric params to `/`
-  - keep the primary-nav routes in the documented order `home`, `recommendations`, `calendar`, `library`, `settings`; append direct-only routes before the catch-all redirect
+  - keep the primary-nav routes in the documented order `home`, `recommendations`, `calendar`, `library`, `settings`; append `stats`, `movie`, and `show` routes after `settings` and before the catch-all redirect
+  - extract a shared `numericIdGuard` function used by both `movie` and `show` route definitions to avoid duplication
 
 > Rollback: revert `src/presentation/router.ts`, the three locale JSON files, and the four new view stubs.
 
@@ -69,10 +70,10 @@
 
 - [ ] Update `tests/presentation/components/layout/sidebar-nav.test.ts`:
   - mock the `Compass` icon
-  - assert the sidebar now renders 5 primary nav links in order `Home`, `Recommendations`, `Calendar`, `Library`, `Settings`
+  - assert the sidebar now renders 5 primary nav links in order `Home`, `Recommendations`, `Calendar`, `Library`, `Settings` (expected route names: `home`, `recommendations`, `calendar`, `library`, `settings`)
   - assert Recommendations uses the translated label in `en` and `fr`
   - assert Recommendations uses the mapped `Compass` icon
-  - assert Recommendations active-state styling matches the existing sidebar accent treatment
+  - assert Recommendations active-state styling uses the same teal accent border/background classes as existing nav items
   - assert Stats and detail routes still do not appear in primary navigation
 - [ ] Update `tests/presentation/components/layout/bottom-nav.test.ts`:
   - mock the `Compass` icon
@@ -83,6 +84,8 @@
 
 ### Step 2 — Extend shell/title tests for the new routes (covering: R-01b-03-02, R-01b-04-03, R-01b-07-01, R-01b-07-02, R-01b-07-03, R-01b-08-02)
 
+> **Note:** Touch target verification (NFR-01b-01) is tested by asserting the presence of `min-h-11 min-w-11` Tailwind classes per the existing nav test pattern, since jsdom lacks layout capabilities for pixel measurement.
+
 - [ ] Update `tests/presentation/components/layout/page-header.test.ts`:
   - add route metadata cases for `/recommendations`, `/stats`, `/movie/550`, and `/show/1396`
   - assert translated header output for at least one non-default locale on a new route
@@ -90,7 +93,7 @@
   - extend the in-memory router with the four new route paths and title keys
   - assert new routes render inside the shared `AppShell` content column beneath `PageHeader`
   - assert route transitions to the new placeholders still use `Transition name="fade" mode="out-in"` and the reduced-motion CSS contract in `src/assets/main.css`
-  - spy on `global.fetch` and `Storage.prototype.setItem` / `removeItem` while navigating to the new routes and assert zero TMDB requests and zero `localStorage` writes
+  - spy on `global.fetch` and `Storage.prototype.setItem` / `removeItem` while navigating to the new routes and assert zero TMDB requests and zero `localStorage` writes (set up spies in Arrange phase, restore via `vi.restoreAllMocks()` in afterEach)
   - assert modal and toast overlays remain mounted above the new routes
 
 ### Step 3 — Add placeholder view tests for the four new screens (covering: R-01b-04-02, R-01b-06-01, R-01b-06-02, R-01b-08-03)
@@ -101,10 +104,10 @@
   - assert icon mappings `Compass`, `ChartColumn`, `Film`, and `Tv`
   - assert the heading uses translated `common.empty.title`
   - assert the supporting text uses translated `common.empty.description`
-- [ ] In the same view test files, inspect the source for each paired SFC in `src/presentation/views/` and assert:
-  - the file binds `common.empty.title`
-  - the file binds `common.empty.description`
-  - the file does not contain hardcoded locale-specific placeholder copy
+- [ ] In the same view test files, read the source file as text using `fs.readFileSync` and use string assertions to verify:
+  - the file contains `common.empty.title` binding
+  - the file contains `common.empty.description` binding
+  - the file does not contain hardcoded locale-specific placeholder copy (e.g., no "Nothing here yet" string literals)
 
 ### Step 4 — Confirm fail-first state `(implementation detail)`
 
@@ -119,7 +122,7 @@
 - [ ] Update `src/presentation/views/recommendations-screen.vue`, `src/presentation/views/stats-screen.vue`, `src/presentation/views/movie-screen.vue`, and `src/presentation/views/show-screen.vue`:
   - use `<script setup lang="ts">`
   - import `useI18n`
-  - import `EmptyState`
+  - import `EmptyState` from `@/presentation/components/common/empty-state.vue`
   - import the mapped Lucide icon (`Compass`, `ChartColumn`, `Film`, `Tv`)
   - render `EmptyState` with translated `common.empty.title` and `common.empty.description`
   - keep SFC block order `script` → `template`
@@ -155,3 +158,8 @@
 - [ ] Run `npm run lint`.
 - [ ] Run `npm run format:check`.
 - [ ] Run `npm run test`.
+
+### Step 3 — Update dependent documentation `(implementation detail)`
+
+- [ ] After R-01b is released, update `docs/product/01 - scaffolding/requirements.md` to promote the assertions that previously deferred `/recommendations`, `/stats`, `/movie/:id`, and `/show/:id` routes (SC-01d-02, SC-05, SC-06).
+- [ ] Check if `CLAUDE.md` needs updating after implementation.

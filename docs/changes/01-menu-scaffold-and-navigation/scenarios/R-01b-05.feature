@@ -8,6 +8,10 @@ Feature: R-01b-05 — Detail ID guards
     And the Home placeholder screen is displayed
 
     Examples:
-      | route      |
-      | /movie/abc |
-      | /show/abc  |
+      | route        |
+      | /movie/abc   |
+      | /show/abc    |
+      | /movie/      |
+      | /show/       |
+      | /movie/123ab |
+      | /show/12.5   |
