@@ -4,7 +4,7 @@
 
 id: 02-home-search
 title: Home Screen Search
-status: approved
+status: under_test
 importance: high
 type: functional
 tags: [home, search, api]

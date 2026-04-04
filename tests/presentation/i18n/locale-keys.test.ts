@@ -11,6 +11,12 @@ const EXPECTED_KEYS = [
   'common.error.description',
   'common.error.reload',
   'common.error.title',
+  'home.search.clear',
+  'home.search.empty.subtitle',
+  'home.search.empty.title',
+  'home.search.error.message',
+  'home.search.error.retry',
+  'home.search.placeholder',
   'modal.cancel',
   'modal.confirm',
   'nav.calendar',
@@ -76,7 +82,7 @@ describe('locale key parity', () => {
     }
   })
 
-  it('contains exactly the expected 24 keys', () => {
+  it('contains exactly the expected 30 keys', () => {
     // Arrange
     const enKeys = Object.keys(locales['en.json']).sort()
 

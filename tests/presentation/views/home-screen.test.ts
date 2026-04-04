@@ -1,65 +1,239 @@
-import { mount } from '@vue/test-utils'
-import { House } from 'lucide-vue-next'
+import { mount, flushPromises } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
-import { describe, expect, it } from 'vitest'
-import EmptyState from '@/presentation/components/common/empty-state.vue'
+import { createRouter, createMemoryHistory } from 'vue-router'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { nextTick } from 'vue'
 import HomeScreen from '@/presentation/views/home-screen.vue'
+import * as providerClient from '@/infrastructure/provider.client'
 
-type Locale = 'en' | 'fr'
+vi.mock('@/infrastructure/provider.client', () => ({
+  searchMulti: vi.fn(),
+}))
 
-function createTestI18n(locale: Locale) {
-  return createI18n({
-    legacy: false,
-    locale,
-    fallbackLocale: 'en',
-    flatJson: true,
-    messages: {
-      en: {
-        'common.empty.title': 'Nothing here yet',
-        'common.empty.description': 'This page is under construction.',
-      },
-      fr: {
-        'common.empty.title': 'Rien ici pour le moment',
-        'common.empty.description': 'Cette page est en construction.',
-      },
+vi.mock('@/application/use-settings', () => ({
+  useSettings: () => ({
+    language: { value: 'en' },
+  }),
+}))
+
+const mockSearchMulti = vi.mocked(providerClient.searchMulti)
+
+const i18n = createI18n({
+  legacy: false,
+  locale: 'en',
+  flatJson: true,
+  messages: {
+    en: {
+      'common.empty.title': 'Nothing here yet',
+      'common.empty.description': 'This page is under construction.',
+      'home.search.placeholder': 'Search movies and shows...',
+      'home.search.clear': 'Clear search',
+      'home.search.empty.title': 'No results found',
+      'home.search.empty.subtitle': 'Try different keywords or check your spelling',
+      'home.search.error.message': 'Failed to load search results',
+      'home.search.error.retry': 'Retry',
     },
-  })
-}
+  },
+})
 
-function renderHomeScreen(locale: Locale) {
-  return mount(HomeScreen, {
-    global: {
-      plugins: [createTestI18n(locale)],
-    },
-  })
+const router = createRouter({
+  history: createMemoryHistory(),
+  routes: [
+    { path: '/', name: 'home', component: { template: '<div>Home</div>' } },
+    { path: '/movie/:id', name: 'movie', component: { template: '<div>Movie</div>' } },
+    { path: '/show/:id', name: 'show', component: { template: '<div>Show</div>' } },
+  ],
+})
+
+const mockMovieResult = {
+  id: 550,
+  title: 'Fight Club',
+  original_title: 'Fight Club',
+  overview: 'A movie.',
+  release_date: '1999-10-15',
+  poster_path: '/path.jpg',
+  backdrop_path: '/backdrop.jpg',
+  vote_average: 8.4,
+  vote_count: 27000,
+  popularity: 73.4,
+  genre_ids: [18],
+  adult: false,
+  original_language: 'en',
+  video: false,
+  media_type: 'movie' as const,
 }
 
 describe('HomeScreen', () => {
-  // SC-20-01, SC-26-01
-  it('renders the documented placeholder content in English', () => {
-    // Arrange
-    const wrapper = renderHomeScreen('en')
-
-    // Assert
-    expect(wrapper.findComponent(EmptyState).exists()).toBe(true)
-    expect(wrapper.findComponent(House).exists()).toBe(true)
-    expect(wrapper.get('h2').text()).toBe('Nothing here yet')
-    expect(wrapper.get('[data-testid="empty-state-description"]').text()).toBe(
-      'This page is under construction.',
-    )
+  beforeEach(() => {
+    vi.useFakeTimers()
+    mockSearchMulti.mockReset()
   })
 
-  // SC-20-01, SC-26-01
-  it('renders the documented placeholder content in French', () => {
-    // Arrange
-    const wrapper = renderHomeScreen('fr')
+  afterEach(() => {
+    vi.useRealTimers()
+  })
 
-    // Assert
-    expect(wrapper.findComponent(EmptyState).exists()).toBe(true)
-    expect(wrapper.findComponent(House).exists()).toBe(true)
-    expect(wrapper.get('h2').text()).toBe('Rien ici pour le moment')
-    expect(wrapper.get('[data-testid="empty-state-description"]').text()).toBe(
-      'Cette page est en construction.',
-    )
+  const mountComponent = () => {
+    return mount(HomeScreen, {
+      global: {
+        plugins: [i18n, router],
+      },
+    })
+  }
+
+  describe('browse mode (HS-09)', () => {
+    it('shows browse sections on initial load (HS-09-01)', () => {
+      // Arrange
+      const wrapper = mountComponent()
+
+      // Assert
+      expect(wrapper.find('[data-testid="browse-sections"]').exists()).toBe(true)
+    })
+
+    it('shows SearchBar in browse mode (HS-09-02)', () => {
+      // Arrange
+      const wrapper = mountComponent()
+
+      // Assert
+      expect(wrapper.find('input[type="search"]').exists()).toBe(true)
+    })
+
+    it('does not show search results in browse mode (HS-09-03)', () => {
+      // Arrange
+      const wrapper = mountComponent()
+
+      // Assert
+      expect(wrapper.find('[data-testid="results-grid"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(false)
+    })
+  })
+
+  describe('search mode (HS-10)', () => {
+    it('hides browse sections when query entered (HS-10-01)', async () => {
+      // Arrange
+      const wrapper = mountComponent()
+      const input = wrapper.find('input[type="search"]')
+
+      // Act
+      await input.setValue('test')
+      await nextTick()
+
+      // Assert
+      expect(wrapper.find('[data-testid="browse-sections"]').exists()).toBe(false)
+    })
+
+    it('shows SearchResults when query entered (HS-10-02)', async () => {
+      // Arrange
+      mockSearchMulti.mockResolvedValue({
+        page: 1,
+        results: [mockMovieResult],
+        total_pages: 1,
+        total_results: 1,
+      })
+
+      const wrapper = mountComponent()
+      const input = wrapper.find('input[type="search"]')
+
+      // Act
+      await input.setValue('fight')
+      await nextTick()
+      await vi.advanceTimersByTimeAsync(300)
+      await flushPromises()
+
+      // Assert - loading state or results should be visible
+      const hasResults = wrapper.find('[data-testid="results-grid"]').exists()
+      const hasSkeletons = wrapper.findAll('[data-testid="skeleton"]').length > 0
+      expect(hasResults || hasSkeletons).toBe(true)
+    })
+
+    it('SearchBar remains visible in search mode (HS-10-03)', async () => {
+      // Arrange
+      const wrapper = mountComponent()
+      const input = wrapper.find('input[type="search"]')
+
+      // Act
+      await input.setValue('test')
+      await nextTick()
+
+      // Assert
+      expect(wrapper.find('input[type="search"]').exists()).toBe(true)
+    })
+
+    it('single character triggers search mode (HS-10-04)', async () => {
+      // Arrange
+      const wrapper = mountComponent()
+      const input = wrapper.find('input[type="search"]')
+
+      // Act
+      await input.setValue('a')
+      await nextTick()
+
+      // Assert
+      expect(wrapper.find('[data-testid="browse-sections"]').exists()).toBe(false)
+    })
+
+    it('whitespace-only query stays in browse mode (HS-10-05)', async () => {
+      // Arrange
+      const wrapper = mountComponent()
+      const input = wrapper.find('input[type="search"]')
+
+      // Act
+      await input.setValue('   ')
+      await nextTick()
+
+      // Assert
+      expect(wrapper.find('[data-testid="browse-sections"]').exists()).toBe(true)
+    })
+  })
+
+  describe('mode transition (HS-11)', () => {
+    it('clearing query restores browse sections (HS-11-01)', async () => {
+      // Arrange
+      const wrapper = mountComponent()
+      const input = wrapper.find('input[type="search"]')
+
+      // Enter search mode
+      await input.setValue('test')
+      await nextTick()
+      expect(wrapper.find('[data-testid="browse-sections"]').exists()).toBe(false)
+
+      // Act - clear
+      await input.setValue('')
+      await nextTick()
+
+      // Assert
+      expect(wrapper.find('[data-testid="browse-sections"]').exists()).toBe(true)
+    })
+
+    it('no mixed state during transition (HS-11-04)', async () => {
+      // Arrange
+      const wrapper = mountComponent()
+      const input = wrapper.find('input[type="search"]')
+
+      // Act - enter search mode
+      await input.setValue('test')
+      await nextTick()
+
+      // Assert - should not have both browse sections and search results visible
+      const hasBrowse = wrapper.find('[data-testid="browse-sections"]').exists()
+      const hasSearchResults = wrapper.find('[data-testid="results-grid"]').exists()
+      const hasEmpty = wrapper.find('[data-testid="empty-state"]').exists()
+      const hasSkeletons = wrapper.findAll('[data-testid="skeleton"]').length > 0
+      const hasError = wrapper.find('[data-testid="error-container"]').exists()
+
+      // Either browse mode XOR search mode components should be visible
+      const inSearchMode = hasSearchResults || hasEmpty || hasSkeletons || hasError
+      expect(hasBrowse && inSearchMode).toBe(false)
+    })
+  })
+
+  describe('empty state (HS-06)', () => {
+    it('does not show empty state when query is empty (HS-06-04)', () => {
+      // Arrange
+      const wrapper = mountComponent()
+
+      // Assert
+      expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(false)
+    })
   })
 })

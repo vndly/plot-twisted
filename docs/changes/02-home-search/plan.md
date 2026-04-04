@@ -4,22 +4,22 @@
 
 ### 0.1 Verify or Create Base Schemas
 
-- [ ] Verify `src/domain/movie.schema.ts` exists with `MovieListItemSchema`
+- [x] Verify `src/domain/movie.schema.ts` exists with `MovieListItemSchema`
   - If missing, create it with fields: `id`, `title`, `poster_path`, `release_date`, `vote_average`, `media_type`
   - Export inferred type: `MovieListItem`
-- [ ] Verify `src/domain/show.schema.ts` exists with `ShowListItemSchema`
+- [x] Verify `src/domain/show.schema.ts` exists with `ShowListItemSchema`
   - If missing, create it with fields: `id`, `name`, `poster_path`, `first_air_date`, `vote_average`, `media_type`
   - Export inferred type: `ShowListItem`
 
 ### 0.2 Verify or Create Provider Client
 
-- [ ] Verify `src/infrastructure/provider.client.ts` exists
+- [x] Verify `src/infrastructure/provider.client.ts` exists
   - If missing, create it with base API client setup (Bearer token auth, base URL, error handling)
   - See `docs/technical/api.md` for configuration details
 
 ### 0.3 Verify or Create Settings Composable
 
-- [ ] Verify `src/application/use-settings.ts` exists with `useSettings()` returning `Settings.language`
+- [x] Verify `src/application/use-settings.ts` exists with `useSettings()` returning `Settings.language`
   - If missing, create stub with default language `'en'`:
     ```typescript
     export function useSettings() {
@@ -31,7 +31,7 @@
 
 ### 0.4 Verify or Create MovieCard Component
 
-- [ ] Verify `src/presentation/components/common/movie-card.vue` exists
+- [x] Verify `src/presentation/components/common/movie-card.vue` exists
   - If missing, create it with props: `item: MovieListItem | ShowListItem`
   - Displays: poster image, title (or name for TV), year (from release_date or first_air_date), vote_average
   - Emits: `click` event for navigation
@@ -40,7 +40,7 @@
 
 ### 1.1 Write Search Schema Tests
 
-- [ ] Create `tests/domain/search.schema.test.ts` (covering: HS-03; scenario IDs: HS-03-01 through HS-03-05, plus schema parsing tests as implementation detail)
+- [x] Create `tests/domain/search.schema.test.ts` (covering: HS-03; scenario IDs: HS-03-01 through HS-03-05, plus schema parsing tests as implementation detail)
   - Test `SearchResultItemSchema` parses valid movie result
   - Test `SearchResultItemSchema` parses valid TV result
   - Test `SearchResultItemSchema` parses valid person result (before filtering)
@@ -49,7 +49,7 @@
 
 ### 1.2 Create Search Schema
 
-- [ ] Create `src/domain/search.schema.ts`
+- [x] Create `src/domain/search.schema.ts`
   - Define `SearchResultItemSchema` as a discriminated union based on `media_type`:
     - For `media_type === 'movie'`: extends `MovieListItemSchema` fields (from `src/domain/movie.schema.ts`)
     - For `media_type === 'tv'`: extends `ShowListItemSchema` fields (from `src/domain/show.schema.ts`)
@@ -60,7 +60,7 @@
 
 ### 1.3 Create Search Constants
 
-- [ ] Update `src/domain/constants.ts`
+- [x] Update `src/domain/constants.ts`
   - Add `SEARCH_DEBOUNCE_MS = 300`
   - Add `MIN_SEARCH_QUERY_LENGTH = 1` (minimum characters to trigger search)
 
@@ -68,7 +68,7 @@
 
 ### 2.1 Write Search API Tests
 
-- [ ] Create `tests/infrastructure/provider.client.search.test.ts` (covering: HS-02, HS-08; scenario IDs: HS-02-01 through HS-02-06, HS-08-06, HS-08-07)
+- [x] Create `tests/infrastructure/provider.client.search.test.ts` (covering: HS-02, HS-08; scenario IDs: HS-02-01 through HS-02-06, HS-08-06, HS-08-07)
   - Test `searchMulti()` constructs correct URL with all query params (HS-02-01, HS-02-02, HS-02-03, HS-02-04, HS-02-06)
   - Test `searchMulti()` returns validated response
   - Test `searchMulti()` rejects empty/whitespace query (HS-02-05)
@@ -78,7 +78,7 @@
 
 ### 2.2 Add Search API Method
 
-- [ ] Update `src/infrastructure/provider.client.ts` (verified to exist in Phase 0.2)
+- [x] Update `src/infrastructure/provider.client.ts` (verified to exist in Phase 0.2)
   - Add `searchMulti(query: string, language: string): Promise<SearchResponse>` method
   - Construct URL: `${API_BASE_URL}/search/multi` with query params: `query`, `language`, `page=1`, `include_adult=false`
   - Validate response with `SearchResponseSchema.parse()`
@@ -89,7 +89,7 @@
 
 ### 3.1 Write Search Composable Tests
 
-- [ ] Create `tests/application/use-search.test.ts` (covering: HS-01, HS-03, HS-06, HS-07, HS-08, HS-09, HS-10, HS-11; scenario IDs: HS-01-01 through HS-01-05, HS-03-01 through HS-03-05, HS-06-01, HS-07-01, HS-07-05, HS-07-06, HS-07-08, HS-08-01, HS-08-03, HS-08-04, HS-08-08, HS-08-09, HS-09-01, HS-09-03, HS-10-01, HS-10-02, HS-11-01, HS-11-06)
+- [x] Create `tests/application/use-search.test.ts` (covering: HS-01, HS-03, HS-06, HS-07, HS-08, HS-09, HS-10, HS-11; scenario IDs: HS-01-01 through HS-01-05, HS-03-01 through HS-03-05, HS-06-01, HS-07-01, HS-07-05, HS-07-06, HS-07-08, HS-08-01, HS-08-03, HS-08-04, HS-08-08, HS-08-09, HS-09-01, HS-09-03, HS-10-01, HS-10-02, HS-11-01, HS-11-06)
   - Test debounce behavior: multiple rapid inputs trigger single API call (HS-01-02)
   - Test debounce timer reset on continued typing (HS-01-03)
   - Test no API call before debounce completes (HS-01-04)
@@ -113,7 +113,7 @@
 
 ### 3.2 Create Search Composable
 
-- [ ] Create `src/application/use-search.ts`
+- [x] Create `src/application/use-search.ts`
   - Signature: `useSearch()` returns `{ query, results, loading, error, search, clear }`
   - `query`: `Ref<string>` bound to SearchBar input
   - `results`: `Ref<(MovieListItem | ShowListItem)[]>` filtered to exclude `media_type === 'person'`
@@ -130,7 +130,7 @@
 
 ### 4.1 Write SearchBar Component Tests
 
-- [ ] Create `tests/presentation/components/home/search-bar.test.ts` (covering: HS-01, HS-11; scenario IDs: HS-01-01, HS-11-02, HS-11-03)
+- [x] Create `tests/presentation/components/home/search-bar.test.ts` (covering: HS-01, HS-11; scenario IDs: HS-01-01, HS-11-02, HS-11-03)
   - Test v-model binding updates on input
   - Test clear button appears when input non-empty
   - Test clear button click emits empty string (HS-11-03)
@@ -140,7 +140,7 @@
 
 ### 4.2 Create SearchBar Component
 
-- [ ] Create `src/presentation/components/home/search-bar.vue`
+- [x] Create `src/presentation/components/home/search-bar.vue`
   - Props: `modelValue: string` (v-model binding)
   - Emits: `update:modelValue`
   - Template structure:
@@ -155,7 +155,7 @@
 
 ### 4.3 Write SearchResults Component Tests
 
-- [ ] Create `tests/presentation/components/home/search-results.test.ts` (covering: HS-04, HS-05, HS-06, HS-07, HS-08; scenario IDs: HS-04-01 through HS-04-08, HS-05-01, HS-05-02, HS-05-04, HS-06-01 through HS-06-07, HS-07-01 through HS-07-09, HS-08-01, HS-08-02, HS-08-05)
+- [x] Create `tests/presentation/components/home/search-results.test.ts` (covering: HS-04, HS-05, HS-06, HS-07, HS-08; scenario IDs: HS-04-01 through HS-04-08, HS-05-01, HS-05-02, HS-05-04, HS-06-01 through HS-06-07, HS-07-01 through HS-07-09, HS-08-01, HS-08-02, HS-08-05)
   - Test renders skeleton grid when loading (HS-07-01)
   - Test skeleton grid has responsive columns (HS-07-02, HS-07-07)
   - Test skeleton has 2:3 aspect ratio (HS-07-03)
@@ -175,7 +175,7 @@
 
 ### 4.4 Create SearchResults Component
 
-- [ ] Create `src/presentation/components/home/search-results.vue`
+- [x] Create `src/presentation/components/home/search-results.vue`
   - Props: `results: (MovieListItem | ShowListItem)[]`, `loading: boolean`, `error: Error | null`, `query: string`
   - Emits: `retry`
   - Template structure:
@@ -189,7 +189,7 @@
 
 ### 4.5 Write MovieCardSkeleton Component Tests
 
-- [ ] Create `tests/presentation/components/common/movie-card-skeleton.test.ts` (covering: HS-07; scenario IDs: HS-07-03, HS-07-04, HS-07-09)
+- [x] Create `tests/presentation/components/common/movie-card-skeleton.test.ts` (covering: HS-07; scenario IDs: HS-07-03, HS-07-04, HS-07-09)
   - Test skeleton has 2:3 aspect ratio
   - Test skeleton has shimmer animation class
   - Test skeleton component can be rendered 8 times for loading grid (HS-07-09)
@@ -197,7 +197,7 @@
 
 ### 4.6 Create MovieCardSkeleton Component
 
-- [ ] Create `src/presentation/components/common/movie-card-skeleton.vue`
+- [x] Create `src/presentation/components/common/movie-card-skeleton.vue`
   - Note: This is a specialized skeleton for MovieCard's 2:3 poster aspect ratio, distinct from R-01a's generic SkeletonLoader. R-01a's SkeletonLoader provides basic shimmer primitives; MovieCardSkeleton composes them into the specific card layout.
   - Matches MovieCard dimensions (2:3 aspect ratio poster, title/year text lines)
   - Shimmer animation using `animate-pulse` or custom shimmer keyframe
@@ -206,7 +206,7 @@
 
 ### 4.7 Write HomeScreen Integration Tests
 
-- [ ] Update `tests/presentation/views/home-screen.test.ts` (covering: HS-05, HS-06, HS-09, HS-10, HS-11; scenario IDs: HS-05-03, HS-06-04, HS-09-01 through HS-09-04, HS-10-01 through HS-10-05, HS-11-01, HS-11-04, HS-11-05)
+- [x] Update `tests/presentation/views/home-screen.test.ts` (covering: HS-05, HS-06, HS-09, HS-10, HS-11; scenario IDs: HS-05-03, HS-06-04, HS-09-01 through HS-09-04, HS-10-01 through HS-10-05, HS-11-01, HS-11-04, HS-11-05)
   - Test browse sections visible on initial load (HS-09-01)
   - Test SearchBar visible in browse mode (HS-09-02)
   - Test no search results in browse mode (HS-09-03)
@@ -225,7 +225,7 @@
 
 ### 4.8 Update HomeScreen View
 
-- [ ] Update `src/presentation/views/home-screen.vue`
+- [x] Update `src/presentation/views/home-screen.vue`
   - Import and use `useSearch()` composable
   - Add `SearchBar` at top of content area, bound to `query`
   - Conditional rendering:
@@ -236,7 +236,7 @@
 
 ### 4.9 Add i18n Keys
 
-- [ ] Update `src/presentation/i18n/locales/en.json`
+- [x] Update `src/presentation/i18n/locales/en.json`
   - Add `home.search.placeholder`: "Search movies and shows..."
   - Add `home.search.empty.title`: "No results found"
   - Add `home.search.empty.subtitle`: "Try different keywords or check your spelling"
@@ -244,17 +244,17 @@
   - Add `home.search.error.retry`: "Retry"
   - Add `home.search.clear`: "Clear search" (for aria-label)
 
-- [ ] Update `src/presentation/i18n/locales/es.json`
+- [x] Update `src/presentation/i18n/locales/es.json`
   - Add Spanish translations for all keys above
 
-- [ ] Update `src/presentation/i18n/locales/fr.json`
+- [x] Update `src/presentation/i18n/locales/fr.json`
   - Add French translations for all keys above
 
 ## Phase 5: Verification
 
-- [ ] Run `npm run lint` — no ESLint errors
-- [ ] Run `npm run build` — production build succeeds
-- [ ] Run `npm run test` — all tests pass
+- [x] Run `npm run lint` — no ESLint errors
+- [x] Run `npm run build` — production build succeeds
+- [x] Run `npm run test` — all tests pass (254 tests)
 - [ ] Verify touch targets: SearchBar clear button and MovieCard components are at least 44x44px on mobile viewports (HS-NFR-05)
 - [ ] Manual verification:
   - Type in SearchBar, observe 300 ms debounce before results appear

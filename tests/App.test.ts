@@ -10,6 +10,10 @@ vi.mock('lucide-vue-next', () => ({
   Bookmark: { template: '<svg data-icon="bookmark" />' },
   Settings: { template: '<svg data-icon="settings" />' },
   X: { template: '<svg data-icon="close" />' },
+  Search: { template: '<svg data-icon="search" />' },
+  AlertCircle: { template: '<svg data-icon="alert-circle" />' },
+  Film: { template: '<svg data-icon="film" />' },
+  Star: { template: '<svg data-icon="star" />' },
 }))
 
 vi.mock('@/presentation/components/error/error-boundary.vue', () => ({
@@ -53,9 +57,9 @@ describe('App', () => {
 
     expect(shell.exists()).toBe(true)
     expect(wrapper.get('header').text()).toContain('Home')
-    expect(wrapper.get('[data-testid="route-content"]').text()).toContain('Nothing here yet')
-    expect(wrapper.get('[data-testid="route-content"]').text()).toContain(
-      'This page is under construction.',
+    // Home screen now renders SearchBar instead of EmptyState placeholder
+    expect(wrapper.get('[data-testid="route-content"]').find('input[type="search"]').exists()).toBe(
+      true,
     )
   })
 
