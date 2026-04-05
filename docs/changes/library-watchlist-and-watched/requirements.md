@@ -65,7 +65,7 @@ Users need a way to track what they want to watch and what they have already see
 | :--- | :--- | :--- | :--- |
 | L-01 | Watchlist Tab | Display all library entries with `status: 'watchlist'` in a responsive grid. | P0 |
 | L-02 | Watched Tab | Display all library entries with `status: 'watched'` in a responsive grid. | P0 |
-| L-03 | Custom Lists Management | Users can create, rename, and delete custom lists with non-empty, unique names. | P0 |
+| L-03 | Custom Lists Management | Users can create, rename, and delete custom lists with non-empty, trimmed, and unique names. | P0 |
 | L-04 | List-Entry Association | Users can add/remove library entries to/from one or more custom lists from the entry detail screen. | P0 |
 | L-05 | List View | Selecting a custom list displays all entries associated with that list ID. | P0 |
 | L-06 | Deletion Integrity | Deleting a list removes its ID from all associated entries but does not delete the entries themselves. | P1 |
