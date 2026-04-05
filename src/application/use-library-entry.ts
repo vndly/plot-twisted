@@ -17,6 +17,8 @@ export function useLibraryEntry(
   mediaType: MediaType,
   title: string,
   posterPath: string | null,
+  voteAverage?: number,
+  releaseDate?: string,
 ) {
   const entry: Ref<LibraryEntry | null> = ref(null)
 
@@ -44,6 +46,8 @@ export function useLibraryEntry(
       notes: '',
       watchDates: [],
       addedAt: new Date().toISOString(),
+      voteAverage,
+      releaseDate,
     }
   }
 

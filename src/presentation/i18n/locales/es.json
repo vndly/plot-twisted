@@ -9,6 +9,7 @@
   "details.actions.unfavorite": "Quitar de favoritos",
   "details.actions.watched": "Marcar como visto",
   "details.actions.watchlist": "Añadir a lista de seguimiento",
+  "details.actions.manageLists": "Gestionar listas",
   "details.boxOffice.budget": "Presupuesto",
   "details.boxOffice.revenue": "Recaudación",
   "details.boxOffice.title": "Taquilla",
@@ -55,5 +56,19 @@
   "page.stats.title": "Estadísticas",
   "toast.dismiss": "Cerrar",
   "toast.error": "Ocurrió un error",
-  "toast.retry": "Reintentar"
+  "toast.retry": "Reintentar",
+  "library.tabs.watchlist": "Lista de seguimiento",
+  "library.tabs.watched": "Visto",
+  "library.tabs.lists": "Listas",
+  "library.lists.manageTitle": "Gestionar listas",
+  "library.lists.noLists": "No se han creado listas personalizadas todavía.",
+  "library.lists.newNamePlaceholder": "Nombre de la nueva lista...",
+  "library.empty.watchlist.title": "Tu lista de seguimiento está vacía",
+  "library.empty.watchlist.description": "Añade películas y series que quieras ver más tarde.",
+  "library.empty.watched.title": "No hay entradas vistas todavía",
+  "library.empty.watched.description": "Marca títulos como vistos para seguir tu progreso.",
+  "library.empty.list.title": "Esta lista está vacía",
+  "library.empty.list.description": "Añade títulos a esta lista desde su pantalla de detalles.",
+  "library.empty.allLists.title": "No hay listas personalizadas",
+  "library.empty.allLists.description": "Crea una nueva lista para organizar tu biblioteca."
 }

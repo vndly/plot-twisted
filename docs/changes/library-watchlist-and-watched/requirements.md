@@ -1,7 +1,7 @@
 ---
 id: R-05
 title: Library Management: Watchlist, Watched, and Custom Lists
-status: approved
+status: under_test
 importance: high
 type: functional
 tags: [library, storage, lists, watchlist, watched]
@@ -31,13 +31,13 @@ Users need a way to track what they want to watch and what they have already see
 
 ## Decisions
 
-| Decision | Choice | Rationale |
-| :--- | :--- | :--- |
-| Persistence | `localStorage` | Matches the project's "local-first" approach; no backend required. |
-| List association | ID-based array on `LibraryEntry` | Simple to implement and query; avoids complex join logic in a local-first environment. |
-| List Schema | Separate `List` entity | Allows storing list metadata (name, created date) independently of the entries it contains. |
-| List IDs | `crypto.randomUUID()` | Ensures unique IDs without needing an external library or complex counters. |
-| Uniqueness | Case-insensitive | List names must be unique when compared case-insensitively to avoid "Horror" and "horror" confusion. |
+| Decision         | Choice                           | Rationale                                                                                            |
+| :--------------- | :------------------------------- | :--------------------------------------------------------------------------------------------------- |
+| Persistence      | `localStorage`                   | Matches the project's "local-first" approach; no backend required.                                   |
+| List association | ID-based array on `LibraryEntry` | Simple to implement and query; avoids complex join logic in a local-first environment.               |
+| List Schema      | Separate `List` entity           | Allows storing list metadata (name, created date) independently of the entries it contains.          |
+| List IDs         | `crypto.randomUUID()`            | Ensures unique IDs without needing an external library or complex counters.                          |
+| Uniqueness       | Case-insensitive                 | List names must be unique when compared case-insensitively to avoid "Horror" and "horror" confusion. |
 
 ## Scope
 
@@ -61,28 +61,31 @@ Users need a way to track what they want to watch and what they have already see
 
 ## Functional Requirements
 
-| ID | Requirement | Description | Priority |
-| :--- | :--- | :--- | :--- |
-| L-01 | Watchlist Tab | Display all library entries with `status: 'watchlist'` in a responsive grid. | P0 |
-| L-02 | Watched Tab | Display all library entries with `status: 'watched'` in a responsive grid. | P0 |
-| L-03 | Custom Lists Management | Users can create, rename, and delete custom lists with non-empty, trimmed, and unique names. | P0 |
-| L-04 | List-Entry Association | Users can add/remove library entries to/from one or more custom lists from the entry detail screen. | P0 |
-| L-05 | List View | Selecting a custom list displays all entries associated with that list ID. | P0 |
-| L-06 | Deletion Integrity | Deleting a list removes its ID from all associated entries but does not delete the entries themselves. | P1 |
-| L-07 | Navigation | Tapping an entry in any library grid navigates to its corresponding detail screen. | P0 |
-| L-08 | Empty States | Each tab and list must show a contextual empty state when no entries are present, including a CTA to add content. | P1 |
+| ID   | Requirement             | Description                                                                                                       | Priority |
+| :--- | :---------------------- | :---------------------------------------------------------------------------------------------------------------- | :------- |
+| L-01 | Watchlist Tab           | Display all library entries with `status: 'watchlist'` in a responsive grid.                                      | P0       |
+| L-02 | Watched Tab             | Display all library entries with `status: 'watched'` in a responsive grid.                                        | P0       |
+| L-03 | Custom Lists Management | Users can create, rename, and delete custom lists with non-empty, trimmed, and unique names.                      | P0       |
+| L-04 | List-Entry Association  | Users can add/remove library entries to/from one or more custom lists from the entry detail screen.               | P0       |
+| L-05 | List View               | Selecting a custom list displays all entries associated with that list ID.                                        | P0       |
+| L-06 | Deletion Integrity      | Deleting a list removes its ID from all associated entries but does not delete the entries themselves.            | P1       |
+| L-07 | Navigation              | Tapping an entry in any library grid navigates to its corresponding detail screen.                                | P0       |
+| L-08 | Empty States            | Each tab and list must show a contextual empty state when no entries are present, including a CTA to add content. | P1       |
 
 ## Non-Functional Requirements
 
 ### Persistence
+
 - **Data Integrity**: All changes to library entries or custom lists must be persisted to `localStorage` immediately.
 - **Validation**: Data read from `localStorage` must be validated against Zod schemas.
 
 ### Performance
+
 - **Grid Rendering**: The `EntryGrid` should handle up to 100 entries with smooth scrolling and no noticeable lag.
 - **Filtering**: Switching between tabs/lists should be instantaneous (< 100ms).
 
 ### UI/UX
+
 - **Responsive Design**: The `EntryGrid` must adjust the number of columns based on screen size (mobile, tablet, desktop).
 - **Feedback**: Users must receive toast notifications for destructive actions (e.g., deleting a list).
 

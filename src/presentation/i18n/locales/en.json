@@ -9,6 +9,7 @@
   "details.actions.unfavorite": "Remove from favorites",
   "details.actions.watched": "Mark as watched",
   "details.actions.watchlist": "Add to watchlist",
+  "details.actions.manageLists": "Manage lists",
   "details.boxOffice.budget": "Budget",
   "details.boxOffice.revenue": "Revenue",
   "details.boxOffice.title": "Box Office",
@@ -55,5 +56,19 @@
   "page.stats.title": "Stats",
   "toast.dismiss": "Dismiss",
   "toast.error": "An error occurred",
-  "toast.retry": "Retry"
+  "toast.retry": "Retry",
+  "library.tabs.watchlist": "Watchlist",
+  "library.tabs.watched": "Watched",
+  "library.tabs.lists": "Lists",
+  "library.lists.manageTitle": "Manage Lists",
+  "library.lists.noLists": "No custom lists created yet.",
+  "library.lists.newNamePlaceholder": "New list name...",
+  "library.empty.watchlist.title": "Your watchlist is empty",
+  "library.empty.watchlist.description": "Add movies and shows you want to watch later.",
+  "library.empty.watched.title": "No watched entries yet",
+  "library.empty.watched.description": "Mark titles as watched to track your progress.",
+  "library.empty.list.title": "This list is empty",
+  "library.empty.list.description": "Add titles to this list from their detail screen.",
+  "library.empty.allLists.title": "No custom lists",
+  "library.empty.allLists.description": "Create a new list to organize your library."
 }

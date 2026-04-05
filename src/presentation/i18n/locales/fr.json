@@ -9,6 +9,7 @@
   "details.actions.unfavorite": "Retirer des favoris",
   "details.actions.watched": "Marquer comme vu",
   "details.actions.watchlist": "Ajouter à la liste de suivi",
+  "details.actions.manageLists": "Gérer les listes",
   "details.boxOffice.budget": "Budget",
   "details.boxOffice.revenue": "Recettes",
   "details.boxOffice.title": "Box-office",
@@ -55,5 +56,19 @@
   "page.stats.title": "Statistiques",
   "toast.dismiss": "Fermer",
   "toast.error": "Une erreur est survenue",
-  "toast.retry": "Réessayer"
+  "toast.retry": "Réessayer",
+  "library.tabs.watchlist": "Liste de suivi",
+  "library.tabs.watched": "Vu",
+  "library.tabs.lists": "Listes",
+  "library.lists.manageTitle": "Gérer les listes",
+  "library.lists.noLists": "Aucune liste personnalisée créée pour le moment.",
+  "library.lists.newNamePlaceholder": "Nom de la nouvelle liste...",
+  "library.empty.watchlist.title": "Votre liste de suivi est vide",
+  "library.empty.watchlist.description": "Ajoutez des films et des séries que vous souhaitez voir plus tard.",
+  "library.empty.watched.title": "Aucune entrée vue pour le moment",
+  "library.empty.watched.description": "Marquez des titres comme vus pour suivre votre progression.",
+  "library.empty.list.title": "Cette liste est vide",
+  "library.empty.list.description": "Ajoutez des titres à cette liste depuis leur écran de détails.",
+  "library.empty.allLists.title": "Aucune liste personnalisée",
+  "library.empty.allLists.description": "Créez une nouvelle liste pour organiser votre bibliothèque."
 }
