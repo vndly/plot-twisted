@@ -81,17 +81,17 @@ As users add more content to their library (Watchlist, Watched, and Custom Lists
 | LF-03 | Filter by Rating Range | Users can filter entries by a range of user ratings (0.0 to 5.0 stars) using numeric inputs or a selection widget. Matches `LibraryEntry.rating`. | P1       |
 | LF-04 | Filter by Watch Status | Users can filter entries by their watch status (Watchlist, Watched, or All).                                                                      | P1       |
 | LF-05 | Filter by Custom List  | Users can filter entries by their membership in specific custom lists.                                                                            | P1       |
+| LF-06 | Filter Badge           | The FilterBar SHALL display a badge showing the count of active filters (e.g., "3"). The badge updates dynamically as filters are toggled.        | P1       |
 | LF-07 | Clear Filters          | A "Clear All" action SHALL reset all active filters to their default states.                                                                      | P0       |
 
 ### UI/UX Specs
 
-| ID    | Requirement             | Description                                                                                                                                  | Priority |
-| :---- | :---------------------- | :------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
-| LU-01 | SortDropdown Component  | A dropdown component for choosing sort field and direction.                                                                                  | P0       |
-| LU-02 | FilterBar Integration   | The `FilterBar` SHALL be integrated into the `LibraryScreen` below the header/tabs.                                                          | P0       |
-| LU-03 | FilterBar Customization | The `FilterBar` SHALL allow enabling/disabling specific filters via props (to adapt to different views).                                     | P1       |
-| LU-04 | Empty State             | When filters result in zero entries, a "No items match your filters" message SHALL be displayed.                                             | P0       |
-| LU-05 | Filter Badge            | The `FilterBar` SHALL display a badge showing the count of active filters (e.g., "3"). The badge updates dynamically as filters are toggled. | P1       |
+| ID    | Requirement             | Description                                                                                              | Priority |
+| :---- | :---------------------- | :------------------------------------------------------------------------------------------------------- | :------- |
+| LU-01 | SortDropdown Component  | A dropdown component for choosing sort field and direction.                                              | P0       |
+| LU-02 | FilterBar Integration   | The `FilterBar` SHALL be integrated into the `LibraryScreen` below the header/tabs.                      | P0       |
+| LU-03 | FilterBar Customization | The `FilterBar` SHALL allow enabling/disabling specific filters via props (to adapt to different views). | P1       |
+| LU-04 | Empty State             | When filters result in zero entries, a "No items match your filters" message SHALL be displayed.         | P0       |
 
 ## Non-Functional Requirements
 
@@ -105,13 +105,24 @@ As users add more content to their library (Watchlist, Watched, and Custom Lists
 - **Visual Parity**: The `FilterBar` in the library SHALL use the same Tailwind theme tokens and layout patterns as the home screen implementation (`R-02`).
 - **Responsive Layout**: Filtering controls SHALL adapt to screen sizes per `docs/technical/ui-ux.md`, maintaining 44x44px touch targets for all interactive elements.
 
+## Risks & Assumptions
+
+### Risks
+
+- **Performance**: Large library collections (> 500 entries) may experience lag if filtering/sorting is not efficient. _Mitigation_: Ensure logic is optimized in `useSort` and `useLibraryFilters`; consider virtualization if performance degrades.
+- **HomeScreen Regression**: Refactoring `FilterBar` into a common component might break existing functionality on the Home Screen. _Mitigation_: Run regression tests on `HomeScreen` after refactoring.
+
+### Assumptions
+
+- **Local Data**: All library entries are available locally for instantaneous client-side processing.
+
 ## Acceptance Criteria
 
 - [ ] `SortDropdown` offers: Date Added (Newest/Oldest), Title (A–Z / Z–A), Release Year, User Rating (High/Low).
-- [ ] Default sort is Date Added (Newest First) on fresh load.
+- [ ] Default sort is Date Added (Newest First) on fresh load (LS-05).
 - [ ] Sort preference persists across page reloads.
 - [ ] `FilterBar` in library includes Genre, Media Type, Rating Range, and List filters.
 - [ ] Filters compose with AND logic (e.g., "Action" AND "Watched").
-- [ ] Active filter count is shown as a badge on the filter bar.
+- [ ] Active filter count is shown as a badge on the filter bar (LF-06).
 - [ ] Empty state shown when filters exclude all entries ("No items match your filters").
 - [ ] "Clear All" resets all filters and updates the view immediately.

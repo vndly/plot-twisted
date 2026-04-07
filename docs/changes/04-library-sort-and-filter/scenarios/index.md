@@ -13,8 +13,9 @@
 9. **[LS-02: Sort by Title](./LS-02.feature)**: User can sort entries alphabetically by title (A-Z, Z-A).
 10. **[LS-03: Sort by Release Year](./LS-03.feature)**: User can sort entries by their release year.
 11. **[LS-04: Sort by User Rating](./LS-04.feature)**: User can sort entries by their personal rating.
-12. **[LS-06: Sort Persistence](./LS-06.feature)**: User's sort selection survives page reload.
-13. **[LU-01: SortDropdown Component](./LU-01.feature)**: SortDropdown is rendered with correct options in Library.
-14. **[LU-02: FilterBar Integration](./LU-02.feature)**: FilterBar is integrated below tabs in Library.
-15. **[LU-03: FilterBar Customization](./LU-03.feature)**: FilterBar adapts its available filters to the current screen.
-16. **[LU-04: Empty State](./LU-04.feature)**: User sees an empty state when filters exclude all entries.
+12. **[LS-05: Default Sort](./LS-05.feature)**: User's library is sorted by date added (newest first) by default.
+13. **[LS-06: Sort Persistence](./LS-06.feature)**: User's sort selection survives page reload.
+14. **[LU-01: SortDropdown Component](./LU-01.feature)**: SortDropdown is rendered with correct options in Library.
+15. **[LU-02: FilterBar Integration](./LU-02.feature)**: FilterBar is integrated below tabs in Library.
+16. **[LU-03: FilterBar Customization](./LU-03.feature)**: FilterBar adapts its available filters to the current screen.
+17. **[LU-04: Empty State](./LU-04.feature)**: User sees an empty state when filters exclude all entries.

@@ -26,6 +26,7 @@ Implement advanced sorting and filtering for the library screen by refactoring e
     - Add visibility toggles via props (e.g., `showRating`, `showStatus`, `showLists`).
     - Implement numeric range inputs for Rating Range (matches `LF-03`).
     - Implement List selector using `useLists`.
+    - Implement dynamic filter badge count (matches `LF-06`).
 2.  **Create `SortDropdown`**: Create `src/presentation/components/common/sort-dropdown.vue`. Options: Date Added, Title, Year, Rating. Toggle for Ascending/Descending.
 3.  **Update `EntryGrid`**: Add a scoped slot for an empty state when filters return no results.
 
@@ -48,7 +49,7 @@ Implement advanced sorting and filtering for the library screen by refactoring e
     - `tests/application/use-library-entries.test.ts`: Verify combined filtering and sorting. (covering: `LF-01` through `LS-04`)
 2.  **Component Tests**:
     - `tests/presentation/components/common/sort-dropdown.test.ts`: Verify selection and event emission. (covering: `LU-01`)
-    - `tests/presentation/components/common/filter-bar.test.ts`: Verify visibility and interaction of new filters. (covering: `LU-02`, `LU-03`, `LU-05`)
+    - `tests/presentation/components/common/filter-bar.test.ts`: Verify visibility and interaction of new filters and active filter count badge. (covering: `LU-02`, `LU-03`, `LF-06`)
     - `tests/presentation/views/library-screen.test.ts`: Verify integration and empty state. (covering: `LU-04`)
 
 ## Phase 6: Final Verification
