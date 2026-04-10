@@ -1,14 +1,20 @@
 Feature: LS-05 — Default Sort
 
-  Scenario: LS-05-01 — Library displays Newest Added first by default
+  Scenario Outline: LS-05-01 — Every library view defaults to newest-first date sorting
     Given the app has loaded for the first time
-    And my library contains "Oldest Movie" (added Jan 1) and "Newest Movie" (added Dec 31)
-    When I view the Library screen
-    Then "Newest Movie" appears before "Oldest Movie"
+    And the "<Scope>" library view contains "Oldest Entry" (added Jan 1) and "Newest Entry" (added Dec 31)
+    When I view the "<Scope>" library view
+    Then "Newest Entry" appears before "Oldest Entry"
     And the sort selection shows "Date Added (Newest First)"
 
-  Scenario: LS-05-02 — Default sort label is localized
+    Examples:
+      | Scope                         |
+      | "Watchlist"                   |
+      | "Watched"                     |
+      | "selected custom list Favorites" |
+
+  Scenario: LS-05-02 — Default sort label is localized in French
     Given my app language is set to "fr"
     And the app has loaded for the first time
     When I view the Library screen
-    Then the default sort selection label is shown in French for "Date Added (Newest First)"
+    Then the default sort selection label is "Date d'ajout (plus récent d'abord)"

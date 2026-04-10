@@ -29,18 +29,18 @@ As users add more content to their library (Watchlist, Watched, and Custom Lists
 
 - `R-05`: Library Management (provides the library entries and custom lists to filter/sort).
 - `02-home`: Home screen (provides the reusable `FilterBar` presentation patterns and shared filter UX language; Home URL query sync remains Home-only).
-- When this change is promoted, update the released Home and Library product docs so the shared `FilterBar` contract and old "sorting/filtering is out of scope" note stay accurate.
+- When this change is promoted, update the released Home and Library product docs plus `docs/technical/data-model.md` so the shared `FilterBar` contract, metadata snapshot contract, and old "sorting/filtering is out of scope" note stay accurate.
 
 ## Decisions
 
-| Decision           | Choice                                         | Rationale                                                                                                                                                                  |
-| :----------------- | :--------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Component Reuse    | Extract a presentation-only `FilterBar` shell  | Reuse the Home filter UI patterns while keeping Library filter state in a library-local composable. Home URL query sync and singleton browse state remain untouched.       |
-| Metadata Source    | Application-layer `LibraryViewItem` read model | Title, release year, and genres come from validated provider metadata joined onto each `LibraryEntry` for Library views. Persisted `LibraryEntry` remains the user record. |
-| Sorting Logic      | Client-side domain comparators                 | The library dataset is local and bounded; pure comparators/predicates run locally while application composables orchestrate reactive state.                                |
-| Filter Composition | AND logic within the active library scope      | Filters refine the currently selected tab or custom list; they do not replace the base Watchlist, Watched, or selected-list scope.                                         |
-| Sort Persistence   | Optional settings fields via canonical storage | Persist only `librarySortField` and `librarySortOrder`, defaulting to LS-05 when absent. Non-sort filters remain session-local.                                            |
-| Pagination         | None                                           | As per roadmap, all entries are rendered; virtualization is deferred.                                                                                                      |
+| Decision           | Choice                                                                     | Rationale                                                                                                                                                                                                                                                                    |
+| :----------------- | :------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Component Reuse    | Extract a presentation-only `FilterBar` shell                              | Reuse the Home filter UI patterns while keeping Library filter state in a library-local composable. Home URL query sync and singleton browse state remain untouched.                                                                                                         |
+| Metadata Source    | Persisted `LibraryEntry` metadata snapshot normalized by `LibraryViewItem` | Library sort/filter operations stay local by reusing the persisted snapshot already stored on `LibraryEntry` (`title`, `posterPath`, `releaseDate`, `voteAverage`) and adding optional `genreIds` for R-06. `LibraryViewItem` normalizes these fields for UI and predicates. |
+| Sorting Logic      | Client-side domain comparators                                             | The library dataset is local and bounded; pure comparators/predicates run locally while application composables orchestrate reactive state.                                                                                                                                  |
+| Filter Composition | AND logic within the active library scope                                  | Filters refine the currently selected tab or custom list; they do not replace the base Watchlist, Watched, or selected-list scope.                                                                                                                                           |
+| Sort Persistence   | Canonical `Settings` storage with additive optional fields                 | Persist only `librarySortField` and `librarySortOrder`, defaulting to LS-05 when absent. Non-sort filters remain session-local, and existing standalone settings keys must migrate into the canonical `settings` object.                                                     |
+| Pagination         | None                                                                       | As per roadmap, all entries are rendered; virtualization is deferred.                                                                                                                                                                                                        |
 
 ## Scope
 
@@ -48,10 +48,10 @@ As users add more content to their library (Watchlist, Watched, and Custom Lists
 
 - `SortDropdown` component for selecting sort criteria and order.
 - Extracting the `FilterBar` presentation shell so Library can enable rating, watch-status, and custom-list filters without reusing Home's URL-synced state.
-- A non-persisted `LibraryViewItem` composition step that joins `LibraryEntry` user state with validated provider metadata required for title, release-year, and genre operations.
+- Extending the persisted `LibraryEntry` metadata snapshot with optional `genreIds`, plus a normalized `LibraryViewItem` composition step for title, release-year, and genre operations.
 - Domain-level sort/filter helpers plus library-local `useSort` and `useLibraryFilters` orchestration.
 - Integration into `LibraryScreen`, including filtered-result empty-state handling that preserves existing `R-05` base empty states.
-- Library-specific filter-state schema/types and optional persisted sort settings.
+- Library-specific filter-state schema/types, optional persisted sort settings, and the required schema/migration notes for additive settings and metadata snapshot changes.
 
 **Out of Scope:**
 
@@ -59,31 +59,32 @@ As users add more content to their library (Watchlist, Watched, and Custom Lists
 - Persistent filter states (except for sort preference).
 - Advanced multi-column sorting.
 - Grouping entries by category (e.g., "By Genre" headers).
+- Replacing Home's existing filter fields or URL query synchronization behavior.
 
 ## Functional Requirements
 
 ### Sorting
 
-| ID    | Requirement          | Description                                                                                                                                                                                                                   | Priority |
-| :---- | :------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
-| LS-01 | Sort by Date Added   | Users can sort library entries by the date they were added (Newest First, Oldest First).                                                                                                                                      | P0       |
-| LS-02 | Sort by Title        | Users can sort the active library scope alphabetically using a normalized display title derived from validated provider metadata (`movie.title`, `tv.name`) with A-Z and Z-A variants.                                        | P0       |
-| LS-03 | Sort by Release Year | Users can sort the active library scope by release year derived from validated provider metadata (Newest to Oldest, Oldest to Newest).                                                                                        | P1       |
-| LS-04 | Sort by User Rating  | Users can sort library entries by the rating they assigned (Highest to Lowest, Lowest to Highest).                                                                                                                            | P1       |
-| LS-05 | Default Sort         | The default sort order for all library views SHALL be "Date Added (Newest First)".                                                                                                                                            | P0       |
-| LS-06 | Persistence          | The selected sort criteria and direction SHALL be persisted as optional `Settings` fields `librarySortField` and `librarySortOrder` managed by the canonical storage service. When absent, the view SHALL fall back to LS-05. | P1       |
+| ID    | Requirement          | Description                                                                                                                                                                                                                                                      | Priority |
+| :---- | :------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
+| LS-01 | Sort by Date Added   | Users can sort library entries by the date they were added (Newest First, Oldest First).                                                                                                                                                                         | P0       |
+| LS-02 | Sort by Title        | Users can sort the active library scope alphabetically using a normalized display title derived from the persisted `LibraryEntry.title` snapshot, which originates from validated provider metadata (`movie.title`, `tv.name`), with A-Z and Z-A variants.       | P0       |
+| LS-03 | Sort by Release Year | Users can sort the active library scope by release year derived from the persisted `LibraryEntry.releaseDate` snapshot sourced from validated provider metadata (`movie.release_date`, `tv.first_air_date`) with Newest-to-Oldest and Oldest-to-Newest variants. | P1       |
+| LS-04 | Sort by User Rating  | Users can sort library entries by the rating they assigned (Highest to Lowest, Lowest to Highest).                                                                                                                                                               | P1       |
+| LS-05 | Default Sort         | The default sort order for all library views SHALL be "Date Added (Newest First)".                                                                                                                                                                               | P0       |
+| LS-06 | Persistence          | The selected sort criteria and direction SHALL be persisted as optional `Settings` fields `librarySortField` and `librarySortOrder` managed by the canonical storage service. When absent, the view SHALL fall back to LS-05.                                    | P1       |
 
 ### Filtering
 
-| ID    | Requirement            | Description                                                                                                                                                                                                                         | Priority |
-| :---- | :--------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
-| LF-01 | Filter by Genre        | Users can filter the active library scope by one or more genres using the multi-select dropdown. Genre values SHALL come from validated provider metadata joined onto the library view model.                                       | P0       |
-| LF-02 | Filter by Media Type   | Users can filter the active library scope by media type (Movie, TV Show, or All) without changing the selected library tab or custom list.                                                                                          | P0       |
-| LF-03 | Filter by Rating Range | Users can filter entries by a range of user ratings (0.0 to 5.0 stars) using numeric inputs or a selection widget. `0` represents unrated and SHALL be handled explicitly.                                                          | P1       |
-| LF-04 | Filter by Watch Status | On the Lists view, users can filter the selected custom list by watch status (Watchlist, Watched, or All). On the Watchlist and Watched tabs, this control SHALL be hidden because the active tab already defines the status scope. | P1       |
-| LF-05 | Filter by Custom List  | On the Watchlist and Watched tabs, users can filter the active tab dataset by membership in specific custom lists. On the Lists view, this control SHALL be hidden because the selected list already defines scope.                 | P1       |
-| LF-06 | Filter Badge           | The FilterBar SHALL display a badge showing the count of active filter categories (genre, media type, rating range, watch status, custom list). Selecting multiple values within one category still counts as one active filter.    | P1       |
-| LF-07 | Clear Filters          | A "Clear All" action SHALL reset all currently visible filters to their default states while preserving the active library tab or selected custom list.                                                                             | P0       |
+| ID    | Requirement            | Description                                                                                                                                                                                                                                                  | Priority |
+| :---- | :--------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
+| LF-01 | Filter by Genre        | Users can filter the active library scope by one or more genres using the multi-select dropdown. Genre values SHALL come from the persisted `LibraryEntry.genreIds` snapshot sourced from validated provider metadata and normalized into `LibraryViewItem`. | P0       |
+| LF-02 | Filter by Media Type   | Users can filter the active library scope by media type (Movie, TV Show, or All) without changing the selected library tab or custom list.                                                                                                                   | P0       |
+| LF-03 | Filter by Rating Range | Users can filter entries by a range of user ratings (0.0 to 5.0 stars) using paired numeric inputs with `0.5` step increments. `0.0` represents unrated, and results SHALL update immediately as either input changes.                                       | P1       |
+| LF-04 | Filter by Watch Status | On the Lists view, users can filter the selected custom list by watch status (`Watchlist`, `Watched`, `Untracked`, or `All`). On the Watchlist and Watched tabs, this control SHALL be hidden because the active tab already defines the status scope.       | P1       |
+| LF-05 | Filter by Custom List  | On the Watchlist and Watched tabs, users can filter the active tab dataset by membership in specific custom lists. On the Lists view, this control SHALL be hidden because the selected list already defines scope.                                          | P1       |
+| LF-06 | Filter Badge           | The FilterBar SHALL display a badge showing the count of active filter categories (genre, media type, rating range, watch status, custom list). Selecting multiple values within one category still counts as one active filter.                             | P1       |
+| LF-07 | Clear Filters          | A "Clear All" action SHALL reset all currently visible filters to their default states while preserving the active library tab or selected custom list.                                                                                                      | P0       |
 
 ### UI/UX Specs
 
@@ -98,55 +99,72 @@ As users add more content to their library (Watchlist, Watched, and Custom Lists
 
 ### Performance
 
-- **Filtering Speed**: Applying filters to a collection of up to 500 entries SHALL complete in < 50ms.
-- **Sorting Speed**: Sorting a collection of up to 500 entries SHALL complete in < 50ms.
+| ID    | Requirement     | Description                                                                                                                                                                              |
+| :---- | :-------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LN-01 | Filtering Speed | Applying filters to a collection of up to 500 entries SHALL complete in < 50ms in the documented benchmark environment when the required metadata snapshot is already available locally. |
+| LN-02 | Sorting Speed   | Sorting a collection of up to 500 entries SHALL complete in < 50ms in the documented benchmark environment.                                                                              |
 
 ### UI/UX Consistency
 
-- **Visual Parity**: The `FilterBar` in the library SHALL use the same Tailwind theme tokens and layout patterns as the Home screen implementation (`02-home`).
-- **Responsive Layout**: Filtering controls SHALL adapt to screen sizes per `docs/technical/ui-ux.md`, maintaining 44x44px touch targets for all interactive elements.
+| ID    | Requirement       | Description                                                                                                                                   |
+| :---- | :---------------- | :-------------------------------------------------------------------------------------------------------------------------------------------- |
+| LN-03 | Visual Parity     | The `FilterBar` in the library SHALL use the same Tailwind theme tokens and layout patterns as the Home screen implementation (`02-home`).    |
+| LN-04 | Responsive Layout | Filtering controls SHALL adapt to screen sizes per `docs/technical/ui-ux.md`, maintaining 44x44px touch targets for all interactive elements. |
 
 ### Testing
 
-- **Scenario Traceability**: Automated tests SHALL map every scenario ID in `scenarios/` to at least one test case, or explicitly mark extra tests as `(implementation detail)`.
-- **Home Regression Coverage**: Regression tests SHALL confirm that extracting the shared `FilterBar` presentation shell does not change Home screen filter fields or URL query synchronization.
+| ID    | Requirement              | Description                                                                                                                                                                      |
+| :---- | :----------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LN-05 | Scenario Traceability    | Automated tests SHALL map every scenario ID in `scenarios/` to at least one test case, or explicitly mark extra tests as `(implementation detail)`.                              |
+| LN-06 | Home Regression Coverage | Regression tests SHALL confirm that extracting the shared `FilterBar` presentation shell does not change Home screen genre/media-type/year filters or URL query synchronization. |
+
+### Internationalization
+
+| ID    | Requirement        | Description                                                                                                                                                          |
+| :---- | :----------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LN-07 | Localized Delivery | All new Library sort/filter labels and messages SHALL be delivered through `vue-i18n` locale keys, with at least one non-default locale verified in scenarios/tests. |
 
 ## Constraints
 
-- **Canonical Data Model**: `LibraryEntry` remains the canonical persisted user-state record. Title, release-year, and genre operations must use a separate validated library read model rather than expanding the persisted contract further.
+- **Metadata Authority**: `LibraryEntry` remains the canonical persisted record for both user state and the local metadata snapshot used by Library sort/filter operations. `LibraryViewItem` may normalize persisted `title`, `posterPath`, `releaseDate`, `voteAverage`, and `genreIds`, but it must not fetch or override these values as a separate primary source during interactive filtering.
+- **Snapshot Backfill**: `R-06` adds optional `genreIds` to the persisted `LibraryEntry` snapshot and must document schema-version impact, migration/backfill behavior, and safe fallback if older entries do not yet include the field.
 - **State Isolation**: Library filter state must be owned by a library-specific composable and must not reuse Home's URL query synchronization or global singleton filter state.
 - **Internationalization**: All new sort/filter labels and messages must be backed by `vue-i18n` keys in `src/presentation/i18n/locales/*.json`; at least one non-default locale must be verified in scenarios/tests.
-- **Persistence Contract**: Optional `Settings` fields `librarySortField` and `librarySortOrder` must be read/written through the canonical storage service with documented default behavior and schema-version impact.
-- **Documentation Sync**: Promotion of `R-06` must update the released Home and Library docs so their scope boundaries and shared filter contract remain accurate.
+- **Persistence Contract**: Optional `Settings` fields `librarySortField` and `librarySortOrder` must be read/written through the canonical storage service with documented default behavior, migration from standalone settings keys, and schema-version impact.
+- **Documentation Sync**: Promotion of `R-06` must update the released Home and Library docs plus `docs/technical/data-model.md` so their scope boundaries, shared filter contract, and metadata snapshot contract remain accurate.
 
 ## Risks & Assumptions
 
 ### Risks
 
-- **Performance**: Large library collections (> 500 entries) may experience lag if filtering/sorting is not efficient. _Mitigation_: Ensure logic is optimized in `useSort` and `useLibraryFilters`; consider virtualization if performance degrades.
-- **HomeScreen Regression**: Refactoring `FilterBar` into a common component might break existing functionality on the Home Screen. _Mitigation_: Run regression tests on `HomeScreen` after refactoring.
+- **Performance Drift**: Likelihood `Medium`; Impact `High`. Large library collections (> 500 entries) may experience lag if filtering/sorting is not efficient. _Mitigation_: Ensure logic is optimized in `useSort` and `useLibraryFilters`, benchmark against a 500-entry fixture, and document the benchmark environment.
+- **Home Filter Regression**: Likelihood `Medium`; Impact `High`. Refactoring `FilterBar` into a common component might break Home filter fields or URL query synchronization. _Mitigation_: Run automated Home regression coverage against the existing genre, media type, year range, and URL-sync behaviors after extraction.
+- **Genre Snapshot Backfill**: Likelihood `Medium`; Impact `Medium`. Existing entries may be missing the new `genreIds` snapshot until migration/backfill completes. _Mitigation_: Ship the additive schema change with documented backfill logic and safe fallback behavior before enabling genre filtering for migrated entries.
 
 ### Assumptions
 
 - **Local Data**: All library entries are available locally for instantaneous client-side processing.
-- **Metadata Availability**: A validated metadata source for each saved title can be composed into the library read model without widening the persisted `LibraryEntry` contract.
+- **Metadata Snapshot Availability**: Each saved title has a validated local metadata snapshot for `title` and `releaseDate`, and `genreIds` can be backfilled into the persisted snapshot before Library genre filtering is relied on.
 
 ## Acceptance Criteria
 
 - [ ] `SortDropdown` offers Date Added, Title, Release Year, and User Rating with the expected ascending/descending variants for each field. (`LS-01`, `LS-02`, `LS-03`, `LS-04`, `LU-01`)
 - [ ] On a fresh load with no persisted sort settings, every library view defaults to Date Added (Newest First). (`LS-05`)
 - [ ] Changing sort persists optional `Settings.librarySortField` and `Settings.librarySortOrder`; after reload, the same selection and rendered order are restored, and missing fields fall back to LS-05. (`LS-06`)
-- [ ] Title sorting uses the normalized display title from validated provider metadata for both movies and TV shows. (`LS-02`)
-- [ ] Release-year sorting uses validated provider metadata for both movies and TV shows. (`LS-03`)
-- [ ] Genre filtering uses validated provider metadata joined onto the active library scope. (`LF-01`)
+- [ ] Title sorting uses the normalized display title derived from persisted `LibraryEntry.title` snapshots for both movies and TV shows. (`LS-02`)
+- [ ] Release-year sorting uses persisted `LibraryEntry.releaseDate` snapshots for both movies and TV shows. (`LS-03`)
+- [ ] Genre filtering uses persisted `LibraryEntry.genreIds` snapshots sourced from validated provider metadata, including multi-select behavior. (`LF-01`)
 - [ ] Media type filtering refines the active library scope to Movie, TV Show, or All without replacing the current tab/list selection. (`LF-02`)
-- [ ] Rating-range filtering supports 0.0-5.0, treats `0` as unrated, and updates results immediately. (`LF-03`)
-- [ ] On the Lists view, watch-status filtering refines the selected custom list by Watchlist, Watched, or All; on Watchlist and Watched tabs, the watch-status control is hidden. (`LF-04`)
+- [ ] Rating-range filtering uses paired numeric inputs with `0.5` step increments, supports `0.0-5.0`, treats `0.0` as unrated, and updates results immediately. (`LF-03`)
+- [ ] On the Lists view, watch-status filtering refines the selected custom list by Watchlist, Watched, Untracked, or All; on Watchlist and Watched tabs, the watch-status control is hidden. (`LF-04`)
 - [ ] On Watchlist and Watched tabs, custom-list filtering refines the active tab by selected list membership; on the Lists view, the custom-list filter is hidden because the selected list already defines scope. (`LF-05`, `LU-03`)
 - [ ] The filter badge counts active filter categories, not selected values; selecting multiple genres still counts as one active filter. (`LF-06`)
-- [ ] `Clear All` resets every visible library filter while preserving the active tab or selected custom list. (`LF-07`)
-- [ ] `FilterBar` is rendered directly below the library header/tabs, uses the same theme tokens as Home, and keeps Library state isolated from Home URL query sync. (`LU-02`)
+- [ ] `Clear All` resets every visible library filter to its documented default while preserving the active tab or selected custom list. (`LF-07`)
+- [ ] `FilterBar` is rendered directly below the library header/tabs, uses the same theme tokens as Home, remains sticky while library content scrolls, and keeps Library state isolated from Home URL query sync. (`LU-02`, `LN-03`)
 - [ ] When a populated tab/list is narrowed to zero results by filters, the screen shows "No items match your filters" plus Clear All; when the base tab/list is empty before filters, the existing `R-05` empty states remain in control. (`LU-04`)
-- [ ] Filtering and sorting a 500-entry library dataset completes in under 50 ms in the documented benchmark/test environment. (`Performance`)
-- [ ] Library sort/filter controls preserve responsive layout and 44x44px touch targets across supported breakpoints. (`UI/UX Consistency`)
-- [ ] All new Library sort/filter labels and messages are delivered through `vue-i18n` locale keys, with at least one non-default locale verified in scenarios/tests. (`Constraints`)
+- [ ] Filtering a 500-entry library dataset completes in under 50 ms in the documented benchmark/test environment. (`LN-01`)
+- [ ] Sorting a 500-entry library dataset completes in under 50 ms in the documented benchmark/test environment. (`LN-02`)
+- [ ] Library sort/filter controls preserve responsive layout and 44x44px touch targets across supported breakpoints. (`LN-04`)
+- [ ] Every scenario ID in `scenarios/` is mapped to at least one planned automated test, and any extra tests are labeled `(implementation detail)`. (`LN-05`)
+- [ ] Home regression tests confirm the shared `FilterBar` extraction preserves Home's genre, media type, year range, and URL query synchronization behavior. (`LN-06`)
+- [ ] All new Library sort/filter labels and messages are delivered through `vue-i18n` locale keys, and the default sort label is verified in French. (`LN-07`)
