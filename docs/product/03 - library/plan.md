@@ -1,96 +1,41 @@
-# Implementation Plan: Library Management
+# Plan: Library Management, Sorting, and Filtering
 
----
+Comprehensive implementation of library collections, status tracking, and advanced client-side sorting/filtering.
 
-## Phase 1 — Domain & Infrastructure
+## Phase 1: Core Management (Infrastructure & Domain)
 
-### Step 1 — Unit tests for List schema and storage
+1. [x] **Define schemas**: Add `ListSchema` and `LibraryEntrySchema` with `voteAverage` and `releaseDate`.
+2. [x] **Storage Service**: Implement CRUD for lists and list-entry associations.
+3. [x] **Unit Tests**: Verify schema validation and storage logic.
 
-- [x] Create `tests/domain/list.schema.test.ts` to verify `ListSchema` (id, name, createdAt).
-- [x] Create `tests/infrastructure/storage.service.lists.test.ts` to verify CRUD operations for lists and list-entry association logic.
-  - `covering: L-03, L-06`
+## Phase 2: Collections (Application & Presentation)
 
-### Step 2 — Implement List schema and storage extensions
+1. [x] **Composables**: Create `useLibraryEntries` and `useLists`.
+2. [x] **UI Components**: Create `TabToggle`, `EntryGrid`, and `ListManagerModal`.
+3. [x] **Integration**: Implement `LibraryScreen` with tab-based filtering.
+4. [x] **Verification**: Verify status toggling and list management.
 
-- [x] Update `src/domain/library.schema.ts` to include `ListSchema` and `List` type.
-  - `id: z.string().uuid()`
-  - `name: z.string().min(1)`
-  - `createdAt: z.string()` (ISO date)
-- [x] Update `src/infrastructure/storage.service.ts` with:
-  - `getAllLists(): List[]`
-  - `saveList(list: List): void`
-  - `removeList(id: string): void`
-  - `getListEntries(listId: string): LibraryEntry[]`
-  - `updateEntryLists(id: number, mediaType: MediaType, listIds: string[]): void`
-  - `removeListFromAllEntries(listId: string): void` (for deletion integrity)
+## Phase 3: Sorting and Filtering (Domain & Infrastructure)
 
----
+1. [x] **Settings Schema**: Define canonical `settings` object for persistent preferences.
+2. [x] **Logic**: Implement pure predicates and comparators for title, release year, rating, and genre.
+3. [x] **Snapshot Extension**: Add `genreIds` to the metadata snapshot on `LibraryEntry`.
+4. [x] **Unit Tests**: Verify filtering predicates and sorting comparators.
 
-## Phase 2 — Application Layer
+## Phase 4: Sorting and Filtering (Application & Presentation)
 
-### Step 3 — Unit tests for Composables
+1. [x] **Orchestration**: Create `useLibraryFilters` and `useSort`.
+2. [x] **Shared UI**: Extract `FilterBar` shell and create `SortDropdown`.
+3. [x] **Integration**: Add sticky filters and sort controls to `LibraryScreen`.
+4. [x] **Empty States**: Implement filtered-empty-state logic.
 
-- [x] Create `tests/application/use-lists.test.ts` to verify list management logic.
-  - `covering: L-03`
-- [x] Create `tests/application/use-library-entries.test.ts` to verify filtering by status and list.
-  - `covering: L-01, L-02, L-05`
+## Phase 5: Refinement and Regressions
 
-### Step 4 — Implement Composables
+1. [x] **i18n**: Add localized labels for all new features (EN, ES, FR).
+2. [x] **Home Regression**: Verify `FilterBar` refactor doesn't break Home screen browse filters.
+3. [x] **Benchmarks**: Verify < 50ms performance for filtering/sorting 500 entries.
 
-- [x] Create `src/application/use-lists.ts`:
-  - `lists: ComputedRef<List[]>`
-  - `createList(name: string): void`
-  - `renameList(id: string, newName: string): void`
-  - `deleteList(id: string): void`
-- [x] Create `src/application/use-library-entries.ts`:
-  - `getEntriesByStatus(status: WatchStatus): LibraryEntry[]`
-  - `getEntriesByList(listId: string): LibraryEntry[]`
-  - `getAllEntries(): LibraryEntry[]`
+## Phase 6: Final Verification
 
----
-
-## Phase 3 — Presentation Layer (Components)
-
-### Step 5 — Component tests
-
-- [x] Create `tests/presentation/components/common/tab-toggle.test.ts`.
-- [x] Create `tests/presentation/components/common/entry-grid.test.ts`.
-- [x] Create `tests/presentation/components/details/list-manager-modal.test.ts`.
-
-### Step 6 — Implement UI Components
-
-- [x] Create `src/presentation/components/common/tab-toggle.vue`:
-  - Props: `tabs: Array<{ id: string, label: string }>`, `activeTab: string`
-  - Events: `update:activeTab`
-- [x] Create `src/presentation/components/common/entry-grid.vue`:
-  - Props: `entries: LibraryEntry[]`
-  - Uses `MovieCard` for rendering.
-- [x] Create `src/presentation/components/details/list-manager-modal.vue`:
-  - Allows toggling list associations for the current entry.
-  - `covering: L-04`
-
-### Step 7 — Update Views
-
-- [x] Update `src/presentation/views/library-screen.vue`:
-  - Integrate `TabToggle` for Watchlist/Watched/Lists.
-  - If "Lists" is active, show list selector.
-  - Show `EntryGrid` for the selected filter.
-  - `covering: L-01, L-02, L-05, L-08`
-- [x] Surgically update `src/presentation/views/movie-screen.vue` and `show-screen.vue`:
-  - Add button to open `ListManagerModal` (likely near the Watchlist/Watched buttons).
-  - `covering: L-04`
-
----
-
-## Phase 4 — Verification
-
-### Step 8 — Final Verification
-
-- [x] Run `npm run check` (lint, type-check, test, build).
-- [x] Manual verification of scenarios:
-  - [x] Switch between Watchlist and Watched tabs.
-  - [x] Create, rename, and delete a custom list.
-  - [x] Add an entry to a list from the detail screen.
-  - [x] Verify entry appears in the custom list grid.
-  - [x] Delete a list and verify entries still exist in "All" but are removed from the deleted list.
-  - [x] Verify empty states for each tab.
+1. [x] **Automated Suite**: Run all unit, integration, and E2E tests.
+2. [x] **Visual Check**: Verify responsive layout and touch targets on mobile.
