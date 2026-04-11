@@ -28,7 +28,7 @@ export interface RecommendationSection {
  */
 export function useRecommendations() {
   const { allEntries } = useLibraryEntries()
-  const { settings } = useSettings()
+  const { language } = useSettings()
   const sections = ref<RecommendationSection[]>([])
   const loading = ref(true)
   const libraryIds = ref(new Set<number>())
@@ -101,17 +101,17 @@ export function useRecommendations() {
       if (section.seed) {
         const response =
           section.seed.mediaType === 'movie'
-            ? await getMovieRecommendations(section.seed.id, settings.value.language)
-            : await getShowRecommendations(section.seed.id, settings.value.language)
+            ? await getMovieRecommendations(section.seed.id, language.value)
+            : await getShowRecommendations(section.seed.id, language.value)
         results = response.results
       } else {
         // Fallback sections
         if (section.titleKey === 'recommendations.trending.title') {
-          results = (await getTrending(settings.value.language)).results
+          results = (await getTrending(language.value)).results
         } else if (section.titleKey === 'recommendations.popular.movies.title') {
-          results = (await getPopularMovies(settings.value.language)).results
+          results = (await getPopularMovies(language.value)).results
         } else if (section.titleKey === 'recommendations.popular.shows.title') {
-          results = (await getPopularShows(settings.value.language)).results
+          results = (await getPopularShows(language.value)).results
         }
       }
 

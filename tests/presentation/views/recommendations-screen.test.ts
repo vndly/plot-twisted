@@ -29,7 +29,7 @@ vi.mock('@/application/use-library-entries', () => ({
 
 vi.mock('@/application/use-settings', () => ({
   useSettings: vi.fn(() => ({
-    settings: { value: { language: 'en' } },
+    language: { value: 'en' },
   })),
 }))
 
