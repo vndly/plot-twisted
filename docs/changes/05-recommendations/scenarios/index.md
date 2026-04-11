@@ -12,3 +12,4 @@
 8. **[RE-08](./RE-08.feature)**: Independent loading and error states for each recommendation carousel.
 9. **[RE-09](./RE-09.feature)**: Handling of seeds that return no recommendations from the API.
 10. **[RE-10](./RE-10.feature)**: Lazy loading of recommendation carousels for performance optimization.
+11. **[RE-11](./RE-11.feature)**: Handling of TMDB API rate limits (429) for recommendation carousels.
