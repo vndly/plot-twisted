@@ -128,6 +128,7 @@ export function useRecommendations() {
       section.results = deduplicated[0]
       section.fetched = true
     } catch (e) {
+      console.error(`Failed to fetch recommendation section ${index}:`, e)
       section.error = e as Error
     } finally {
       section.loading = false

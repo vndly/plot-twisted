@@ -52,7 +52,9 @@ export async function fetchWithRetry(url: string, attempt = 1): Promise<Response
   }
 
   if (!response.ok) {
-    throw new Error(`API request failed: ${response.status} ${response.statusText}`)
+    const errorMsg = `API request failed: ${response.status} ${response.statusText} at ${url}`
+    console.error(errorMsg)
+    throw new Error(errorMsg)
   }
 
   return response
@@ -127,7 +129,12 @@ export async function getTrending(language: string): Promise<SearchResponse> {
   const response = await fetchWithRetry(url)
   const data = await response.json()
 
-  return SearchResponseSchema.parse(data)
+  try {
+    return SearchResponseSchema.parse(data)
+  } catch (e) {
+    console.error('Zod parsing failed for Trending response:', e, data)
+    throw e
+  }
 }
 
 /**

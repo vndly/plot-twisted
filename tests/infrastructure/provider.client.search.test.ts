@@ -152,7 +152,8 @@ describe('searchMulti', () => {
     await expect(searchMulti('test', 'en')).rejects.toThrow(
       'API request failed: 500 Internal Server Error',
     )
-  })
+    })
+
 
   it('throws error on network failure', async () => {
     // Arrange
@@ -214,7 +215,7 @@ describe('searchMulti', () => {
 
     // Assert
     expect(error).not.toBeNull()
-    expect(error?.message).toBe('API request failed: 429 Too Many Requests')
+    expect(error?.message).toContain('API request failed: 429 Too Many Requests')
     expect(mockFetch).toHaveBeenCalledTimes(4) // Initial + 3 retries
 
     vi.useRealTimers()

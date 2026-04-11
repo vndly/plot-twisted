@@ -55,6 +55,7 @@
   "common.error.description": "Une erreur inattendue s'est produite.",
   "common.error.reload": "Recharger",
   "common.error.title": "Une erreur est survenue",
+  "errors.generic": "Une erreur inattendue s'est produite. Veuillez réessayer plus tard.",
   "modal.cancel": "Annuler",
   "modal.confirm": "Confirmer",
   "nav.calendar": "Calendrier",

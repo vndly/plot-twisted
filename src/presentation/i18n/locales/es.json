@@ -55,6 +55,7 @@
 
   "common.error.reload": "Recargar",
   "common.error.title": "Algo salió mal",
+  "errors.generic": "Ocurrió un error inesperado. Por favor, inténtelo de nuevo más tarde.",
   "modal.cancel": "Cancelar",
   "modal.confirm": "Confirmar",
   "nav.calendar": "Calendario",

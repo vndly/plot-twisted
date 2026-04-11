@@ -139,10 +139,11 @@ describe('getMovieDetail', () => {
     })
 
     // Act & Assert
-    await expect(getMovieDetail(999999999, 'en')).rejects.toThrow(
+    await expect(getMovieDetail(999999, 'en')).rejects.toThrow(
       'API request failed: 404 Not Found',
     )
-  })
+    })
+
 
   it('throws error on network failure (ED-12-04)', async () => {
     // Arrange

@@ -13,6 +13,7 @@ const EXPECTED_KEYS = [
   'common.error.reload',
   'common.error.title',
   'common.retry',
+  'errors.generic',
   'details.actions.favorite',
   'details.actions.imdb',
   'details.actions.manageLists',
