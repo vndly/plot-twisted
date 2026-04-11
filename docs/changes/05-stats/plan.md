@@ -13,7 +13,7 @@ Implement a statistics dashboard for the library, including key metrics cards an
 3. [ ] **Implement Stats Computation Logic**: Create `src/domain/stats.logic.ts` with pure functions to compute:
    - `calculateKeyMetrics`: Total watched, watchlist, average rating, total watch time.
    - `calculateGenreDistribution`: Map of genre ID/name to count.
-   - `calculateMonthlyActivity`: Count of items watched per month for the current year.
+   - `calculateMonthlyActivity`: Count of items watched per month for the current year (derived from `new Date().getFullYear()`).
    - `getTopRatedItems`: Filter and sort logic for top 10 items.
    - (covering: `ST-01`, `ST-02`, `ST-03`, `ST-04`)
 4. [ ] **Write Domain and Infrastructure Tests**:
@@ -28,7 +28,7 @@ Implement a statistics dashboard for the library, including key metrics cards an
 2. [ ] **Create `useStats` Composable**: Create `src/application/use-stats.ts` to orchestrate stats computation.
    - Use `useLibraryEntries` as the data source.
    - Expose reactive computed properties for metrics and chart data.
-   - Integrate with `useGenres` to resolve genre names.
+   - Integrate with `useGenres` to resolve genre names, handling its loading state.
    - (covering: `ST-05`)
 3. [ ] **Write Application Tests**:
    - `tests/application/use-stats.test.ts`: Verify reactivity when library entries change and integration with genre names.
@@ -72,7 +72,7 @@ Implement a statistics dashboard for the library, including key metrics cards an
 
 ## Phase 5: Testing Phase
 
-> **Test-First Order**: Tests are written before implementation and run to confirm failure.
+> **Test-First Order**: Unit tests in Phase 1 and 2 are written before implementation and run to confirm failure. This phase is for end-to-end and integration verification.
 
 1. [ ] **Domain Logic**: `tests/domain/stats.logic.test.ts` (covering `ST-01`, `ST-02`, `ST-03`, `ST-04`)
 2. [ ] **Application Logic**: `tests/application/use-stats.test.ts` (covering `ST-05`)
@@ -82,4 +82,6 @@ Implement a statistics dashboard for the library, including key metrics cards an
 
 1. [ ] **Performance Check**: Verify stats computation < 100ms for 1,000 entries. (`SN-01`)
 2. [ ] **Visual/Responsive Check**: Verify charts on mobile and desktop. (`SN-03`, `SN-02`)
+3. [ ] **Localization Check**: Verify charts labels in English and French. (`SN-05`)
+e Check**: Verify charts on mobile and desktop. (`SN-03`, `SN-02`)
 3. [ ] **Localization Check**: Verify charts labels in English and French. (`SN-05`)

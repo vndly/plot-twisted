@@ -1,7 +1,7 @@
 ---
 id: R-07
 title: 'Stats: Insights and Overview'
-status: draft
+status: approved
 importance: medium
 type: functional
 tags: [stats, library, charts]
@@ -34,13 +34,13 @@ Users who track their media consumption often want to see high-level metrics, su
 
 ## Decisions
 
-| Decision | Choice | Rationale |
-| :--- | :--- | :--- |
-| Computation | Client-side derivation | All stats are computed locally from the `localStorage` library entries to maintain privacy and offline capability. |
-| Metadata | Add `runtime` to `LibraryEntry` | To support "Total Watch Time" without per-stat API calls, the runtime must be captured in the library entry snapshot when an item is added or updated. |
-| Charting | Chart.js with `vue-chartjs` | Provides a robust, well-documented, and relatively lightweight charting solution that integrates well with Vue. |
-| Time Range | Current Year for Monthly Chart | Limits the dataset for the monthly activity chart to the current calendar year to keep it focused and performant. |
-| Genre Source | `useGenres` Cache | Uses the existing genre fetching logic to map TMDB genre IDs to localized names. |
+| Decision     | Choice                          | Rationale                                                                                                                                              |
+| :----------- | :------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Computation  | Client-side derivation          | All stats are computed locally from the `localStorage` library entries to maintain privacy and offline capability.                                     |
+| Metadata     | Add `runtime` to `LibraryEntry` | To support "Total Watch Time" without per-stat API calls, the runtime must be captured in the library entry snapshot when an item is added or updated. |
+| Charting     | Chart.js with `vue-chartjs`     | Provides a robust, well-documented, and relatively lightweight charting solution that integrates well with Vue.                                        |
+| Time Range   | Current Year for Monthly Chart  | Limits the dataset for the monthly activity chart to the current calendar year to keep it focused and performant.                                      |
+| Genre Source | `useGenres` Cache               | Uses the existing genre fetching logic to map TMDB genre IDs to localized names.                                                                       |
 
 ## Scope
 
@@ -66,51 +66,52 @@ Users who track their media consumption often want to see high-level metrics, su
 
 ### Statistics Computation
 
-| ID | Requirement | Description | Priority |
-| :--- | :--- | :--- | :--- |
-| ST-01 | Stat Calculations | The system SHALL compute: Total Watched count, Total Watchlist count, Mean User Rating (excluding unrated), and Total Watch Time (sum of runtimes for watched items). | P0 |
-| ST-02 | Genre Distribution | The system SHALL compute the count of watched items per genre, using the cached genre names from TMDB. | P0 |
-| ST-03 | Monthly Activity | The system SHALL compute the count of items watched per month for the current calendar year, based on the `watchDates` array in `LibraryEntry`. | P1 |
-| ST-04 | Top Rated Ranking | The system SHALL identify the top 10 watched items with the highest user ratings, sorted by rating descending, then by title ascending. | P1 |
-| ST-05 | Reactivity | Stats SHALL update automatically whenever the library entries in storage are modified. | P0 |
+| ID    | Requirement        | Description                                                                                                                                                           | Priority |
+| :---- | :----------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
+| ST-01 | Stat Calculations  | The system SHALL compute: Total Watched count, Total Watchlist count, Mean User Rating (excluding unrated), and Total Watch Time (sum of runtimes for watched items). | P0       |
+| ST-02 | Genre Distribution | The system SHALL compute the count of watched items per genre, using the cached genre names from TMDB.                                                                | P0       |
+| ST-03 | Monthly Activity   | The system SHALL compute the count of items watched per month for the current calendar year, based on the `watchDates` array in `LibraryEntry`.                       | P1       |
+| ST-04 | Top Rated Ranking  | The system SHALL identify the top 10 watched items with the highest user ratings, sorted by rating descending, then by title ascending.                               | P1       |
+| ST-05 | Reactivity         | Stats SHALL update automatically whenever the library entries in storage are modified.                                                                                | P0       |
 
 ### UI Components
 
-| ID | Requirement | Description | Priority |
-| :--- | :--- | :--- | :--- |
-| SU-01 | StatCards Layout | Display the four key metrics in a responsive grid of cards at the top of the stats screen. | P0 |
-| SU-02 | GenreChart Display | Display genre distribution as a horizontal bar chart for readability with many genres. | P0 |
-| SU-03 | MonthlyChart Display | Display monthly activity for the current year as a line or bar chart. | P1 |
-| SU-04 | TopRatedList Display | Display the top 10 titles with their posters and ratings in a concise list. | P1 |
-| SU-05 | Empty State | Show a specialized empty state if the user has zero "watched" entries, encouraging them to add and rate content. | P0 |
+| ID    | Requirement          | Description                                                                                                      | Priority |
+| :---- | :------------------- | :--------------------------------------------------------------------------------------------------------------- | :------- |
+| SU-01 | StatCards Layout     | Display the four key metrics in a responsive grid of cards at the top of the stats screen.                       | P0       |
+| SU-02 | GenreChart Display   | Display genre distribution as a horizontal bar chart for readability with many genres.                           | P0       |
+| SU-03 | MonthlyChart Display | Display monthly activity for the current year as a line or bar chart.                                            | P1       |
+| SU-04 | TopRatedList Display | Display the top 10 titles with their posters and ratings in a concise list.                                      | P1       |
+| SU-05 | Empty State          | Show a specialized empty state if the user has zero "watched" entries, encouraging them to add and rate content. | P0       |
 
 ### Data Model Enhancements
 
-| ID | Requirement | Description | Priority |
-| :--- | :--- | :--- | :--- |
-| SD-01 | Runtime Snapshot | `LibraryEntry` SHALL include an optional `runtime` field (number, in minutes) to store the duration of the movie or average episode duration of the TV show. | P0 |
-| SD-02 | Runtime Capture | When adding an item to the library or viewing its details, the `runtime` from the provider metadata SHALL be saved into the library entry snapshot. | P0 |
+| ID    | Requirement      | Description                                                                                                                                                  | Priority |
+| :---- | :--------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------- | :------- |
+| SD-01 | Runtime Snapshot | `LibraryEntry` SHALL include an optional `runtime` field (number, in minutes) to store the duration of the movie or average episode duration of the TV show. | P0       |
+| SD-02 | Runtime Capture  | When adding an item to the library or viewing its details, the `runtime` from the provider metadata SHALL be saved into the library entry snapshot.          | P0       |
 
 ## Non-Functional Requirements
 
 ### Performance
 
-| ID | Requirement | Description |
-| :--- | :--- | :--- |
-| SN-01 | Computation Time | Stats for a library of 1,000 entries SHALL be computed in < 100ms. |
-| SN-02 | Chart Rendering | Charts SHALL render smoothly and be responsive to container size changes. |
+| ID    | Requirement      | Description                                                               |
+| :---- | :--------------- | :------------------------------------------------------------------------ |
+| SN-01 | Computation Time | Stats for a library of 1,000 entries SHALL be computed in < 100ms.        |
+| SN-02 | Chart Rendering  | Charts SHALL render smoothly and be responsive to container size changes. |
 
 ### UI/UX Consistency
 
-| ID | Requirement | Description |
-| :--- | :--- | :--- |
-| SN-03 | Visual Style | Components SHALL use existing Tailwind theme tokens and Lucide icons consistent with the rest of the app. |
-| SN-04 | Accessibility | Charts SHALL include ARIA labels and be navigable or described for screen readers. |
+| ID    | Requirement   | Description                                                                                               |
+| :---- | :------------ | :-------------------------------------------------------------------------------------------------------- |
+| SN-03 | Visual Style  | Components SHALL use existing Tailwind theme tokens and Lucide icons consistent with the rest of the app. |
+| SN-04 | Accessibility    | Charts SHALL include `aria-label` descriptions and be navigable or described for screen readers to meet WCAG 2.1 AA standards. |
+
 
 ### Internationalization
 
-| ID | Requirement | Description |
-| :--- | :--- | :--- |
+| ID    | Requirement      | Description                                                                              |
+| :---- | :--------------- | :--------------------------------------------------------------------------------------- |
 | SN-05 | Localized Labels | All stats-related labels, chart axes, and month names SHALL be localized via `vue-i18n`. |
 
 ## Constraints
@@ -142,3 +143,17 @@ Users who track their media consumption often want to see high-level metrics, su
 - [ ] Stats update immediately if an item's rating or status is changed in another tab (via storage events or shared state).
 - [ ] `LibraryEntry` schema is updated to include `runtime`, and new entries capture this value.
 - [ ] All charts and labels are fully localized in English and at least one other language.
+- [ ] Stats computation for 1,000 entries completes in under 100ms. (`SN-01`)
+- [ ] Genre and Monthly charts resize correctly without data loss or layout breakage on mobile. (`SN-02`)
+- [ ] All stat components use Tailwind theme tokens for colors and spacing. (`SN-03`)
+- [ ] All charts include ARIA labels or descriptions for screen readers. (`SN-04`)
+and spacing. (`SN-03`)
+- [ ] All charts include ARIA labels or descriptions for screen readers. (`SN-04`)
+ith no watched items displays the "No watched items" empty state.
+- [ ] Stats update immediately if an item's rating or status is changed in another tab (via storage events or shared state).
+- [ ] `LibraryEntry` schema is updated to include `runtime`, and new entries capture this value.
+- [ ] All charts and labels are fully localized in English and at least one other language.
+- [ ] Stats computation for 1,000 entries completes in under 100ms. (`SN-01`)
+- [ ] Genre and Monthly charts resize correctly without data loss or layout breakage on mobile. (`SN-02`)
+- [ ] All stat components use Tailwind theme tokens for colors and spacing. (`SN-03`)
+- [ ] All charts include ARIA labels or descriptions for screen readers. (`SN-04`)
