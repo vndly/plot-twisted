@@ -85,15 +85,19 @@ describe('SearchResultItemSchema', () => {
     }
   })
 
-  it('rejects result with invalid media_type', () => {
+  it('parses result with unknown media_type using fallback', () => {
     // Arrange
-    const invalidResult = {
+    const unknownResult = {
       id: 123,
-      media_type: 'invalid',
+      media_type: 'unknown_type',
     }
 
-    // Act & Assert
-    expect(() => SearchResultItemSchema.parse(invalidResult)).toThrow()
+    // Act
+    const result = SearchResultItemSchema.parse(unknownResult)
+
+    // Assert
+    expect(result.id).toBe(123)
+    expect(result.media_type).toBe('unknown_type')
   })
 })
 

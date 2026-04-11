@@ -1,5 +1,28 @@
 import { describe, it, expect } from 'vitest'
-import { MovieDetailSchema } from '@/domain/movie.schema'
+import { MovieDetailSchema, MovieListItemSchema } from '@/domain/movie.schema'
+
+describe('MovieListItemSchema', () => {
+  it('parses minimal movie item with missing optional fields', () => {
+    // Arrange
+    const minimalMovie = {
+      id: 550,
+      title: 'Fight Club',
+      poster_path: null,
+      backdrop_path: null,
+    }
+
+    // Act
+    const result = MovieListItemSchema.parse(minimalMovie)
+
+    // Assert
+    expect(result.id).toBe(550)
+    expect(result.title).toBe('Fight Club')
+    expect(result.overview).toBe('')
+    expect(result.release_date).toBe('')
+    expect(result.vote_average).toBe(0)
+    expect(result.adult).toBe(false)
+  })
+})
 
 describe('MovieDetailSchema', () => {
   it('parses a valid movie detail response with all appended relations', () => {

@@ -26,13 +26,22 @@ const SearchPersonResultSchema = z.object({
 })
 
 /**
- * Schema for a search result item, discriminated by media_type.
- * Supports movie, TV show, and person results.
+ * Schema for an unrecognized result in search (minimal fields, will be filtered out).
  */
-export const SearchResultItemSchema = z.discriminatedUnion('media_type', [
+const SearchUnknownResultSchema = z.object({
+  id: z.number(),
+  media_type: z.string(),
+})
+
+/**
+ * Schema for a search result item.
+ * Supports movie, TV show, person, and unknown results.
+ */
+export const SearchResultItemSchema = z.union([
   SearchMovieResultSchema,
   SearchTvResultSchema,
   SearchPersonResultSchema,
+  SearchUnknownResultSchema,
 ])
 
 /** Inferred type for a search result item. */

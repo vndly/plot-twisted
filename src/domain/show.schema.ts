@@ -15,18 +15,18 @@ import {
 export const ShowListItemSchema = z.object({
   id: z.number(),
   name: z.string(),
-  original_name: z.string(),
-  overview: z.string(),
-  first_air_date: z.string(),
+  original_name: z.string().optional(),
+  overview: z.string().optional().default(''),
+  first_air_date: z.string().optional().default(''),
   poster_path: z.string().nullable(),
   backdrop_path: z.string().nullable(),
-  vote_average: z.number(),
-  vote_count: z.number(),
-  popularity: z.number(),
-  genre_ids: z.array(z.number()),
-  adult: z.boolean(),
-  original_language: z.string(),
-  origin_country: z.array(z.string()),
+  vote_average: z.number().optional().default(0),
+  vote_count: z.number().optional().default(0),
+  popularity: z.number().optional().default(0),
+  genre_ids: z.array(z.number()).optional().default([]),
+  adult: z.boolean().optional().default(false),
+  original_language: z.string().optional().default(''),
+  origin_country: z.array(z.string()).optional().default([]),
 })
 
 /** Inferred type for a TV show list item. */

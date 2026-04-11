@@ -15,18 +15,18 @@ import {
 export const MovieListItemSchema = z.object({
   id: z.number(),
   title: z.string(),
-  original_title: z.string(),
-  overview: z.string(),
-  release_date: z.string(),
+  original_title: z.string().optional(),
+  overview: z.string().optional().default(''),
+  release_date: z.string().optional().default(''),
   poster_path: z.string().nullable(),
   backdrop_path: z.string().nullable(),
-  vote_average: z.number(),
-  vote_count: z.number(),
-  popularity: z.number(),
-  genre_ids: z.array(z.number()),
-  adult: z.boolean(),
-  original_language: z.string(),
-  video: z.boolean(),
+  vote_average: z.number().optional().default(0),
+  vote_count: z.number().optional().default(0),
+  popularity: z.number().optional().default(0),
+  genre_ids: z.array(z.number()).optional().default([]),
+  adult: z.boolean().optional().default(false),
+  original_language: z.string().optional().default(''),
+  video: z.boolean().optional().default(false),
 })
 
 /** Inferred type for a movie list item. */

@@ -1,5 +1,27 @@
 import { describe, it, expect } from 'vitest'
-import { ShowDetailSchema } from '@/domain/show.schema'
+import { ShowDetailSchema, ShowListItemSchema } from '@/domain/show.schema'
+
+describe('ShowListItemSchema', () => {
+  it('parses minimal show item with missing optional fields', () => {
+    // Arrange
+    const minimalShow = {
+      id: 1396,
+      name: 'Breaking Bad',
+      poster_path: null,
+      backdrop_path: null,
+    }
+
+    // Act
+    const result = ShowListItemSchema.parse(minimalShow)
+
+    // Assert
+    expect(result.id).toBe(1396)
+    expect(result.name).toBe('Breaking Bad')
+    expect(result.first_air_date).toBe('')
+    expect(result.vote_count).toBe(0)
+    expect(result.origin_country).toEqual([])
+  })
+})
 
 describe('ShowDetailSchema', () => {
   it('parses a valid TV show detail response with all appended relations', () => {

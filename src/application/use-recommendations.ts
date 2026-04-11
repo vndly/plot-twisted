@@ -115,6 +115,8 @@ export function useRecommendations() {
         }
       }
 
+      results = results.filter((item) => item.media_type === 'movie' || item.media_type === 'tv')
+
       // Deduplicate against library AND other ALREADY FETCHED sections
       const otherSectionsResults = sections.value
         .filter((_, i) => i !== index && sections.value[i].fetched)
