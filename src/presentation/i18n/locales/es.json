@@ -105,5 +105,19 @@
   "library.filters.status.watched": "Visto",
   "library.filters.status.none": "No rastreado",
   "library.empty.filtered.title": "No hay elementos que coincidan con tus filtros",
-  "library.empty.filtered.description": "Intenta ajustar tus filtros para ver más resultados."
+  "library.empty.filtered.description": "Intenta ajustar tus filtros para ver más resultados.",
+  "stats.title": "Perspectivas de tu biblioteca",
+  "stats.description": "Análisis personalizados y tendencias de tu colección de medios.",
+  "stats.metrics.watched": "Visto",
+  "stats.metrics.watchlist": "Lista de seguimiento",
+  "stats.metrics.avgRating": "Calificación media",
+  "stats.metrics.totalTime": "Tiempo total",
+  "stats.charts.genre.title": "Elementos vistos por género",
+  "stats.charts.genre.label": "Elementos",
+  "stats.charts.monthly.title": "Actividad de visionado este año",
+  "stats.charts.monthly.label": "Visionados",
+  "stats.topRated.title": "Títulos mejor valorados",
+  "stats.topRated.empty": "Califica algunos títulos para verlos aquí.",
+  "stats.empty.title": "No hay elementos vistos todavía",
+  "stats.empty.description": "Empieza a marcar títulos como vistos para generar tus perspectivas personalizadas de la biblioteca."
 }

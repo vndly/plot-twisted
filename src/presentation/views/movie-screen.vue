@@ -46,6 +46,7 @@ watch(
         newMovie.poster_path,
         newMovie.vote_average,
         newMovie.release_date,
+        newMovie.runtime,
       )
     } else {
       libraryEntryRef.value = null

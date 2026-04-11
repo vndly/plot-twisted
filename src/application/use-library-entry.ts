@@ -19,14 +19,35 @@ export function useLibraryEntry(
   posterPath: string | null,
   voteAverage?: number,
   releaseDate?: string,
+  runtime?: number,
 ) {
   const entry: Ref<LibraryEntry | null> = ref(null)
 
   /**
-   * Loads the entry from storage.
+   * Loads the entry from storage and syncs metadata if needed.
    */
   function loadEntry() {
-    entry.value = getLibraryEntry(id, mediaType)
+    const stored = getLibraryEntry(id, mediaType)
+    if (stored) {
+      let changed = false
+      if (runtime !== undefined && stored.runtime !== runtime) {
+        stored.runtime = runtime
+        changed = true
+      }
+      if (voteAverage !== undefined && stored.voteAverage !== voteAverage) {
+        stored.voteAverage = voteAverage
+        changed = true
+      }
+      if (releaseDate !== undefined && stored.releaseDate !== releaseDate) {
+        stored.releaseDate = releaseDate
+        changed = true
+      }
+
+      if (changed) {
+        saveLibraryEntry(stored)
+      }
+    }
+    entry.value = stored
   }
 
   /**
@@ -48,6 +69,7 @@ export function useLibraryEntry(
       addedAt: new Date().toISOString(),
       voteAverage,
       releaseDate,
+      runtime,
     }
   }
 
