@@ -1,7 +1,7 @@
 ---
 id: R-06
 title: 'Library: Sort and Filter'
-status: approved
+status: in_development
 importance: medium
 type: functional
 tags: [library, sort, filter]

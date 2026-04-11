@@ -2,6 +2,7 @@
 
 ## Contents
 
-1. **[Requirements](./requirements.md)**: Functional and non-functional requirements for library sorting and filtering.
-2. **[Plan](./plan.md)**: Step-by-step implementation strategy for sorting and filtering.
-3. **[Scenarios](./scenarios/)**: Behavioral scenarios covering the library sorting and filtering requirements.
+1. **[Requirements](./requirements.md)**: Functional requirements and acceptance criteria for Library sort and filter.
+2. **[Plan](./plan.md)**: Step-by-step implementation plan and scenario-to-test mapping.
+3. **[Implementation](./implementation.md)**: Summary of the built feature, key decisions, and testing coverage.
+4. **[Scenarios](./scenarios/)**: Behavioral scenarios covering the library sorting and filtering requirements.

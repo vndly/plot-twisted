@@ -1,7 +1,14 @@
 import { describe, it, expect } from 'vitest'
-import { filterResults } from '@/domain/filter.logic'
-import { FilterState } from '@/domain/filter.schema'
+import {
+  filterResults,
+  matchesLibraryFilters,
+  toLibraryViewItem,
+  getLibraryComparator,
+  countActiveFilters,
+} from '@/domain/filter.logic'
+import { FilterState, DEFAULT_LIBRARY_FILTER_STATE } from '@/domain/filter.schema'
 import { SearchResultItem } from '@/domain/search.schema'
+import { LibraryEntry } from '@/domain/library.schema'
 
 describe('filter.logic', () => {
   const mockMovie: SearchResultItem = {
@@ -153,5 +160,163 @@ describe('filter.logic', () => {
     }
     expect(filterResults(items, correctCombinedFilters)).toHaveLength(1)
     expect(filterResults(items, correctCombinedFilters)[0].id).toBe(1)
+  })
+
+  describe('library filter logic', () => {
+    const mockEntry: LibraryEntry = {
+      id: 1,
+      mediaType: 'movie',
+      title: 'Action Movie',
+      posterPath: '/path.jpg',
+      rating: 4,
+      favorite: false,
+      status: 'watchlist',
+      lists: ['list-1'],
+      tags: [],
+      notes: '',
+      watchDates: [],
+      addedAt: '2024-01-01T00:00:00Z',
+      releaseDate: '2020-01-01',
+      genreIds: [28],
+    }
+
+    const item = toLibraryViewItem(mockEntry)
+
+    it('matches default filters', () => {
+      expect(matchesLibraryFilters(item, DEFAULT_LIBRARY_FILTER_STATE)).toBe(true)
+    })
+
+    it('filters by media type', () => {
+      expect(
+        matchesLibraryFilters(item, { ...DEFAULT_LIBRARY_FILTER_STATE, mediaType: 'movie' }),
+      ).toBe(true)
+      expect(
+        matchesLibraryFilters(item, { ...DEFAULT_LIBRARY_FILTER_STATE, mediaType: 'tv' }),
+      ).toBe(false)
+    })
+
+    it('filters by genre (AND logic)', () => {
+      expect(matchesLibraryFilters(item, { ...DEFAULT_LIBRARY_FILTER_STATE, genres: [28] })).toBe(
+        true,
+      )
+      expect(matchesLibraryFilters(item, { ...DEFAULT_LIBRARY_FILTER_STATE, genres: [35] })).toBe(
+        false,
+      )
+      expect(
+        matchesLibraryFilters(item, { ...DEFAULT_LIBRARY_FILTER_STATE, genres: [28, 35] }),
+      ).toBe(false)
+    })
+
+    it('filters by rating range', () => {
+      expect(
+        matchesLibraryFilters(item, {
+          ...DEFAULT_LIBRARY_FILTER_STATE,
+          ratingMin: 3,
+          ratingMax: 5,
+        }),
+      ).toBe(true)
+      expect(
+        matchesLibraryFilters(item, {
+          ...DEFAULT_LIBRARY_FILTER_STATE,
+          ratingMin: 4.5,
+          ratingMax: 5,
+        }),
+      ).toBe(false)
+      expect(
+        matchesLibraryFilters(item, {
+          ...DEFAULT_LIBRARY_FILTER_STATE,
+          ratingMin: 0,
+          ratingMax: 3.5,
+        }),
+      ).toBe(false)
+    })
+
+    it('filters by status', () => {
+      expect(
+        matchesLibraryFilters(item, { ...DEFAULT_LIBRARY_FILTER_STATE, status: 'watchlist' }),
+      ).toBe(true)
+      expect(
+        matchesLibraryFilters(item, { ...DEFAULT_LIBRARY_FILTER_STATE, status: 'watched' }),
+      ).toBe(false)
+    })
+
+    it('filters by custom list', () => {
+      expect(
+        matchesLibraryFilters(item, { ...DEFAULT_LIBRARY_FILTER_STATE, listIds: ['list-1'] }),
+      ).toBe(true)
+      expect(
+        matchesLibraryFilters(item, { ...DEFAULT_LIBRARY_FILTER_STATE, listIds: ['list-2'] }),
+      ).toBe(false)
+    })
+
+    it('counts active filters correctly', () => {
+      expect(countActiveFilters(DEFAULT_LIBRARY_FILTER_STATE)).toBe(0)
+      expect(countActiveFilters({ ...DEFAULT_LIBRARY_FILTER_STATE, genres: [28] })).toBe(1)
+      expect(countActiveFilters({ ...DEFAULT_LIBRARY_FILTER_STATE, mediaType: 'movie' })).toBe(1)
+      expect(countActiveFilters({ ...DEFAULT_LIBRARY_FILTER_STATE, ratingMin: 1 })).toBe(1)
+      expect(countActiveFilters({ ...DEFAULT_LIBRARY_FILTER_STATE, ratingMax: 4 })).toBe(1)
+      expect(countActiveFilters({ ...DEFAULT_LIBRARY_FILTER_STATE, status: 'watchlist' })).toBe(1)
+      expect(countActiveFilters({ ...DEFAULT_LIBRARY_FILTER_STATE, listIds: ['list-1'] })).toBe(1)
+
+      expect(
+        countActiveFilters({
+          ...DEFAULT_LIBRARY_FILTER_STATE,
+          genres: [28],
+          mediaType: 'movie',
+        }),
+      ).toBe(2)
+    })
+
+    describe('sorting', () => {
+      const items = [
+        toLibraryViewItem({
+          ...mockEntry,
+          id: 1,
+          title: 'B',
+          addedAt: '2024-01-01',
+          releaseDate: '2020-01-01',
+          rating: 5,
+        }),
+        toLibraryViewItem({
+          ...mockEntry,
+          id: 2,
+          title: 'A',
+          addedAt: '2024-01-02',
+          releaseDate: '2010-01-01',
+          rating: 3,
+        }),
+        toLibraryViewItem({
+          ...mockEntry,
+          id: 3,
+          title: 'C',
+          addedAt: '2024-01-03',
+          releaseDate: '2015-01-01',
+          rating: 4,
+        }),
+      ]
+
+      it('sorts by dateAdded', () => {
+        const sortedDesc = [...items].sort(getLibraryComparator('dateAdded', 'desc'))
+        expect(sortedDesc.map((i) => i.id)).toEqual([3, 2, 1])
+
+        const sortedAsc = [...items].sort(getLibraryComparator('dateAdded', 'asc'))
+        expect(sortedAsc.map((i) => i.id)).toEqual([1, 2, 3])
+      })
+
+      it('sorts by title', () => {
+        const sortedAsc = [...items].sort(getLibraryComparator('title', 'asc'))
+        expect(sortedAsc.map((i) => i.id)).toEqual([2, 1, 3])
+      })
+
+      it('sorts by releaseYear', () => {
+        const sortedDesc = [...items].sort(getLibraryComparator('releaseYear', 'desc'))
+        expect(sortedDesc.map((i) => i.id)).toEqual([1, 3, 2])
+      })
+
+      it('sorts by userRating', () => {
+        const sortedDesc = [...items].sort(getLibraryComparator('userRating', 'desc'))
+        expect(sortedDesc.map((i) => i.id)).toEqual([1, 3, 2])
+      })
+    })
   })
 })

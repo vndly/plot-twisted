@@ -1,15 +1,49 @@
-import { ref, computed } from 'vue'
+import { ref, computed, type Ref } from 'vue'
 import type { LibraryEntry, WatchStatus } from '@/domain/library.schema'
+import type { LibraryFilterState, SortField, SortOrder } from '@/domain/filter.schema'
 import { getAllLibraryEntries } from '@/infrastructure/storage.service'
+import {
+  toLibraryViewItem,
+  matchesLibraryFilters,
+  getLibraryComparator,
+  type LibraryViewItem,
+} from '@/domain/filter.logic'
 
 /**
- * Composable for accessing and filtering all library entries.
+ * Composable for accessing, filtering, and sorting library entries.
+ * @param filters - Optional reactive library filter state
+ * @param sortField - Optional reactive sort field
+ * @param sortOrder - Optional reactive sort order
  * @returns Object containing all entries and methods to filter them
  */
-export function useLibraryEntries() {
+export function useLibraryEntries(
+  filters?: Ref<LibraryFilterState>,
+  sortField?: Ref<SortField>,
+  sortOrder?: Ref<SortOrder>,
+) {
   const allEntries = ref<LibraryEntry[]>(getAllLibraryEntries())
 
-  const entries = computed(() => allEntries.value)
+  /**
+   * Computed list of normalized library view items, filtered and sorted.
+   */
+  const entries = computed<LibraryViewItem[]>(() => {
+    let items = allEntries.value.map(toLibraryViewItem)
+
+    // Apply filters if provided
+    if (filters?.value) {
+      items = items.filter((item) => matchesLibraryFilters(item, filters.value))
+    }
+
+    // Apply sorting if provided
+    if (sortField?.value && sortOrder?.value) {
+      items.sort(getLibraryComparator(sortField.value, sortOrder.value))
+    } else {
+      // Default sort by dateAdded desc
+      items.sort(getLibraryComparator('dateAdded', 'desc'))
+    }
+
+    return items
+  })
 
   /**
    * Refreshes entries from storage.
@@ -37,6 +71,7 @@ export function useLibraryEntries() {
   }
 
   return {
+    allEntries,
     entries,
     refresh,
     getEntriesByStatus,

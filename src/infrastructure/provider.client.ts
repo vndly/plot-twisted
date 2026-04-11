@@ -143,7 +143,10 @@ export async function getPopularMovies(language: string): Promise<SearchResponse
   const data = await response.json()
 
   // Inject media_type for consistency with SearchResponse
-  data.results = data.results.map((item: any) => ({ ...item, media_type: 'movie' }))
+  data.results = data.results.map((item: Record<string, unknown>) => ({
+    ...item,
+    media_type: 'movie',
+  }))
 
   return SearchResponseSchema.parse(data)
 }
@@ -161,7 +164,10 @@ export async function getPopularShows(language: string): Promise<SearchResponse>
   const data = await response.json()
 
   // Inject media_type for consistency with SearchResponse
-  data.results = data.results.map((item: any) => ({ ...item, media_type: 'tv' }))
+  data.results = data.results.map((item: Record<string, unknown>) => ({
+    ...item,
+    media_type: 'tv',
+  }))
 
   return SearchResponseSchema.parse(data)
 }

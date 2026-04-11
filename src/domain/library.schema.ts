@@ -35,6 +35,7 @@ export const LibraryEntrySchema = z.object({
   addedAt: z.string(),
   voteAverage: z.number().optional(),
   releaseDate: z.string().optional(),
+  genreIds: z.array(z.number()).optional(),
 })
 
 /** Inferred type for a library entry. */

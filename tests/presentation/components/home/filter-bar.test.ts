@@ -3,15 +3,15 @@ import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import FilterBar from '@/presentation/components/home/filter-bar.vue'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 // Mock useFilters
-const mockFilters = {
+const mockFilters = ref({
   genres: [] as number[],
   mediaType: 'all',
-  yearFrom: null,
-  yearTo: null,
-}
+  yearFrom: null as number | null,
+  yearTo: null as number | null,
+})
 const mockClearAll = vi.fn()
 
 vi.mock('@/application/use-filters', () => ({
@@ -22,6 +22,14 @@ vi.mock('@/application/use-filters', () => ({
       { id: 35, name: 'Comedy' },
     ]),
     clearAll: mockClearAll,
+    activeFilterCount: computed(() => {
+      let count = 0
+      if (mockFilters.value.genres.length > 0) count++
+      if (mockFilters.value.mediaType !== 'all') count++
+      if (mockFilters.value.yearFrom !== null) count++
+      if (mockFilters.value.yearTo !== null) count++
+      return count
+    }),
   }),
 }))
 
@@ -48,10 +56,10 @@ const router = createRouter({
 
 describe('FilterBar', () => {
   beforeEach(() => {
-    mockFilters.genres = []
-    mockFilters.mediaType = 'all'
-    mockFilters.yearFrom = null
-    mockFilters.yearTo = null
+    mockFilters.value.genres = []
+    mockFilters.value.mediaType = 'all'
+    mockFilters.value.yearFrom = null
+    mockFilters.value.yearTo = null
     vi.clearAllMocks()
   })
 
@@ -80,11 +88,11 @@ describe('FilterBar', () => {
     })
     const movieButton = wrapper.findAll('button').find((b) => b.text() === 'Movies')
     await movieButton?.trigger('click')
-    expect(mockFilters.mediaType).toBe('movie')
+    expect(mockFilters.value.mediaType).toBe('movie')
   })
 
   it('shows clear button when filters are active', async () => {
-    mockFilters.mediaType = 'movie'
+    mockFilters.value.mediaType = 'movie'
     const wrapper = mount(FilterBar, {
       global: { plugins: [i18n, router] },
     })
@@ -92,7 +100,7 @@ describe('FilterBar', () => {
   })
 
   it('calls clearAll when clear button clicked', async () => {
-    mockFilters.mediaType = 'movie'
+    mockFilters.value.mediaType = 'movie'
     const wrapper = mount(FilterBar, {
       global: { plugins: [i18n, router] },
     })

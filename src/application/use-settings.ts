@@ -1,28 +1,41 @@
 import { ref, watch } from 'vue'
-
-export type LayoutMode = 'grid' | 'list'
+import { getSettings, saveSettings } from '@/infrastructure/storage.service'
+import { type LayoutMode } from '@/domain/settings.schema'
 
 /**
- * Composable for accessing user settings.
- * Currently provides a stub implementation with default values.
- * @returns Object containing language and preferredRegion settings
+ * Composable for accessing and managing user settings.
+ * @returns Object containing settings refs and update methods
  */
 export function useSettings() {
-  const language = ref('en')
-  const preferredRegion = ref('US')
+  const settings = getSettings()
 
-  // Load layout preference from localStorage or default to 'grid'
-  const savedLayout = localStorage.getItem('layoutMode') as LayoutMode | null
-  const layoutMode = ref<LayoutMode>(savedLayout || 'grid')
+  const language = ref(settings.language)
+  const preferredRegion = ref(settings.preferredRegion)
+  const layoutMode = ref<LayoutMode>(settings.layoutMode)
+  const theme = ref(settings.theme)
+  const defaultHomeSection = ref(settings.defaultHomeSection)
 
-  // Persist layout preference whenever it changes
-  watch(layoutMode, (newMode) => {
-    localStorage.setItem('layoutMode', newMode)
-  })
+  // Watch and persist settings
+  watch(
+    [language, preferredRegion, layoutMode, theme, defaultHomeSection],
+    ([newLang, newRegion, newLayout, newTheme, newHome]) => {
+      const current = getSettings()
+      saveSettings({
+        ...current,
+        language: newLang,
+        preferredRegion: newRegion,
+        layoutMode: newLayout as LayoutMode,
+        theme: newTheme as 'dark' | 'light',
+        defaultHomeSection: newHome as 'trending' | 'popular' | 'search',
+      })
+    },
+  )
 
   return {
     language,
     preferredRegion,
     layoutMode,
+    theme,
+    defaultHomeSection,
   }
 }

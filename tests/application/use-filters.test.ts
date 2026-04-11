@@ -3,6 +3,7 @@ import { useFilters, _resetFilters } from '@/application/use-filters'
 import { useRouter, useRoute } from 'vue-router'
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
+import { createI18n } from 'vue-i18n'
 
 // Mock vue-router
 vi.mock('vue-router', () => ({
@@ -30,6 +31,12 @@ vi.mock('@/application/use-settings', () => ({
   })),
 }))
 
+const i18n = createI18n({
+  legacy: false,
+  locale: 'en',
+  messages: { en: {} },
+})
+
 describe('useFilters', () => {
   let mockRouter: any
   let mockRoute: any
@@ -54,7 +61,9 @@ describe('useFilters', () => {
       },
       template: '<div></div>',
     })
-    const wrapper = mount(TestComponent)
+    const wrapper = mount(TestComponent, {
+      global: { plugins: [i18n] },
+    })
     expect(wrapper.vm.filters.genres).toEqual([])
     expect(wrapper.vm.filters.mediaType).toBe('all')
   })
@@ -74,7 +83,9 @@ describe('useFilters', () => {
       },
       template: '<div></div>',
     })
-    const wrapper = mount(TestComponent)
+    const wrapper = mount(TestComponent, {
+      global: { plugins: [i18n] },
+    })
 
     // Wait for onMounted
     await nextTick()
@@ -93,7 +104,9 @@ describe('useFilters', () => {
       },
       template: '<div></div>',
     })
-    const wrapper = mount(TestComponent)
+    const wrapper = mount(TestComponent, {
+      global: { plugins: [i18n] },
+    })
     await nextTick()
 
     wrapper.vm.filters.mediaType = 'tv'
@@ -112,7 +125,9 @@ describe('useFilters', () => {
       },
       template: '<div></div>',
     })
-    const wrapper = mount(TestComponent)
+    const wrapper = mount(TestComponent, {
+      global: { plugins: [i18n] },
+    })
     await nextTick()
 
     wrapper.vm.filters.mediaType = 'movie'

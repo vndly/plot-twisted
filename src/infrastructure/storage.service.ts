@@ -1,11 +1,67 @@
 import type { LibraryEntry, MediaType, List } from '@/domain/library.schema'
 import { LibraryEntrySchema, ListSchema } from '@/domain/library.schema'
+import type { Settings } from '@/domain/settings.schema'
+import { SettingsSchema, DEFAULT_SETTINGS } from '@/domain/settings.schema'
 
 /** Storage key for the library data in localStorage. */
 export const STORAGE_KEY = 'plot-twisted-library'
 
 /** Storage key for custom lists in localStorage. */
 export const STORAGE_KEY_LISTS = 'plot-twisted-lists'
+
+/** Storage key for settings in localStorage. */
+export const STORAGE_KEY_SETTINGS = 'plot-twisted-settings'
+
+/**
+ * Retrieves user settings from localStorage.
+ * Handles migration from standalone layoutMode key.
+ * @returns Validated user settings
+ */
+export function getSettings(): Settings {
+  const stored = localStorage.getItem(STORAGE_KEY_SETTINGS)
+
+  let settings: Partial<Settings> = {}
+
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored)
+      const result = SettingsSchema.safeParse(parsed)
+      if (result.success) {
+        return result.data
+      }
+      settings = parsed
+    } catch {
+      // Fall through to defaults/migration
+    }
+  }
+
+  // Handle migration of standalone layoutMode
+  const standaloneLayout = localStorage.getItem('layoutMode')
+  if (standaloneLayout === 'grid' || standaloneLayout === 'list') {
+    settings.layoutMode = standaloneLayout
+    // Clean up standalone key
+    localStorage.removeItem('layoutMode')
+  }
+
+  const merged = { ...DEFAULT_SETTINGS, ...settings }
+  const result = SettingsSchema.safeParse(merged)
+
+  if (result.success) {
+    // Save migrated settings back to storage
+    saveSettings(result.data)
+    return result.data
+  }
+
+  return DEFAULT_SETTINGS
+}
+
+/**
+ * Saves user settings to localStorage.
+ * @param settings - The settings object to save
+ */
+export function saveSettings(settings: Settings): void {
+  localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings))
+}
 
 /**
  * Retrieves all library entries from localStorage.

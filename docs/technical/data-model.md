@@ -29,14 +29,19 @@ User data for a saved movie or TV show. Stored in localStorage, validated with Z
 interface LibraryEntry {
   id: number // provider ID
   mediaType: 'movie' | 'tv'
+  title: string
+  posterPath: string | null
+  releaseDate?: string // authoritative snapshot for Release Year sorting
+  voteAverage?: number // authoritative snapshot for TMDB rating (read-only reference)
+  genreIds?: number[] // authoritative snapshot for local genre filtering
   status: 'watchlist' | 'watched' | 'none'
-  rating: number // 0 (unrated) to 5
+  rating: number // user-assigned rating (0 to 5)
   favorite: boolean
   lists: string[] // IDs of custom lists this entry belongs to
-  tags: string[] // user-defined tags, e.g. ["horror", "90s"]
-  notes: string // free-text user notes
-  watchDates: string[] // ISO dates, e.g. ["2026-03-08"] (supports rewatches)
-  addedAt: string // ISO date — when the entry was first saved
+  tags: string[]
+  notes: string
+  watchDates: string[]
+  addedAt: string // ISO date
 }
 ```
 
@@ -59,9 +64,12 @@ User preferences. Persisted in localStorage.
 ```ts
 interface Settings {
   theme: 'dark' | 'light'
-  language: string // ISO 639-1, e.g. "en" — controls both UI translations (vue-i18n) and media provider API content
-  defaultHomeSection: 'trending' | 'popular' | 'search' // which section is scrolled-to on initial load
-  preferredRegion: string // ISO 3166-1, e.g. "US" — for streaming availability and release calendar region filtering
+  language: string
+  defaultHomeSection: 'trending' | 'popular' | 'search'
+  preferredRegion: string
+  layoutMode: 'grid' | 'list'
+  librarySortField?: 'dateAdded' | 'title' | 'releaseYear' | 'userRating'
+  librarySortOrder?: 'asc' | 'desc'
 }
 ```
 

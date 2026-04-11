@@ -1,13 +1,11 @@
-import { ref, reactive, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { FilterState, DEFAULT_FILTER_STATE } from '@/domain/filter.schema'
-import { getMovieGenres, getTvGenres } from '@/infrastructure/provider.client'
 import { useSettings } from './use-settings'
-import { Genre } from '@/domain/shared.schema'
+import { useGenres } from './use-genres'
 
 // Global state to share across instances
-const filters = reactive<FilterState>({ ...DEFAULT_FILTER_STATE })
-const genresCache = ref<Genre[]>([])
+const filters = ref<FilterState>({ ...DEFAULT_FILTER_STATE })
 const isInitialized = ref(false)
 
 /**
@@ -15,7 +13,7 @@ const isInitialized = ref(false)
  * Used primarily for testing.
  */
 export function _resetFilters() {
-  Object.assign(filters, DEFAULT_FILTER_STATE)
+  filters.value = { ...DEFAULT_FILTER_STATE }
   isInitialized.value = false
 }
 
@@ -27,27 +25,7 @@ export function useFilters() {
   const router = useRouter()
   const route = useRoute()
   const { language } = useSettings()
-
-  /**
-   * Fetches and merges movie and TV genres from TMDB.
-   */
-  const fetchGenres = async () => {
-    if (genresCache.value.length > 0) return
-
-    try {
-      const [movieGenresRes, tvGenresRes] = await Promise.all([
-        getMovieGenres(language.value),
-        getTvGenres(language.value),
-      ])
-
-      const merged = [...movieGenresRes.genres, ...tvGenresRes.genres]
-      const unique = Array.from(new Map(merged.map((g) => [g.id, g])).values())
-
-      genresCache.value = unique.sort((a, b) => a.name.localeCompare(b.name))
-    } catch (error) {
-      console.error('Failed to fetch genres:', error)
-    }
-  }
+  const { genres, fetchGenres } = useGenres()
 
   /**
    * Synchronizes the filter state with the URL query parameters.
@@ -58,26 +36,34 @@ export function useFilters() {
 
     const query: Record<string, string> = { ...route.query }
 
-    if (filters.genres.length > 0) {
-      query.genres = filters.genres.join(',')
+    if (filters.value.genres.length > 0) {
+      query.genres = filters.value.genres.join(',')
     } else {
       delete query.genres
     }
 
-    if (filters.mediaType !== 'all') {
-      query.mediaType = filters.mediaType
+    if (filters.value.mediaType !== 'all') {
+      query.mediaType = filters.value.mediaType
     } else {
       delete query.mediaType
     }
 
-    if (filters.yearFrom !== null && filters.yearFrom !== undefined && !isNaN(filters.yearFrom)) {
-      query.yearFrom = filters.yearFrom.toString()
+    if (
+      filters.value.yearFrom !== null &&
+      filters.value.yearFrom !== undefined &&
+      !isNaN(filters.value.yearFrom)
+    ) {
+      query.yearFrom = filters.value.yearFrom.toString()
     } else {
       delete query.yearFrom
     }
 
-    if (filters.yearTo !== null && filters.yearTo !== undefined && !isNaN(filters.yearTo)) {
-      query.yearTo = filters.yearTo.toString()
+    if (
+      filters.value.yearTo !== null &&
+      filters.value.yearTo !== undefined &&
+      !isNaN(filters.value.yearTo)
+    ) {
+      query.yearTo = filters.value.yearTo.toString()
     } else {
       delete query.yearTo
     }
@@ -95,27 +81,27 @@ export function useFilters() {
     if (!route) return
 
     if (route.query.genres) {
-      filters.genres = (route.query.genres as string).split(',').map(Number)
+      filters.value.genres = (route.query.genres as string).split(',').map(Number)
     } else {
-      filters.genres = []
+      filters.value.genres = []
     }
 
     if (route.query.mediaType) {
-      filters.mediaType = route.query.mediaType as any
+      filters.value.mediaType = route.query.mediaType as 'all' | 'movie' | 'tv'
     } else {
-      filters.mediaType = 'all'
+      filters.value.mediaType = 'all'
     }
 
     if (route.query.yearFrom) {
-      filters.yearFrom = Number(route.query.yearFrom)
+      filters.value.yearFrom = Number(route.query.yearFrom)
     } else {
-      filters.yearFrom = null
+      filters.value.yearFrom = null
     }
 
     if (route.query.yearTo) {
-      filters.yearTo = Number(route.query.yearTo)
+      filters.value.yearTo = Number(route.query.yearTo)
     } else {
-      filters.yearTo = null
+      filters.value.yearTo = null
     }
   }
 
@@ -123,13 +109,25 @@ export function useFilters() {
    * Clears all active filters.
    */
   const clearAll = () => {
-    Object.assign(filters, DEFAULT_FILTER_STATE)
+    filters.value = { ...DEFAULT_FILTER_STATE }
     syncToUrl()
   }
 
+  /**
+   * Computed count of active filters.
+   */
+  const activeFilterCount = computed(() => {
+    let count = 0
+    if (filters.value.genres.length > 0) count++
+    if (filters.value.mediaType !== 'all') count++
+    if (filters.value.yearFrom !== null && !isNaN(filters.value.yearFrom)) count++
+    if (filters.value.yearTo !== null && !isNaN(filters.value.yearTo)) count++
+    return count
+  })
+
   // Watch for filter changes and update URL
   watch(
-    filters,
+    () => filters.value,
     () => {
       syncToUrl()
     },
@@ -140,15 +138,16 @@ export function useFilters() {
   onMounted(() => {
     if (!isInitialized.value) {
       restoreFromUrl()
-      fetchGenres()
+      fetchGenres(language.value)
       isInitialized.value = true
     }
   })
 
   return {
     filters,
-    genres: genresCache,
+    genres,
     clearAll,
     fetchGenres,
+    activeFilterCount,
   }
 }
