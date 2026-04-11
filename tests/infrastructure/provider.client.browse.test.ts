@@ -6,7 +6,7 @@ const globalFetch = vi.fn()
 vi.stubGlobal('fetch', globalFetch)
 
 describe('provider.client (browse)', () => {
-  const mockResponse = (data: any) => ({
+  const mockResponse = (data: unknown) => ({
     ok: true,
     status: 200,
     json: async () => data,

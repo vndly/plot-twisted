@@ -3,7 +3,8 @@ import { createI18n } from 'vue-i18n'
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import StatsScreen from '@/presentation/views/stats-screen.vue'
 import { useStats } from '@/application/use-stats'
-import { ref, type Ref } from 'vue'
+import { ref } from 'vue'
+import type { LibraryEntry } from '@/domain/library.schema'
 
 // Mock useStats composable
 vi.mock('@/application/use-stats', () => ({
@@ -49,11 +50,13 @@ describe('StatsScreen', () => {
         averageRating: 0,
         totalWatchTimeMinutes: 0,
       }),
-      genreChartData: ref({ labels: [], datasets: [] }) as Ref<any>,
-      monthlyChartData: ref({ labels: [], datasets: [] }) as Ref<any>,
+      genreChartData: ref({ labels: [], datasets: [] }),
+      monthlyChartData: ref({ labels: [], datasets: [] }),
       topRatedItems: ref([]),
       genresLoading: ref(false),
-    } as any)
+      genreDistribution: ref([]),
+      monthlyActivity: ref({}),
+    } as unknown as ReturnType<typeof useStats>)
   })
 
   // SU-05
@@ -81,8 +84,14 @@ describe('StatsScreen', () => {
         averageRating: 4.5,
         totalWatchTimeMinutes: 600,
       }),
-      genreChartData: ref({ labels: ['Action'], datasets: [{ data: [5] }] }) as Ref<any>,
-      monthlyChartData: ref({ labels: ['Jan'], datasets: [{ data: [2] }] }) as Ref<any>,
+      genreChartData: ref({
+        labels: ['Action'],
+        datasets: [{ label: 'Genres', data: [5], backgroundColor: '#14b8a6', borderRadius: 4 }],
+      }),
+      monthlyChartData: ref({
+        labels: ['Jan'],
+        datasets: [{ label: 'Monthly', data: [2], backgroundColor: '#14b8a6', borderRadius: 4 }],
+      }),
       topRatedItems: ref([
         {
           id: 1,
@@ -91,10 +100,20 @@ describe('StatsScreen', () => {
           mediaType: 'movie',
           status: 'watched',
           posterPath: null,
+          runtime: 120,
+          genreIds: [28],
+          watchDates: ['2026-01-01'],
+          addedAt: '2026-01-01',
+          lists: [],
+          favorite: false,
+          tags: [],
+          notes: '',
         },
-      ]) as Ref<any[]>,
+      ] as LibraryEntry[]),
       genresLoading: ref(false),
-    } as any)
+      genreDistribution: ref([]),
+      monthlyActivity: ref({}),
+    } as unknown as ReturnType<typeof useStats>)
 
     const wrapper = mount(StatsScreen, {
       global: {

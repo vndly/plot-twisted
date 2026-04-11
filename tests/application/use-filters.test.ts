@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useFilters, _resetFilters } from '@/application/use-filters'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute, type Router, type RouteLocationNormalizedLoaded } from 'vue-router'
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
 import { createI18n } from 'vue-i18n'
@@ -37,9 +37,17 @@ const i18n = createI18n({
   messages: { en: {} },
 })
 
+/** Helper component to test the composable. */
+const TestComponent = defineComponent({
+  setup() {
+    return { ...useFilters() }
+  },
+  template: '<div></div>',
+})
+
 describe('useFilters', () => {
-  let mockRouter: any
-  let mockRoute: any
+  let mockRouter: Partial<Router>
+  let mockRoute: Partial<RouteLocationNormalizedLoaded>
 
   beforeEach(() => {
     _resetFilters()
@@ -49,23 +57,17 @@ describe('useFilters', () => {
     mockRoute = {
       query: {},
     }
-    ;(useRouter as any).mockReturnValue(mockRouter)
-    ;(useRoute as any).mockReturnValue(mockRoute)
+    vi.mocked(useRouter).mockReturnValue(mockRouter as Router)
+    vi.mocked(useRoute).mockReturnValue(mockRoute as RouteLocationNormalizedLoaded)
   })
 
   it('should initialize with default filters', () => {
-    const TestComponent = defineComponent({
-      setup() {
-        const { filters } = useFilters()
-        return { filters }
-      },
-      template: '<div></div>',
-    })
     const wrapper = mount(TestComponent, {
       global: { plugins: [i18n] },
     })
-    expect(wrapper.vm.filters.genres).toEqual([])
-    expect(wrapper.vm.filters.mediaType).toBe('all')
+    const vm = wrapper.vm as unknown as ReturnType<typeof useFilters>
+    expect(vm.filters.genres).toEqual([])
+    expect(vm.filters.mediaType).toBe('all')
   })
 
   it('should restore filters from URL', async () => {
@@ -76,40 +78,28 @@ describe('useFilters', () => {
       yearTo: '2022',
     }
 
-    const TestComponent = defineComponent({
-      setup() {
-        const { filters } = useFilters()
-        return { filters }
-      },
-      template: '<div></div>',
-    })
     const wrapper = mount(TestComponent, {
       global: { plugins: [i18n] },
     })
+    const vm = wrapper.vm as unknown as ReturnType<typeof useFilters>
 
     // Wait for onMounted
     await nextTick()
 
-    expect(wrapper.vm.filters.genres).toEqual([1, 2])
-    expect(wrapper.vm.filters.mediaType).toBe('movie')
-    expect(wrapper.vm.filters.yearFrom).toBe(2020)
-    expect(wrapper.vm.filters.yearTo).toBe(2022)
+    expect(vm.filters.genres).toEqual([1, 2])
+    expect(vm.filters.mediaType).toBe('movie')
+    expect(vm.filters.yearFrom).toBe(2020)
+    expect(vm.filters.yearTo).toBe(2022)
   })
 
   it('should sync filters to URL when changed', async () => {
-    const TestComponent = defineComponent({
-      setup() {
-        const { filters } = useFilters()
-        return { filters }
-      },
-      template: '<div></div>',
-    })
     const wrapper = mount(TestComponent, {
       global: { plugins: [i18n] },
     })
+    const vm = wrapper.vm as unknown as ReturnType<typeof useFilters>
     await nextTick()
 
-    wrapper.vm.filters.mediaType = 'tv'
+    vm.filters.mediaType = 'tv'
     await nextTick()
 
     expect(mockRouter.push).toHaveBeenCalledWith({
@@ -118,24 +108,18 @@ describe('useFilters', () => {
   })
 
   it('should clear all filters', async () => {
-    const TestComponent = defineComponent({
-      setup() {
-        const { filters, clearAll } = useFilters()
-        return { filters, clearAll }
-      },
-      template: '<div></div>',
-    })
     const wrapper = mount(TestComponent, {
       global: { plugins: [i18n] },
     })
+    const vm = wrapper.vm as unknown as ReturnType<typeof useFilters>
     await nextTick()
 
-    wrapper.vm.filters.mediaType = 'movie'
-    wrapper.vm.filters.genres = [1]
+    vm.filters.mediaType = 'movie'
+    vm.filters.genres = [1]
 
-    wrapper.vm.clearAll()
+    vm.clearAll()
 
-    expect(wrapper.vm.filters.mediaType).toBe('all')
-    expect(wrapper.vm.filters.genres).toEqual([])
+    expect(vm.filters.mediaType).toBe('all')
+    expect(vm.filters.genres).toEqual([])
   })
 })

@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
 import { useBrowse } from '@/application/use-browse'
 import * as providerClient from '@/infrastructure/provider.client'
+import type { SearchResponse, SearchResultItem } from '@/domain/search.schema'
 
 // Mock the provider client
 vi.mock('@/infrastructure/provider.client', () => ({
@@ -27,7 +28,7 @@ const TestComponent = defineComponent({
 })
 
 describe('useBrowse', () => {
-  const mockTrending = {
+  const mockTrending: SearchResponse = {
     page: 1,
     results: [
       {
@@ -64,13 +65,13 @@ describe('useBrowse', () => {
         popularity: 100,
         vote_count: 100,
       },
-      { id: 3, name: 'Person', media_type: 'person' }, // Should be filtered out
+      { id: 3, name: 'Person', media_type: 'person' } as SearchResultItem, // Should be filtered out
     ],
     total_pages: 1,
     total_results: 3,
   }
 
-  const mockMovies = {
+  const mockMovies: SearchResponse = {
     page: 1,
     results: Array.from({ length: 25 }, (_, i) => ({
       id: i + 10,
@@ -93,7 +94,7 @@ describe('useBrowse', () => {
     total_results: 25,
   }
 
-  const mockShows = {
+  const mockShows: SearchResponse = {
     page: 1,
     results: Array.from({ length: 25 }, (_, i) => ({
       id: i + 100,
@@ -118,14 +119,14 @@ describe('useBrowse', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(providerClient.getTrending).mockResolvedValue(mockTrending as any)
-    vi.mocked(providerClient.getPopularMovies).mockResolvedValue(mockMovies as any)
-    vi.mocked(providerClient.getPopularShows).mockResolvedValue(mockShows as any)
+    vi.mocked(providerClient.getTrending).mockResolvedValue(mockTrending)
+    vi.mocked(providerClient.getPopularMovies).mockResolvedValue(mockMovies)
+    vi.mocked(providerClient.getPopularShows).mockResolvedValue(mockShows)
   })
 
   it('fetches and filters browse data on mount', async () => {
     const wrapper = mount(TestComponent)
-    const vm = wrapper.vm as any
+    const vm = wrapper.vm as unknown as ReturnType<typeof useBrowse>
 
     expect(vm.loading).toBe(true)
 
@@ -150,7 +151,7 @@ describe('useBrowse', () => {
     vi.mocked(providerClient.getTrending).mockRejectedValue(new Error('Network Error'))
 
     const wrapper = mount(TestComponent)
-    const vm = wrapper.vm as any
+    const vm = wrapper.vm as unknown as ReturnType<typeof useBrowse>
 
     await nextTick()
     await nextTick()
@@ -164,10 +165,10 @@ describe('useBrowse', () => {
   it('retries fetching data', async () => {
     vi.mocked(providerClient.getTrending)
       .mockRejectedValueOnce(new Error('Fail'))
-      .mockResolvedValueOnce(mockTrending as any)
+      .mockResolvedValueOnce(mockTrending)
 
     const wrapper = mount(TestComponent)
-    const vm = wrapper.vm as any
+    const vm = wrapper.vm as unknown as ReturnType<typeof useBrowse>
 
     await nextTick()
     await nextTick()

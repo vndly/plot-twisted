@@ -4,6 +4,9 @@ import { useLibraryEntries } from '@/application/use-library-entries'
 import { useGenres } from '@/application/use-genres'
 import { useSettings } from '@/application/use-settings'
 import { ref, type Ref } from 'vue'
+import type { LibraryEntry } from '@/domain/library.schema'
+import type { Genre } from '@/domain/shared.schema'
+import type { LibraryViewItem } from '@/domain/filter.logic'
 
 // Mock dependencies
 vi.mock('@/application/use-library-entries', () => ({
@@ -26,39 +29,50 @@ vi.mock('vue-i18n', () => ({
 }))
 
 describe('useStats', () => {
-  const mockEntries = [
+  const mockEntries: LibraryEntry[] = [
     {
       id: 1,
+      mediaType: 'movie',
       status: 'watched',
       rating: 5,
       runtime: 120,
       genreIds: [28],
       watchDates: ['2026-01-01'],
       title: 'A',
+      addedAt: '2026-01-01',
+      posterPath: null,
+      lists: [],
+      favorite: false,
+      tags: [],
+      notes: '',
     },
   ]
 
-  const mockGenres = [{ id: 28, name: 'Action' }]
+  const mockGenres: Genre[] = [{ id: 28, name: 'Action' }]
 
   beforeEach(() => {
     vi.mocked(useLibraryEntries).mockReturnValue({
-      allEntries: ref(mockEntries) as Ref<any[]>,
-      entries: ref([]) as Ref<any[]>,
+      allEntries: ref(mockEntries),
+      entries: ref([]) as Ref<LibraryViewItem[]>,
       refresh: vi.fn(),
       getEntriesByStatus: vi.fn(),
       getEntriesByList: vi.fn(),
-    })
+    } as unknown as ReturnType<typeof useLibraryEntries>)
 
     vi.mocked(useGenres).mockReturnValue({
-      genres: ref(mockGenres) as Ref<any[]>,
+      genres: ref(mockGenres),
       loading: ref(false),
       error: ref(null),
       fetchGenres: vi.fn(),
-    })
+    } as unknown as ReturnType<typeof useGenres>)
 
     vi.mocked(useSettings).mockReturnValue({
       language: ref('en'),
-    } as any)
+      preferredRegion: ref('US'),
+      layoutMode: ref('grid'),
+      theme: ref('dark'),
+      defaultHomeSection: ref('trending'),
+    } as unknown as ReturnType<typeof useSettings>)
   })
 
   it('computes metrics correctly', () => {
@@ -88,12 +102,18 @@ describe('useStats', () => {
     const fetchGenres = vi.fn()
     const language = ref('en')
     vi.mocked(useGenres).mockReturnValue({
-      genres: ref(mockGenres) as Ref<any[]>,
+      genres: ref(mockGenres),
       loading: ref(false),
       error: ref(null),
       fetchGenres,
-    })
-    vi.mocked(useSettings).mockReturnValue({ language } as any)
+    } as unknown as ReturnType<typeof useGenres>)
+    vi.mocked(useSettings).mockReturnValue({
+      language,
+      preferredRegion: ref('US'),
+      layoutMode: ref('grid'),
+      theme: ref('dark'),
+      defaultHomeSection: ref('trending'),
+    } as unknown as ReturnType<typeof useSettings>)
 
     useStats()
 
