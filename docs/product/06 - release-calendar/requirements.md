@@ -2,7 +2,7 @@
 
 - **ID**: FEAT-06
 - **Title**: Release Calendar Sync
-- **Status**: under_test
+- **Status**: released
 - **Importance**: medium
 - **Type**: functional
 - **Tags**: [calendar, movies, upcoming]
