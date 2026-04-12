@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { exportData, importData } from '@/infrastructure/storage.service'
 
 // Mocking global fetch for download trigger if needed, or window.URL
@@ -116,37 +116,37 @@ describe('storageService Import/Export', () => {
       const storedSettings = JSON.parse(localStorage.getItem('plot-twisted-settings') || '{}')
 
       // Library should have both
-      expect(storedLibrary).toHaveLength(2);
-      expect(storedLibrary.find((e: { id: number }) => e.id === 123)).toBeDefined();
-      expect(storedLibrary.find((e: { id: number }) => e.id === 550)).toBeDefined();
+      expect(storedLibrary).toHaveLength(2)
+      expect(storedLibrary.find((e: { id: number }) => e.id === 123)).toBeDefined()
+      expect(storedLibrary.find((e: { id: number }) => e.id === 550)).toBeDefined()
 
       // Settings should NOT be overwritten in merge strategy
-      expect(storedSettings.language).toBe('en');
-      });
+      expect(storedSettings.language).toBe('en')
+    })
 
-      it('should reject malformed JSON or invalid schema', async () => {
-      const invalidData = { ...validExport, exportVersion: 'wrong' };
+    it('should reject malformed JSON or invalid schema', async () => {
+      const invalidData = { ...validExport, exportVersion: 'wrong' }
 
-      await expect(importData(invalidData, 'merge')).rejects.toThrow();
-      });
+      await expect(importData(invalidData, 'merge')).rejects.toThrow()
+    })
 
-      it('should sanitize imported content to prevent XSS', async () => {
+    it('should sanitize imported content to prevent XSS', async () => {
       const maliciousExport = {
         ...validExport,
         library: {
           '666-movie': {
             ...validEntry,
             id: 666,
-            title: '<script>alert("xss")</script>Evil'
-          }
-        }
-      };
+            title: '<script>alert("xss")</script>Evil',
+          },
+        },
+      }
 
-      await importData(maliciousExport, 'merge');
-      const storedLibrary = JSON.parse(localStorage.getItem('plot-twisted-library') || '[]');
-      const entry = storedLibrary.find((e: { id: number }) => e.id === 666);
+      await importData(maliciousExport, 'merge')
+      const storedLibrary = JSON.parse(localStorage.getItem('plot-twisted-library') || '[]')
+      const entry = storedLibrary.find((e: { id: number }) => e.id === 666)
 
-      expect(entry.title).not.toContain('<script>');
-      });
+      expect(entry.title).not.toContain('<script>')
+    })
   })
 })

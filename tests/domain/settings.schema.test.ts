@@ -11,18 +11,30 @@ describe('Settings Domain Schemas', () => {
         layoutMode: 'grid',
         defaultHomeSection: 'trending',
         librarySortField: 'title',
-        librarySortOrder: 'asc'
+        librarySortOrder: 'asc',
       }
       expect(SettingsSchema.parse(valid)).toEqual(valid)
     })
 
     it('should reject invalid theme', () => {
-      const invalid = { theme: 'blue', language: 'en', preferredRegion: 'US', layoutMode: 'grid', defaultHomeSection: 'trending' }
+      const invalid = {
+        theme: 'blue',
+        language: 'en',
+        preferredRegion: 'US',
+        layoutMode: 'grid',
+        defaultHomeSection: 'trending',
+      }
       expect(() => SettingsSchema.parse(invalid)).toThrow()
     })
 
     it('should reject invalid layout mode', () => {
-      const invalid = { theme: 'dark', language: 'en', preferredRegion: 'US', layoutMode: 'masonry', defaultHomeSection: 'trending' }
+      const invalid = {
+        theme: 'dark',
+        language: 'en',
+        preferredRegion: 'US',
+        layoutMode: 'masonry',
+        defaultHomeSection: 'trending',
+      }
       expect(() => SettingsSchema.parse(invalid)).toThrow()
     })
   })
@@ -40,7 +52,7 @@ describe('Settings Domain Schemas', () => {
       tags: [],
       notes: '',
       watchDates: [],
-      addedAt: new Date().toISOString()
+      addedAt: new Date().toISOString(),
     }
 
     const validExport = {
@@ -55,8 +67,8 @@ describe('Settings Domain Schemas', () => {
         language: 'en',
         preferredRegion: 'US',
         layoutMode: 'grid',
-        defaultHomeSection: 'trending'
-      }
+        defaultHomeSection: 'trending',
+      },
     }
 
     it('should validate correct export object', () => {
@@ -88,8 +100,8 @@ describe('Settings Domain Schemas', () => {
           language: 'en',
           preferredRegion: 'US',
           layoutMode: 'grid',
-          defaultHomeSection: 'trending'
-        }
+          defaultHomeSection: 'trending',
+        },
       }
       expect(ImportDataSchema.parse(validExport)).toEqual(validExport)
     })

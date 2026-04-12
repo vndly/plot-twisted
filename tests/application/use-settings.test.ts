@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import * as storageService from '@/infrastructure/storage.service';
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import * as storageService from '@/infrastructure/storage.service'
 
 vi.mock('@/infrastructure/storage.service', async () => {
   const actual = await vi.importActual('@/infrastructure/storage.service')
@@ -49,16 +49,16 @@ describe('useSettings', () => {
   })
 
   it('should expose export and import methods', () => {
-    const { triggerExport, importLibrary } = useSettings();
-    expect(triggerExport).toBeDefined();
-    expect(importLibrary).toBeDefined();
-  });
+    const { triggerExport, importLibrary } = useSettings()
+    expect(triggerExport).toBeDefined()
+    expect(importLibrary).toBeDefined()
+  })
 
   it('should call storageService.exportData when triggerExport is called', async () => {
-    const { triggerExport } = useSettings();
-    await triggerExport();
-    expect(storageService.exportData).toHaveBeenCalled();
-  });
+    const { triggerExport } = useSettings()
+    await triggerExport()
+    expect(storageService.exportData).toHaveBeenCalled()
+  })
 
   it('should call storageService.importData when importLibrary is called', async () => {
     const { importLibrary } = useSettings()
