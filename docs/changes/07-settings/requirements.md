@@ -2,7 +2,7 @@
 
 - **ID**: FEAT-07
 - **Title**: User Settings & Data Management
-- **Status**: approved
+- **Status**: review
 - **Importance**: high
 - **Type**: functional
 - **Tags**: [settings, preferences, data, i18n]
@@ -26,10 +26,10 @@ Users have different preferences for UI appearance and content language. They al
 
 ### Dependencies
 
-- **FEAT-01: App Scaffolding**: Provides the sidebar/navigation and global layouts.
-- **FEAT-02: Home Screen**: Uses the 'Home Section' and 'Layout Mode' settings.
-- **FEAT-03: Library Management**: Provides the data (library entries, lists, tags) for import/export.
-- **FEAT-06: Release Calendar**: Uses the 'Region' setting for filtering.
+- **R-01a: App Scaffolding**: Provides the sidebar/navigation and global layouts.
+- **02-home: Home Screen**: Uses the 'Home Section' and 'Layout Mode' settings.
+- **R-05: Library Management: Collections, Sorting, and Filtering**: Provides the data (library entries, lists, tags) for import/export.
+- **FEAT-06: Release Calendar Sync**: Uses the 'Region' setting for filtering.
 
 ## Decisions
 
@@ -58,15 +58,16 @@ Users have different preferences for UI appearance and content language. They al
 
 ## Functional Requirements
 
-| ID       | Requirement     | Description                                                                                                 | Priority |
-| -------- | --------------- | ----------------------------------------------------------------------------------------------------------- | -------- |
-| FR-07-01 | Theme Toggle    | Switch between dark and light modes.                                                                        | P0       |
-| FR-07-02 | Language Select | Change UI and API content language (en, es, fr). Triggers a re-fetch of all currently active view metadata. | P0       |
-| FR-07-03 | Region Select   | Set preferred region for streaming and releases.                                                            | P1       |
-| FR-07-04 | Home Section    | Select default section for the Home screen (trending, popular, search).                                     | P2       |
-| FR-07-05 | Export Data     | Download a JSON file containing all user data.                                                              | P1       |
-| FR-07-06 | Import Data     | Upload a JSON file to restore user data (Merge or Overwrite).                                               | P1       |
-| FR-07-07 | Validation      | Validate imported JSON schema and version.                                                                  | P0       |
+| ID       | Requirement     | Description                                                                                                                                 | Priority |
+| -------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| FR-07-01 | Theme Toggle    | Switch between dark and light modes.                                                                                                        | P0       |
+| FR-07-02 | Language Select | Change UI and API content language (en, es, fr). Triggers a re-fetch of the current page of active view metadata (e.g., trending, popular). | P0       |
+| FR-07-03 | Region Select   | Set preferred region for streaming and releases.                                                                                            | P1       |
+| FR-07-04 | Home Section    | Select default section for the Home screen (trending, popular, search).                                                                     | P2       |
+| FR-07-05 | Export Data     | Download a JSON file containing all user data.                                                                                              | P1       |
+| FR-07-06 | Import Data     | Upload a JSON file to restore user data (Merge or Overwrite).                                                                               | P1       |
+| FR-07-07 | Validation      | Validate imported JSON structure (export version) and internal data schemas (schema version).                                               | P0       |
+| FR-07-08 | Layout Mode     | Select preferred layout for grids and lists (grid vs list). Updates views immediately without re-fetching data.                             | P0       |
 
 ## Import / Export Specification
 

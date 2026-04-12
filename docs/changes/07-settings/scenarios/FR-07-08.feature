@@ -1,10 +1,10 @@
-Feature: FR-07-01b — Layout Mode
+Feature: FR-07-08 — Layout Mode
 
   Background:
     Given the app is running
     And I am on the "/settings" page
 
-  Scenario: FR-07-01b-01 — Switching to list layout
+  Scenario: FR-07-08-01 — Switching to list layout
     Given the current layout mode is "grid"
     When I click the "List" layout option
     Then the library view should update to list layout
