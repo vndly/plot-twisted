@@ -7,6 +7,11 @@ const LOCALE_FILES = ['en.json', 'es.json', 'fr.json'] as const
 
 const EXPECTED_KEYS = [
   'app.title',
+  'calendar.empty.description',
+  'calendar.empty.title',
+  'calendar.nav.next',
+  'calendar.nav.previous',
+  'calendar.nav.today',
   'common.empty.description',
   'common.empty.title',
   'common.error.description',

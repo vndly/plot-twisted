@@ -60,10 +60,10 @@ All paginated TMDB endpoints (search, trending, popular, recommendations, upcomi
 
 This is sufficient because:
 
+- **Upcoming** — Up to 5 pages are fetched to ensure a complete month's releases are visible in the calendar view. This is the only endpoint that uses multi-page fetching.
 - **Trending / Popular** — 20 items per section is more than enough for a personal tracker. Client-side filtering (by genre, media type, year range) narrows the set further without additional API calls.
 - **Search** — The first 20 results from `/search/multi` are shown. Users can refine their query for better matches rather than paginating through hundreds of results.
 - **Recommendations** — Up to 5 seed entries × 20 results each provides a large enough pool after deduplication.
-- **Upcoming** — 20 upcoming releases per page covers the near-term calendar view.
 
 The `PaginatedResponse` fields (`page`, `total_pages`, `total_results`) are available in the response type but are not used by any composable to request additional pages.
 

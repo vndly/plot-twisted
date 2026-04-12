@@ -158,8 +158,9 @@ export function matchesFilters(item: SearchResultItem, filters: FilterState): bo
   }
 
   // Year Range Filter
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const releaseDate = item.media_type === 'movie' ? (item as any).release_date : (item as any).first_air_date
+  const releaseDate =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    item.media_type === 'movie' ? (item as any).release_date : (item as any).first_air_date
   if (releaseDate) {
     const year = new Date(releaseDate).getFullYear()
 

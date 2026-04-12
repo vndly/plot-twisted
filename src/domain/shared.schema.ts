@@ -90,3 +90,26 @@ export const SpokenLanguageSchema = z.object({
 
 /** Inferred type for a spoken language. */
 export type SpokenLanguage = z.infer<typeof SpokenLanguageSchema>
+
+/**
+ * Generic factory for paginated response schemas.
+ * @param resultSchema - Zod schema for the items in the results array
+ * @returns Zod object schema for the paginated response
+ */
+export const createPaginatedResponseSchema = <T extends z.ZodTypeAny>(resultSchema: T) =>
+  z.object({
+    page: z.number(),
+    results: z.array(resultSchema),
+    total_pages: z.number(),
+    total_results: z.number(),
+  })
+
+/**
+ * Generic type for a paginated response.
+ */
+export type PaginatedResponse<T> = {
+  page: number
+  results: T[]
+  total_pages: number
+  total_results: number
+}

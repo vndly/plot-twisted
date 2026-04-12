@@ -1,11 +1,12 @@
 import { MAX_RETRY_ATTEMPTS, RETRY_BASE_DELAY_MS } from '@/domain/constants'
-import type { MovieDetail } from '@/domain/movie.schema'
-import { MovieDetailSchema } from '@/domain/movie.schema'
+import type { MovieDetail, MovieListItem } from '@/domain/movie.schema'
+import { MovieDetailSchema, MovieListItemSchema } from '@/domain/movie.schema'
 import type { SearchResponse } from '@/domain/search.schema'
 import { SearchResponseSchema } from '@/domain/search.schema'
 import type { ShowDetail } from '@/domain/show.schema'
 import { ShowDetailSchema } from '@/domain/show.schema'
-import { GenreSchema } from '@/domain/shared.schema'
+import { GenreSchema, createPaginatedResponseSchema } from '@/domain/shared.schema'
+import type { PaginatedResponse } from '@/domain/shared.schema'
 import { z } from 'zod'
 
 /** Base URL for the TMDB API. */
@@ -267,4 +268,35 @@ export async function getShowRecommendations(
   }))
 
   return SearchResponseSchema.parse(data)
+}
+
+/**
+ * Schema for the upcoming movies response from TMDB.
+ */
+const UpcomingMoviesResponseSchema = createPaginatedResponseSchema(MovieListItemSchema)
+
+/**
+ * Fetches upcoming movies from TMDB.
+ * @param language - ISO 639-1 language code (e.g., 'en')
+ * @param region - ISO 3166-1 region code (e.g., 'US')
+ * @param page - Page number to fetch
+ * @returns Validated paginated response of upcoming movies
+ * @throws Error if the API request fails
+ */
+export async function getUpcomingMovies(
+  language: string,
+  region: string,
+  page: number,
+): Promise<PaginatedResponse<MovieListItem>> {
+  const params = new URLSearchParams({
+    language,
+    region,
+    page: page.toString(),
+  })
+
+  const url = `${API_BASE_URL}/movie/upcoming?${params.toString()}`
+  const response = await fetchWithRetry(url)
+  const data = await response.json()
+
+  return UpcomingMoviesResponseSchema.parse(data)
 }
