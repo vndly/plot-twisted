@@ -225,7 +225,7 @@ describe('useSearch', () => {
 
       // Assert
       expect(results.value).toHaveLength(2)
-      expect(results.value.every((r) => r.media_type !== 'person')).toBe(true)
+      expect(results.value.every((r: any) => r.media_type !== 'person')).toBe(true)
     })
 
     it('returns empty array when all results are persons (HS-03-04)', async () => {
@@ -253,7 +253,7 @@ describe('useSearch', () => {
   describe('loading state', () => {
     it('transitions from idle to loading to success (HS-07-01, HS-07-06)', async () => {
       // Arrange
-      let resolvePromise: (value: unknown) => void
+      let resolvePromise: (value: any) => void
       mockSearchMulti.mockReturnValue(
         new Promise((resolve) => {
           resolvePromise = resolve

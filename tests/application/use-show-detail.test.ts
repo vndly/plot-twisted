@@ -108,7 +108,7 @@ describe('useShowDetail', () => {
 
   it('transitions from loading to success', async () => {
     // Arrange
-    let resolvePromise: (value: typeof mockShowDetail) => void
+    let resolvePromise!: (value: typeof mockShowDetail) => void
     mockGetShowDetail.mockReturnValue(
       new Promise((resolve) => {
         resolvePromise = resolve

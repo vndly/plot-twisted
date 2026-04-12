@@ -126,7 +126,7 @@ describe('useBrowse', () => {
 
   it('fetches and filters browse data on mount', async () => {
     const wrapper = mount(TestComponent)
-    const vm = wrapper.vm as unknown as ReturnType<typeof useBrowse>
+    const vm = wrapper.vm as any
 
     expect(vm.loading).toBe(true)
 
@@ -151,7 +151,7 @@ describe('useBrowse', () => {
     vi.mocked(providerClient.getTrending).mockRejectedValue(new Error('Network Error'))
 
     const wrapper = mount(TestComponent)
-    const vm = wrapper.vm as unknown as ReturnType<typeof useBrowse>
+    const vm = wrapper.vm as any
 
     await nextTick()
     await nextTick()
@@ -168,7 +168,7 @@ describe('useBrowse', () => {
       .mockResolvedValueOnce(mockTrending)
 
     const wrapper = mount(TestComponent)
-    const vm = wrapper.vm as unknown as ReturnType<typeof useBrowse>
+    const vm = wrapper.vm as any
 
     await nextTick()
     await nextTick()

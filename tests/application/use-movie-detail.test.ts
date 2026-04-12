@@ -102,7 +102,7 @@ describe('useMovieDetail', () => {
 
   it('transitions from idle to loading to success (ED-11-02)', async () => {
     // Arrange
-    let resolvePromise: (value: typeof mockMovieDetail) => void
+    let resolvePromise!: (value: typeof mockMovieDetail) => void
     mockGetMovieDetail.mockReturnValue(
       new Promise((resolve) => {
         resolvePromise = resolve

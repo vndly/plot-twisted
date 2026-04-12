@@ -65,7 +65,7 @@ describe('useFilters', () => {
     const wrapper = mount(TestComponent, {
       global: { plugins: [i18n] },
     })
-    const vm = wrapper.vm as unknown as ReturnType<typeof useFilters>
+    const vm = wrapper.vm as any
     expect(vm.filters.genres).toEqual([])
     expect(vm.filters.mediaType).toBe('all')
   })
@@ -81,7 +81,7 @@ describe('useFilters', () => {
     const wrapper = mount(TestComponent, {
       global: { plugins: [i18n] },
     })
-    const vm = wrapper.vm as unknown as ReturnType<typeof useFilters>
+    const vm = wrapper.vm as any
 
     // Wait for onMounted
     await nextTick()
@@ -96,7 +96,7 @@ describe('useFilters', () => {
     const wrapper = mount(TestComponent, {
       global: { plugins: [i18n] },
     })
-    const vm = wrapper.vm as unknown as ReturnType<typeof useFilters>
+    const vm = wrapper.vm as any
     await nextTick()
 
     vm.filters.mediaType = 'tv'
@@ -111,7 +111,7 @@ describe('useFilters', () => {
     const wrapper = mount(TestComponent, {
       global: { plugins: [i18n] },
     })
-    const vm = wrapper.vm as unknown as ReturnType<typeof useFilters>
+    const vm = wrapper.vm as any
     await nextTick()
 
     vm.filters.mediaType = 'movie'
