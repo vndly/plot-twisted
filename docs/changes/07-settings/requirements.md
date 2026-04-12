@@ -14,9 +14,11 @@ Empower users to customize their experience (theme, language, region) and manage
 ## Context & Background
 
 ### Problem Statement
+
 Users have different preferences for UI appearance and content language. They also need a way to backup and restore their library data.
 
 ### User Stories
+
 - As a user, I want to switch between dark and light themes.
 - As a multilingual user, I want to change the app language.
 - As a user, I want to set my region for accurate release dates and streaming info.
@@ -25,29 +27,31 @@ Users have different preferences for UI appearance and content language. They al
 ## Scope
 
 ### In Scope
+
 - Settings screen with sections for:
-    - Appearance (Theme toggle).
-    - Content & UI (Language select, Preferred Region).
-    - Default View (Home section select).
-    - Data Management (Import/Export buttons).
+  - Appearance (Theme toggle).
+  - Content & UI (Language select, Preferred Region).
+  - Default View (Home section select).
+  - Data Management (Import/Export buttons).
 - Implementation of the Import/Export logic.
 - Integration with existing `useSettings` and `storageService`.
 
 ### Out of Scope
+
 - Automatic cloud sync.
 - Multiple user profiles.
 
 ## Functional Requirements
 
-| ID | Requirement | Description | Priority |
-|---|---|---|---|
-| FR-07-01 | Theme Toggle | Switch between dark and light modes. | P0 |
-| FR-07-02 | Language Select | Change UI and API content language (en, es, fr). | P0 |
-| FR-07-03 | Region Select | Set preferred region for streaming and releases. | P1 |
-| FR-07-04 | Home Section | Select default section for the Home screen (trending, popular, search). | P2 |
-| FR-07-05 | Export Data | Download a JSON file containing all user data. | P1 |
-| FR-07-06 | Import Data | Upload a JSON file to restore user data (Merge or Overwrite). | P1 |
-| FR-07-07 | Validation | Validate imported JSON schema and version. | P0 |
+| ID       | Requirement     | Description                                                             | Priority |
+| -------- | --------------- | ----------------------------------------------------------------------- | -------- |
+| FR-07-01 | Theme Toggle    | Switch between dark and light modes.                                    | P0       |
+| FR-07-02 | Language Select | Change UI and API content language (en, es, fr).                        | P0       |
+| FR-07-03 | Region Select   | Set preferred region for streaming and releases.                        | P1       |
+| FR-07-04 | Home Section    | Select default section for the Home screen (trending, popular, search). | P2       |
+| FR-07-05 | Export Data     | Download a JSON file containing all user data.                          | P1       |
+| FR-07-06 | Import Data     | Upload a JSON file to restore user data (Merge or Overwrite).           | P1       |
+| FR-07-07 | Validation      | Validate imported JSON schema and version.                              | P0       |
 
 ## Import / Export Specification
 
@@ -86,9 +90,11 @@ The export produces a single JSON file containing the full user data set:
 ## Non-Functional Requirements
 
 ### Security
+
 - Validate all imported data with Zod schemas before applying to localStorage.
 
 ### UI/UX
+
 - Settings should be easily accessible from the sidebar.
 - Confirmation dialog for destructive actions (Overwrite import).
 

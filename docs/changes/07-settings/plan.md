@@ -17,10 +17,10 @@ Implementation plan for user settings and import/export functionality.
 ## Phase 3: Presentation Layer
 
 - [ ] **Step 3.1**: Update `src/presentation/views/settings-screen.vue` with UI components for:
-    - [ ] Appearance (ThemeToggle)
-    - [ ] Content & UI (LanguageSelect, RegionSelect)
-    - [ ] Default View (HomeSectionSelect)
-    - [ ] Data Management (ImportButton, ExportButton)
+  - [ ] Appearance (ThemeToggle)
+  - [ ] Content & UI (LanguageSelect, RegionSelect)
+  - [ ] Default View (HomeSectionSelect)
+  - [ ] Data Management (ImportButton, ExportButton)
 - [ ] **Step 3.2**: Add internationalization keys for all new labels and descriptions in `src/presentation/i18n/locales/en.json` (and others).
 - [ ] **Step 3.3**: Implement components for specific settings like `ThemeToggle`, `LanguageSelect`, etc., if they don't exist.
 

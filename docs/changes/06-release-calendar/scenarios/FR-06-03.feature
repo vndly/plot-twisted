@@ -13,3 +13,8 @@ Feature: FR-06-03 — Month Navigation
     When I click the "Previous Month" button
     Then the grid should update to show the previous month
     And a new API request should be made for the previous month's releases
+
+  Scenario: SC-06-03-03 — Month view persists on reload
+    Given I have navigated to the "Next Month"
+    When I reload the page
+    Then the grid should still show the "Next Month"

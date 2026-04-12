@@ -4,33 +4,35 @@ Implementation plan for the monthly release calendar.
 
 ## Phase 1: Infrastructure Updates
 
-- [ ] **Step 1.1**: Update `src/infrastructure/provider.client.ts` to include `getUpcomingMovies(language: string, region: string, page: number)`.
-- [ ] **Step 1.2**: Add test for `getUpcomingMovies` in `tests/infrastructure/provider.client.calendar.test.ts`.
+- [ ] **Step 1.1**: Add test for `getUpcomingMovies` in `tests/infrastructure/provider.client.calendar.test.ts`. (covering: `SC-06-04-01`)
+- [ ] **Step 1.2**: Update `src/infrastructure/provider.client.ts` to include `getUpcomingMovies(language: string, region: string, page: number)`. (`FR-06-04`)
 
 ## Phase 2: Domain Layer
 
-- [ ] **Step 2.1**: Update `src/domain/movie.schema.ts` if any additional fields are needed for `MovieListItem` (likely `release_date` is already there).
-- [ ] **Step 2.2**: Create `src/domain/calendar.logic.ts` for pure functions like getting days of a month, determining day of the week, and grouping movies by date.
+- [ ] **Step 2.1**: Update `src/domain/movie.schema.ts` if any additional fields are needed for `MovieListItem` (likely `release_date` is already there). (`implementation detail`)
+- [ ] **Step 2.2**: Write unit tests for calendar logic in `tests/domain/calendar.logic.test.ts`. (covering: `SC-06-01-01`, `SC-06-02-01`)
+- [ ] **Step 2.3**: Create `src/domain/calendar.logic.ts` for pure functions like getting days of a month, determining day of the week, and grouping movies by date. (`FR-06-01`, `FR-06-02`)
 
 ## Phase 3: Application Layer
 
-- [ ] **Step 3.1**: Create `src/application/use-upcoming-movies.ts` to fetch and manage upcoming movies state (loading, error, list).
-- [ ] **Step 3.2**: Create `src/application/use-calendar.ts` to manage calendar state (current month, year, navigation methods).
-- [ ] **Step 3.3**: Write tests for `use-upcoming-movies` and `use-calendar`.
+- [ ] **Step 3.1**: Write tests for composables in `tests/application/use-upcoming-movies.test.ts` and `tests/application/use-calendar.test.ts`. (covering: `SC-06-03-01`, `SC-06-05-01`)
+- [ ] **Step 3.2**: Create `src/application/use-upcoming-movies.ts` to fetch and manage upcoming movies state (loading, error, list). (`FR-06-04`, `FR-06-05`)
+- [ ] **Step 3.3**: Create `src/application/use-calendar.ts` to manage calendar state (current month, year, navigation methods). (`FR-06-03`)
 
 ## Phase 4: Presentation Layer
 
-- [ ] **Step 4.1**: Create `src/presentation/components/calendar/ReleaseCard.vue` to display a single release in a grid cell.
-- [ ] **Step 4.2**: Create `src/presentation/components/calendar/CalendarGrid.vue` for the monthly view.
-- [ ] **Step 4.3**: Update `src/presentation/views/calendar-screen.vue` to integrate the grid and navigation.
-- [ ] **Step 4.4**: Add internationalization keys for the calendar in `src/presentation/i18n/locales/en.json` (and other languages if applicable).
+- [ ] **Step 4.1**: Create `src/presentation/components/calendar/ReleaseCard.vue` to display a single release in a grid cell. (`FR-06-02`, `FR-06-07`)
+- [ ] **Step 4.2**: Create `src/presentation/components/calendar/CalendarGrid.vue` for the monthly view, including the skeleton loader and empty state. (`FR-06-01`, `FR-06-06`, `NFR-Performance`)
+- [ ] **Step 4.3**: Update `src/presentation/views/calendar-screen.vue` to integrate the grid and navigation. (`FR-06-03`, `FR-06-07`)
+- [ ] **Step 4.4**: Add internationalization keys for the calendar in `src/presentation/i18n/locales/en.json`. (`implementation detail`)
 
 ## Verification Phase
 
-- [ ] **Run all tests**: `npm run test`
-- [ ] **Visual check**: Open `/calendar` and verify month rendering.
-- [ ] **Interaction check**: Verify month navigation and detail page navigation.
-- [ ] **Region check**: Change region in settings (when implemented) and verify calendar updates.
+- [ ] **Run all tests**: `npm run test` (Verifies `SC-06-01` through `SC-06-07`)
+- [ ] **Visual check**: Open `/calendar` and verify month rendering. (`SC-06-01-01`)
+- [ ] **Interaction check**: Verify month navigation and detail page navigation. (`SC-06-03-01`, `SC-06-07-01`)
+- [ ] **Region check**: Change region in settings and verify calendar updates. (`SC-06-05-01`)
+- [ ] **Empty State check**: Navigate to a month with no releases and verify message. (`SC-06-06-01`)
 
 ## Rollback Plan
 

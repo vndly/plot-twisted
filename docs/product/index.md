@@ -8,3 +8,5 @@
 4. **[03 - library](./03 - library/)**: User library management, collections, sorting, and advanced filtering.
 5. **[04 - stats](./04 - stats/)**: Provides users with meaningful insights and a visual overview of their library through charts and statistics.
 6. **[05 - recommendations](./05 - recommendations/)**: Personalized "If you liked X" suggestions based on user library.
+7. **[06 - release-calendar](./06 - release-calendar/)**: Monthly calendar view of upcoming movie releases.
+8. **[07 - settings](./07 - settings/)**: User preferences, theme, and region configuration.
