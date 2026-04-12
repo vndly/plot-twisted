@@ -1,7 +1,7 @@
 import type { LibraryEntry, MediaType, List } from '@/domain/library.schema'
 import { LibraryEntrySchema, ListSchema } from '@/domain/library.schema'
-import type { Settings } from '@/domain/settings.schema'
-import { SettingsSchema, DEFAULT_SETTINGS } from '@/domain/settings.schema'
+import type { Settings, ExportData } from '@/domain/settings.schema'
+import { SettingsSchema, DEFAULT_SETTINGS, ImportDataSchema } from '@/domain/settings.schema'
 
 /** Storage key for the library data in localStorage. */
 export const STORAGE_KEY = 'plot-twisted-library'
@@ -220,4 +220,154 @@ export function removeListFromAllEntries(listId: string): void {
     return entry
   })
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+}
+
+/**
+ * Generates an export object containing all user data.
+ * @returns The export data object
+ */
+export async function exportData(): Promise<ExportData> {
+  const libraryEntries = getAllLibraryEntries()
+  const lists = getAllLists()
+  const settings = getSettings()
+
+  // Convert arrays to records as expected by schema
+  const libraryRecord: Record<string, LibraryEntry> = {}
+  libraryEntries.forEach((entry) => {
+    libraryRecord[`${entry.id}-${entry.mediaType}`] = entry
+  })
+
+  const listRecord: Record<string, List> = {}
+  lists.forEach((list) => {
+    listRecord[list.id] = list
+  })
+
+  // Extract all unique tags
+  const tags = new Set<string>()
+  libraryEntries.forEach((entry) => {
+    entry.tags.forEach((tag) => tags.add(tag))
+  })
+
+  const exportData: ExportData = {
+    exportVersion: 1,
+    exportedAt: new Date().toISOString(),
+    schemaVersion: 1,
+    library: libraryRecord,
+    lists: listRecord,
+    tags: Array.from(tags).sort(),
+    settings,
+  }
+
+  return exportData
+}
+
+/**
+ * Imports user data from a provided object using the specified strategy.
+ * @param data - The data to import (untrusted)
+ * @param strategy - Whether to 'merge' with existing data or 'overwrite' it
+ */
+export async function importData(data: unknown, strategy: 'merge' | 'overwrite'): Promise<void> {
+  // 1. Validate structure
+  const result = ImportDataSchema.safeParse(data)
+  if (!result.success) {
+    throw new Error(`Invalid export data: ${result.error.message}`)
+  }
+
+  const validatedData = result.data
+
+  // 2. Safety Export for overwrite strategy
+  if (strategy === 'overwrite') {
+    const backup = await exportData()
+    downloadFile(
+      JSON.stringify(backup, null, 2),
+      `plot-twisted-backup-${new Date().toISOString()}.json`,
+      'application/json',
+    )
+  }
+
+  // 3. Process entries with sanitization
+  const sanitizeEntry = (entry: LibraryEntry): LibraryEntry => ({
+    ...entry,
+    title: sanitize(entry.title),
+    notes: sanitize(entry.notes),
+    tags: entry.tags.map(sanitize),
+  })
+
+  const sanitizeList = (list: List): List => ({
+    ...list,
+    name: sanitize(list.name),
+  })
+
+  // 4. Apply strategy
+  if (strategy === 'overwrite') {
+    // Clear existing
+    localStorage.removeItem(STORAGE_KEY)
+    localStorage.removeItem(STORAGE_KEY_LISTS)
+    localStorage.removeItem(STORAGE_KEY_SETTINGS)
+
+    // Save imported
+    const libraryEntries = Object.values(validatedData.library).map(sanitizeEntry)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(libraryEntries))
+
+    const lists = Object.values(validatedData.lists).map(sanitizeList)
+    localStorage.setItem(STORAGE_KEY_LISTS, JSON.stringify(lists))
+
+    saveSettings(validatedData.settings)
+  } else {
+    // Merge
+    const importedLibrary = Object.values(validatedData.library).map(sanitizeEntry)
+    importedLibrary.forEach((entry) => saveLibraryEntry(entry))
+
+    const importedLists = Object.values(validatedData.lists).map(sanitizeList)
+    importedLists.forEach((list) => saveList(list))
+
+    // Settings are ignored in merge strategy per requirements
+  }
+}
+
+/**
+ * Triggers a file download in the browser.
+ * @param content - The string content of the file
+ * @param fileName - The desired name for the downloaded file
+ * @param contentType - The MIME type of the file
+ */
+export function downloadFile(content: string, fileName: string, contentType: string): void {
+  const a = document.createElement('a')
+  const file = new Blob([content], { type: contentType })
+  const url = URL.createObjectURL(file)
+  a.href = url
+  a.download = fileName
+  a.click()
+  // Give it a moment before revoking
+  setTimeout(() => URL.revokeObjectURL(url), 100)
+}
+
+/**
+ * Parses a JSON file from a File object.
+ * @param file - The browser File object
+ * @returns The parsed data
+ */
+export async function parseFile(file: File): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string
+        resolve(JSON.parse(content))
+      } catch {
+        reject(new Error('Invalid JSON format'))
+      }
+    }
+    reader.onerror = () => reject(new Error('Failed to read file'))
+    reader.readAsText(file)
+  })
+}
+
+/**
+ * Simple sanitization to prevent XSS.
+ * Trims and removes script-like tags.
+ */
+function sanitize(value: string): string {
+  if (!value) return value
+  return value.trim().replace(/<[^>]*>?/gm, '')
 }

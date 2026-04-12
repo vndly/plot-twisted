@@ -67,6 +67,9 @@ const EXPECTED_KEYS = [
   'home.search.error.message',
   'home.search.error.retry',
   'home.search.placeholder',
+  'home.sections.popular',
+  'home.sections.search',
+  'home.sections.trending',
   'library.empty.allLists.description',
   'library.empty.allLists.title',
   'library.empty.filtered.description',
@@ -136,12 +139,44 @@ const EXPECTED_KEYS = [
   'stats.title',
   'stats.topRated.empty',
   'stats.topRated.title',
+  'settings.title',
+  'settings.description',
+  'settings.sections.appearance',
+  'settings.sections.content',
+  'settings.sections.navigation',
+  'settings.sections.data',
+  'settings.appearance.theme.label',
+  'settings.appearance.theme.description',
+  'settings.appearance.layout.label',
+  'settings.appearance.layout.description',
+  'settings.content.language.label',
+  'settings.content.language.description',
+  'settings.content.region.label',
+  'settings.content.region.description',
+  'settings.navigation.home.label',
+  'settings.navigation.home.description',
+  'settings.data.info.title',
+  'settings.data.info.description',
+  'settings.data.export',
+  'settings.data.exportError',
+  'settings.data.exportSuccess',
+  'settings.data.import',
+  'settings.data.importError',
+  'settings.data.importSuccess',
+  'settings.import.title',
+  'settings.import.description',
+  'settings.import.merge',
+  'settings.import.overwrite',
+  'settings.import.confirmOverwriteButton',
+  'settings.import.confirmOverwriteDescription',
+  'settings.import.confirmOverwriteTitle',
+  'settings.footer.legal',
   'toast.dismiss',
   'toast.error',
   'toast.retry',
 ].sort()
 
-const CAMEL_CASE_SEGMENT = /^[a-z][a-zA-Z0-9]*$/
+const KEY_SEGMENT_PATTERN = /^[a-z][a-zA-Z0-9]*$/
 
 function readLocale(filename: string): Record<string, unknown> {
   const raw = readFileSync(resolve(LOCALES_DIR, filename), 'utf-8')
@@ -194,7 +229,7 @@ describe('locale key parity', () => {
     const keys = Object.keys(locales['en.json'])
     for (const key of keys) {
       for (const segment of key.split('.')) {
-        expect(segment, `segment "${segment}" in key "${key}"`).toMatch(CAMEL_CASE_SEGMENT)
+        expect(segment, `segment "${segment}" in key "${key}"`).toMatch(KEY_SEGMENT_PATTERN)
       }
     }
   })

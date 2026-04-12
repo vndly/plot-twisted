@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { SortFieldSchema, SortOrderSchema } from './filter.schema'
+import { LibraryEntrySchema, ListSchema } from './library.schema'
 
 /**
  * Schema for user settings.
@@ -32,3 +33,27 @@ export const DEFAULT_SETTINGS: Settings = {
   librarySortField: 'dateAdded',
   librarySortOrder: 'desc',
 }
+
+/**
+ * Schema for the exported data file.
+ */
+export const ExportDataSchema = z.object({
+  exportVersion: z.literal(1),
+  exportedAt: z.string().datetime(),
+  schemaVersion: z.literal(1),
+  library: z.record(z.string(), LibraryEntrySchema),
+  lists: z.record(z.string(), ListSchema),
+  tags: z.array(z.string()),
+  settings: SettingsSchema,
+})
+
+/** Inferred type for exported data. */
+export type ExportData = z.infer<typeof ExportDataSchema>
+
+/**
+ * Schema for importing data, supporting potential future migrations.
+ */
+export const ImportDataSchema = z.discriminatedUnion('exportVersion', [
+  ExportDataSchema,
+  // Add future versions here with transforms
+])

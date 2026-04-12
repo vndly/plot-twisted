@@ -4,21 +4,21 @@ Implementation plan for user settings and import/export functionality.
 
 ## Phase 1: Infrastructure Layer (Data Portability)
 
-- [ ] **Step 1.1 (Test-First)**: Create `tests/infrastructure/storage.service.import-export.test.ts` to verify `exportData` and `importData` logic.
+- [x] **Step 1.1 (Test-First)**: Create `tests/infrastructure/storage.service.import-export.test.ts` to verify `exportData` and `importData` logic.
   - covering: FR-07-05-01, FR-07-06-01, FR-07-06-02, FR-07-06-03, FR-07-07-01, FR-07-07-02, FR-07-07-03
-- [ ] **Step 1.2**: Update `src/domain/settings.schema.ts` to include `ExportDataSchema` and `ImportValidationRules`.
+- [x] **Step 1.2**: Update `src/domain/settings.schema.ts` to include `ExportDataSchema` and `ImportValidationRules`.
   - [ ] Add Zod `transform` logic for version-to-version schema migrations.
   - covering: FR-07-07-02
-- [ ] **Step 1.3**: Implement `exportData()` and `importData(data: unknown, strategy: 'merge' | 'overwrite')` in `src/infrastructure/storage.service.ts`.
+- [x] **Step 1.3**: Implement `exportData()` and `importData(data: unknown, strategy: 'merge' | 'overwrite')` in `src/infrastructure/storage.service.ts`.
   - [ ] Ensure `overwrite` strategy automatically triggers a "Safety Export" download before applying destructive changes.
   - [ ] **Sanitization**: Implement sanitization logic (NFR-07-02) for imported data to prevent XSS.
   - covering: FR-07-05-01, FR-07-06-01, FR-07-06-02, FR-07-07b-01, NFR-07-04
 
 ## Phase 2: Application Layer (Business Logic)
 
-- [ ] **Step 2.1 (Test-First)**: Create `tests/application/use-settings.test.ts` for new settings methods.
+- [x] **Step 2.1 (Test-First)**: Create `tests/application/use-settings.test.ts` for new settings methods.
   - covering: FR-07-01-01, FR-07-08-01, FR-07-02-01, FR-07-03-01, FR-07-04-01
-- [ ] **Step 2.2**: Update `src/application/use-settings.ts` to expose `exportLibrary`, `importLibrary`, and reactive state for `layoutMode`, `region`, and `homeSection`.
+- [x] **Step 2.2**: Update `src/application/use-settings.ts` to expose `exportLibrary`, `importLibrary`, and reactive state for `layoutMode`, `region`, and `homeSection`.
   - [ ] Implement `watchEffect` for language and region changes to propagate re-fetch signals to other composables (e.g., `useBrowse`, `useCalendar`).
   - covering: FR-07-01, FR-07-02, FR-07-03, FR-07-04, FR-07-08
 

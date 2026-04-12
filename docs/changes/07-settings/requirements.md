@@ -2,7 +2,7 @@
 
 - **ID**: FEAT-07
 - **Title**: User Settings & Data Management
-- **Status**: review
+- **Status**: under_test
 - **Importance**: high
 - **Type**: functional
 - **Tags**: [settings, preferences, data, i18n]

@@ -1,65 +1,97 @@
 import { mount } from '@vue/test-utils'
-import { Settings } from 'lucide-vue-next'
 import { createI18n } from 'vue-i18n'
-import { describe, expect, it } from 'vitest'
-import EmptyState from '@/presentation/components/common/empty-state.vue'
+import { describe, expect, it, vi } from 'vitest'
 import SettingsScreen from '@/presentation/views/settings-screen.vue'
+import ThemeToggle from '@/presentation/components/settings/ThemeToggle.vue'
+import LayoutModeToggle from '@/presentation/components/settings/LayoutModeToggle.vue'
+import SettingsSelect from '@/presentation/components/settings/SettingsSelect.vue'
 
-type Locale = 'en' | 'fr'
+vi.mock('@/application/use-settings', () => ({
+  useSettings: () => ({
+    language: { value: 'en' },
+    preferredRegion: { value: 'US' },
+    layoutMode: { value: 'grid' },
+    theme: { value: 'dark' },
+    defaultHomeSection: { value: 'trending' },
+    exportLibrary: vi.fn(),
+    importLibrary: vi.fn(),
+  }),
+}))
 
-function createTestI18n(locale: Locale) {
+vi.mock('@/presentation/composables/use-modal', () => ({
+  useModal: () => ({
+    open: vi.fn(),
+    close: vi.fn(),
+    isOpen: { value: false },
+    props: { value: null },
+  }),
+}))
+
+function createTestI18n() {
   return createI18n({
     legacy: false,
-    locale,
+    locale: 'en',
     fallbackLocale: 'en',
     flatJson: true,
     messages: {
       en: {
-        'common.empty.title': 'Nothing here yet',
-        'common.empty.description': 'This page is under construction.',
+        'settings.title': 'Settings',
+        'settings.description': 'Customize your experience',
+        'settings.sections.appearance': 'Appearance',
+        'settings.sections.content': 'Content',
+        'settings.sections.navigation': 'Navigation',
+        'settings.sections.data': 'Data',
+        'settings.appearance.theme.label': 'Theme',
+        'settings.appearance.layout.label': 'Layout',
+        'settings.content.language.label': 'Language',
+        'settings.content.region.label': 'Region',
+        'settings.navigation.home.label': 'Home',
+        'settings.data.export': 'Export',
+        'settings.data.import': 'Import',
+        'home.sections.trending': 'Trending',
+        'home.sections.popular': 'Popular',
+        'home.sections.search': 'Search',
       },
-      fr: {
-        'common.empty.title': 'Rien ici pour le moment',
-        'common.empty.description': 'Cette page est en construction.',
-      },
-    },
-  })
-}
-
-function renderSettingsScreen(locale: Locale) {
-  return mount(SettingsScreen, {
-    global: {
-      plugins: [createTestI18n(locale)],
     },
   })
 }
 
 describe('SettingsScreen', () => {
-  // SC-20-01, SC-26-01
-  it('renders the documented placeholder content in English', () => {
-    // Arrange
-    const wrapper = renderSettingsScreen('en')
+  it('renders all settings sections', () => {
+    const wrapper = mount(SettingsScreen, {
+      global: {
+        plugins: [createTestI18n()],
+      },
+    })
 
-    // Assert
-    expect(wrapper.findComponent(EmptyState).exists()).toBe(true)
-    expect(wrapper.findComponent(Settings).exists()).toBe(true)
-    expect(wrapper.get('h2').text()).toBe('Nothing here yet')
-    expect(wrapper.get('[data-testid="empty-state-description"]').text()).toBe(
-      'This page is under construction.',
-    )
+    expect(wrapper.get('h1').text()).toBe('Settings')
+    expect(wrapper.findAll('h2')).toHaveLength(4) // Appearance, Content, Navigation, Data
   })
 
-  // SC-20-01, SC-26-01
-  it('renders the documented placeholder content in French', () => {
-    // Arrange
-    const wrapper = renderSettingsScreen('fr')
+  it('renders specialized toggle and select components', () => {
+    const wrapper = mount(SettingsScreen, {
+      global: {
+        plugins: [createTestI18n()],
+      },
+    })
 
-    // Assert
-    expect(wrapper.findComponent(EmptyState).exists()).toBe(true)
-    expect(wrapper.findComponent(Settings).exists()).toBe(true)
-    expect(wrapper.get('h2').text()).toBe('Rien ici pour le moment')
-    expect(wrapper.get('[data-testid="empty-state-description"]').text()).toBe(
-      'Cette page est en construction.',
-    )
+    expect(wrapper.findComponent(ThemeToggle).exists()).toBe(true)
+    expect(wrapper.findComponent(LayoutModeToggle).exists()).toBe(true)
+    expect(wrapper.findAllComponents(SettingsSelect)).toHaveLength(3) // Language, Region, Home Section
+  })
+
+  it('renders data management buttons', () => {
+    const wrapper = mount(SettingsScreen, {
+      global: {
+        plugins: [createTestI18n()],
+      },
+    })
+
+    const buttons = wrapper.findAll('button')
+    const exportBtn = buttons.find((b) => b.text().includes('Export'))
+    const importBtn = buttons.find((b) => b.text().includes('Import'))
+
+    expect(exportBtn?.exists()).toBe(true)
+    expect(importBtn?.exists()).toBe(true)
   })
 })
