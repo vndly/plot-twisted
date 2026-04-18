@@ -45,6 +45,7 @@
   "home.browse.error.message": "Error al cargar el contenido",
   "home.browse.error.retry": "Reintentar",
   "home.filters.genre": "Género",
+  "home.filters.genreSearch": "Buscar géneros",
   "home.filters.mediaType.all": "Todo",
   "home.filters.mediaType.movie": "Películas",
   "home.filters.mediaType.tv": "Series",

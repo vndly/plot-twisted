@@ -57,6 +57,7 @@ const i18n = createI18n({
       'home.browse.error.message': 'Failed to load browse content',
       'home.browse.error.retry': 'Retry',
       'home.filters.genre': 'Genre',
+      'home.filters.genreSearch': 'Search genres',
       'home.filters.mediaType.all': 'All',
       'home.filters.mediaType.movie': 'Movies',
       'home.filters.mediaType.tv': 'Shows',

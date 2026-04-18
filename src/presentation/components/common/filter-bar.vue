@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { X, ChevronDown, Minus, Plus } from 'lucide-vue-next'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, nextTick, ref, onMounted, onUnmounted, watch } from 'vue'
 
 interface Genre {
   id: number
@@ -45,9 +45,18 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const isGenreOpen = ref(false)
+const genreSearch = ref('')
+const genreFilterInputRef = ref<HTMLInputElement | null>(null)
 const genreDropdownRef = ref<HTMLElement | null>(null)
 const MIN_YEAR = 1900
 const MAX_YEAR = new Date().getFullYear() + 5
+
+const filteredGenres = computed(() => {
+  const query = genreSearch.value.trim().toLocaleLowerCase()
+  if (!query) return props.genres
+
+  return props.genres.filter((genre) => genre.name.toLocaleLowerCase().includes(query))
+})
 
 /**
  * Toggles a genre ID in the filter state.
@@ -143,6 +152,18 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
+
+watch(isGenreOpen, async (open) => {
+  if (open) {
+    await nextTick()
+    genreFilterInputRef.value?.focus()
+    return
+  }
+
+  if (!open) {
+    genreSearch.value = ''
+  }
+})
 </script>
 
 <template>
@@ -166,32 +187,46 @@ onUnmounted(() => {
 
       <div
         v-if="isGenreOpen"
-        data-testid="genre-dropdown-menu"
-        class="absolute left-0 z-50 mt-2 max-h-64 w-56 overflow-y-auto rounded-lg border border-slate-700 bg-surface p-2 shadow-xl [scrollbar-width:thin] [scrollbar-color:#14b8a6_#1e293b] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-slate-800 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-teal-500/70 hover:[&::-webkit-scrollbar-thumb]:bg-teal-400"
+        class="absolute left-0 z-50 mt-2 w-56 rounded-lg border border-slate-700 bg-surface p-2 shadow-xl"
       >
+        <input
+          ref="genreFilterInputRef"
+          v-model="genreSearch"
+          data-testid="genre-filter-input"
+          type="text"
+          :placeholder="t('home.filters.genreSearch')"
+          class="w-full rounded-md border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none ring-accent transition focus:border-teal-500/60 focus:ring-2"
+        />
+
         <div
-          v-for="genre in genres"
-          :key="genre.id"
-          class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-slate-700"
-          :class="{ 'bg-accent/20 text-accent': modelValue.genres.includes(genre.id) }"
-          @click="toggleGenre(genre.id)"
+          data-testid="genre-dropdown-menu"
+          class="mt-2 max-h-52 overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#14b8a6_#1e293b] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-slate-800 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-teal-500/70 hover:[&::-webkit-scrollbar-thumb]:bg-teal-400"
         >
           <div
-            class="size-4 rounded border border-slate-500"
-            :class="{ 'bg-accent border-accent': modelValue.genres.includes(genre.id) }"
+            v-for="genre in filteredGenres"
+            :key="genre.id"
+            data-testid="genre-option"
+            class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-slate-700"
+            :class="{ 'bg-accent/20 text-accent': modelValue.genres.includes(genre.id) }"
+            @click="toggleGenre(genre.id)"
           >
-            <svg
-              v-if="modelValue.genres.includes(genre.id)"
-              class="size-full text-white"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="4"
+            <div
+              class="size-4 rounded border border-slate-500"
+              :class="{ 'bg-accent border-accent': modelValue.genres.includes(genre.id) }"
             >
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
+              <svg
+                v-if="modelValue.genres.includes(genre.id)"
+                class="size-full text-white"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="4"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span>{{ genre.name }}</span>
           </div>
-          <span>{{ genre.name }}</span>
         </div>
       </div>
     </div>

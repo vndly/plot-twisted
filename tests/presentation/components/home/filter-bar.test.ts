@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import FilterBar from '@/presentation/components/home/filter-bar.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 
 // Mock useFilters
 const mockFilters = ref({
@@ -39,6 +39,7 @@ const i18n = createI18n({
   messages: {
     en: {
       'home.filters.genre': 'Genre',
+      'home.filters.genreSearch': 'Search genres',
       'home.filters.mediaType.all': 'All',
       'home.filters.mediaType.movie': 'Movies',
       'home.filters.mediaType.tv': 'Shows',
@@ -94,6 +95,46 @@ describe('FilterBar', () => {
     const dropdown = wrapper.get('[data-testid="genre-dropdown-menu"]')
     expect(dropdown.classes()).toContain('[&::-webkit-scrollbar]:w-2')
     expect(dropdown.classes()).toContain('[&::-webkit-scrollbar-thumb]:bg-teal-500/70')
+  })
+
+  it('filters genres in real time as the user types', async () => {
+    const wrapper = mount(FilterBar, {
+      global: { plugins: [i18n, router] },
+    })
+
+    await wrapper.find('button').trigger('click')
+    await wrapper.get('[data-testid="genre-filter-input"]').setValue('com')
+
+    const options = wrapper.findAll('[data-testid="genre-option"]')
+    expect(options).toHaveLength(1)
+    expect(options[0]?.text()).toContain('Comedy')
+  })
+
+  it('autofocuses the genre filter input when the dropdown opens', async () => {
+    const wrapper = mount(FilterBar, {
+      attachTo: document.body,
+      global: { plugins: [i18n, router] },
+    })
+
+    await wrapper.find('button').trigger('click')
+    await nextTick()
+
+    const input = wrapper.get('[data-testid="genre-filter-input"]').element
+    expect(document.activeElement).toBe(input)
+
+    wrapper.unmount()
+  })
+
+  it('toggles a genre from the filtered list', async () => {
+    const wrapper = mount(FilterBar, {
+      global: { plugins: [i18n, router] },
+    })
+
+    await wrapper.find('button').trigger('click')
+    await wrapper.get('[data-testid="genre-filter-input"]').setValue('act')
+    await wrapper.get('[data-testid="genre-option"]').trigger('click')
+
+    expect(mockFilters.value.genres).toEqual([28])
   })
 
   it('updates media type when clicked', async () => {

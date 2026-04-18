@@ -56,6 +56,7 @@ const EXPECTED_KEYS = [
   'home.browse.trending',
   'home.filters.clear',
   'home.filters.genre',
+  'home.filters.genreSearch',
   'home.filters.grid',
   'home.filters.list',
   'home.filters.mediaType.all',
