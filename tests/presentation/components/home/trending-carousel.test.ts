@@ -71,6 +71,7 @@ describe('TrendingCarousel', () => {
 
     expect(wrapper.text()).toContain('Movie Title')
     expect(wrapper.text()).toContain('Show Name')
+    expect(wrapper.text()).toContain('2024')
     expect(wrapper.findAll('img')).toHaveLength(2)
   })
 
@@ -83,5 +84,32 @@ describe('TrendingCarousel', () => {
 
     await wrapper.find('[role="button"]').trigger('click')
     expect(push).toHaveBeenCalledWith('/movie/1')
+  })
+
+  it('renders scroll controls and scrolls the carousel when clicked', async () => {
+    const wrapper = mount(TrendingCarousel, {
+      props: { items: mockItems, loading: false },
+      global: { plugins: [router] },
+    })
+
+    const scrollContainer = wrapper.get('[data-testid="trending-carousel"]').element as HTMLElement
+    const scrollBy = vi.fn()
+    scrollContainer.scrollBy = scrollBy
+
+    expect(wrapper.get('[data-testid="trending-carousel"]').classes()).toContain(
+      '[scrollbar-width:none]',
+    )
+
+    await wrapper.get('[data-testid="trending-scroll-next"]').trigger('click')
+    await wrapper.get('[data-testid="trending-scroll-previous"]').trigger('click')
+
+    expect(scrollBy).toHaveBeenNthCalledWith(1, {
+      left: 280,
+      behavior: 'smooth',
+    })
+    expect(scrollBy).toHaveBeenNthCalledWith(2, {
+      left: -280,
+      behavior: 'smooth',
+    })
   })
 })

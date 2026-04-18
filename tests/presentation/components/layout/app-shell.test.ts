@@ -182,6 +182,19 @@ describe('AppShell', () => {
     )
   })
 
+  it('does not remount the active route when only query params change', async () => {
+    // Arrange
+    const { wrapper, router } = await renderAppShell('/')
+    const initialView = wrapper.get('[data-testid="view-home"]').element
+
+    // Act
+    await router.push({ path: '/', query: { yearFrom: '2020' } })
+    await flushPromises()
+
+    // Assert
+    expect(wrapper.get('[data-testid="view-home"]').element).toBe(initialView)
+  })
+
   // SC-10-03 — Global overlays stack above shell chrome
   it('mounts bottom-nav, modal, and toast layers in the documented stacking order', async () => {
     // Arrange

@@ -13,6 +13,7 @@ const props = defineProps<{
   results: MediaResult[]
   loading: boolean
   error: Error | null
+  hasSearched: boolean
   query: string
 }>()
 
@@ -29,7 +30,11 @@ const SKELETON_COUNT = 8
 /** Whether to show the empty state. */
 const showEmptyState = (): boolean => {
   return (
-    !props.loading && !props.error && props.results.length === 0 && props.query.trim().length > 0
+    props.hasSearched &&
+    !props.loading &&
+    !props.error &&
+    props.results.length === 0 &&
+    props.query.trim().length > 0
   )
 }
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { X, ChevronDown } from 'lucide-vue-next'
+import { X, ChevronDown, Minus, Plus } from 'lucide-vue-next'
 import { ref, onMounted, onUnmounted } from 'vue'
 
 interface Genre {
@@ -46,6 +46,8 @@ const { t } = useI18n()
 
 const isGenreOpen = ref(false)
 const genreDropdownRef = ref<HTMLElement | null>(null)
+const MIN_YEAR = 1900
+const MAX_YEAR = new Date().getFullYear() + 5
 
 /**
  * Toggles a genre ID in the filter state.
@@ -84,6 +86,56 @@ function handleClickOutside(event: MouseEvent) {
   }
 }
 
+/**
+ * Emits a normalized year value for the requested field.
+ */
+function updateYear(
+  field: 'yearFrom' | 'yearTo',
+  rawValue: number | null,
+  options: { clamp?: boolean } = {},
+) {
+  const { clamp = true } = options
+  const nextValue =
+    rawValue === null || Number.isNaN(rawValue)
+      ? null
+      : clamp
+        ? Math.min(MAX_YEAR, Math.max(MIN_YEAR, Math.round(rawValue)))
+        : Math.round(rawValue)
+
+  emit('update:modelValue', {
+    ...props.modelValue,
+    [field]: nextValue,
+  })
+}
+
+/**
+ * Handles direct typing into a year field.
+ */
+function handleYearInput(field: 'yearFrom' | 'yearTo', event: Event) {
+  const input = event.target as HTMLInputElement
+  updateYear(field, input.value === '' ? null : input.valueAsNumber, { clamp: false })
+}
+
+/**
+ * Steps a year field up or down using the custom controls.
+ */
+function stepYear(field: 'yearFrom' | 'yearTo', delta: -1 | 1) {
+  const currentValue = props.modelValue[field]
+  const baseYear =
+    currentValue === null || currentValue === undefined || Number.isNaN(currentValue)
+      ? new Date().getFullYear()
+      : currentValue
+
+  updateYear(field, baseYear + delta)
+}
+
+/**
+ * Returns the translated label for a year field.
+ */
+function getYearLabel(field: 'yearFrom' | 'yearTo') {
+  return t(field === 'yearFrom' ? 'home.filters.yearFrom' : 'home.filters.yearTo')
+}
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
 })
@@ -114,7 +166,8 @@ onUnmounted(() => {
 
       <div
         v-if="isGenreOpen"
-        class="absolute left-0 z-50 mt-2 max-h-64 w-56 overflow-y-auto rounded-lg border border-slate-700 bg-surface p-2 shadow-xl"
+        data-testid="genre-dropdown-menu"
+        class="absolute left-0 z-50 mt-2 max-h-64 w-56 overflow-y-auto rounded-lg border border-slate-700 bg-surface p-2 shadow-xl [scrollbar-width:thin] [scrollbar-color:#14b8a6_#1e293b] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-slate-800 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-teal-500/70 hover:[&::-webkit-scrollbar-thumb]:bg-teal-400"
       >
         <div
           v-for="genre in genres"
@@ -163,37 +216,73 @@ onUnmounted(() => {
 
     <!-- Year Range (Home Only) -->
     <div v-if="showYearRange" class="flex items-center gap-2">
-      <input
-        :value="modelValue.yearFrom"
-        type="number"
-        :placeholder="t('home.filters.yearFrom')"
-        class="w-24 rounded-lg bg-surface px-3 py-2 text-sm text-white placeholder-slate-500 outline-none ring-accent focus:ring-2"
-        min="1900"
-        :max="new Date().getFullYear() + 5"
-        @input="
-          (e) =>
-            emit('update:modelValue', {
-              ...modelValue,
-              yearFrom: (e.target as HTMLInputElement).valueAsNumber,
-            })
-        "
-      />
+      <div
+        data-testid="year-from-control"
+        class="flex items-center overflow-hidden rounded-lg border border-slate-700 bg-surface shadow-lg shadow-black/10"
+      >
+        <button
+          data-testid="year-from-decrement"
+          type="button"
+          :aria-label="t('home.filters.year.decrement', { label: getYearLabel('yearFrom') })"
+          class="flex size-10 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          @click="stepYear('yearFrom', -1)"
+        >
+          <Minus class="size-4" />
+        </button>
+        <input
+          data-testid="year-from-input"
+          :value="modelValue.yearFrom ?? ''"
+          type="number"
+          :placeholder="t('home.filters.yearFrom')"
+          class="w-20 border-x border-slate-700 bg-transparent px-2 py-2 text-center text-sm text-white placeholder-slate-500 outline-none ring-accent [appearance:textfield] focus:ring-2 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          :min="MIN_YEAR"
+          :max="MAX_YEAR"
+          @input="handleYearInput('yearFrom', $event)"
+        />
+        <button
+          data-testid="year-from-increment"
+          type="button"
+          :aria-label="t('home.filters.year.increment', { label: getYearLabel('yearFrom') })"
+          class="flex size-10 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          @click="stepYear('yearFrom', 1)"
+        >
+          <Plus class="size-4" />
+        </button>
+      </div>
       <span class="text-slate-500">-</span>
-      <input
-        :value="modelValue.yearTo"
-        type="number"
-        :placeholder="t('home.filters.yearTo')"
-        class="w-24 rounded-lg bg-surface px-3 py-2 text-sm text-white placeholder-slate-500 outline-none ring-accent focus:ring-2"
-        min="1900"
-        :max="new Date().getFullYear() + 5"
-        @input="
-          (e) =>
-            emit('update:modelValue', {
-              ...modelValue,
-              yearTo: (e.target as HTMLInputElement).valueAsNumber,
-            })
-        "
-      />
+      <div
+        data-testid="year-to-control"
+        class="flex items-center overflow-hidden rounded-lg border border-slate-700 bg-surface shadow-lg shadow-black/10"
+      >
+        <button
+          data-testid="year-to-decrement"
+          type="button"
+          :aria-label="t('home.filters.year.decrement', { label: getYearLabel('yearTo') })"
+          class="flex size-10 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          @click="stepYear('yearTo', -1)"
+        >
+          <Minus class="size-4" />
+        </button>
+        <input
+          data-testid="year-to-input"
+          :value="modelValue.yearTo ?? ''"
+          type="number"
+          :placeholder="t('home.filters.yearTo')"
+          class="w-20 border-x border-slate-700 bg-transparent px-2 py-2 text-center text-sm text-white placeholder-slate-500 outline-none ring-accent [appearance:textfield] focus:ring-2 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          :min="MIN_YEAR"
+          :max="MAX_YEAR"
+          @input="handleYearInput('yearTo', $event)"
+        />
+        <button
+          data-testid="year-to-increment"
+          type="button"
+          :aria-label="t('home.filters.year.increment', { label: getYearLabel('yearTo') })"
+          class="flex size-10 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          @click="stepYear('yearTo', 1)"
+        >
+          <Plus class="size-4" />
+        </button>
+      </div>
     </div>
 
     <!-- Rating Range (Library Only) -->

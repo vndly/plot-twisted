@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import type { MediaResult } from '@/application/use-browse'
 import { buildImageUrl } from '@/infrastructure/image.helper'
 import { IMAGE_SIZES } from '@/domain/constants'
@@ -12,6 +14,7 @@ defineProps<{
 
 const router = useRouter()
 const { t } = useI18n()
+const carouselRef = ref<HTMLElement | null>(null)
 
 /**
  * Navigates to the detail page for the given item.
@@ -34,11 +37,63 @@ function getTitle(item: MediaResult) {
 function getBackdropUrl(item: MediaResult) {
   return buildImageUrl(item.backdrop_path || item.poster_path, IMAGE_SIZES.backdrop.medium)
 }
+
+/**
+ * Returns the release year for a movie or show.
+ */
+function getYear(item: MediaResult) {
+  const date = 'release_date' in item ? item.release_date : item.first_air_date
+
+  if (!date) {
+    return ''
+  }
+
+  const year = new Date(date).getFullYear()
+  return Number.isNaN(year) ? '' : String(year)
+}
+
+/**
+ * Scrolls the carousel in the requested direction.
+ */
+function scrollCarousel(direction: 'previous' | 'next') {
+  if (!carouselRef.value) {
+    return
+  }
+
+  const offset = Math.max(carouselRef.value.clientWidth * 0.85, 280)
+  carouselRef.value.scrollBy({
+    left: direction === 'next' ? offset : -offset,
+    behavior: 'smooth',
+  })
+}
 </script>
 
 <template>
   <section class="space-y-4">
-    <h2 class="text-xl font-bold text-white">{{ t('home.browse.trending') }}</h2>
+    <div class="flex items-center justify-between gap-4">
+      <h2 class="text-xl font-bold tracking-tight text-white">{{ t('home.browse.trending') }}</h2>
+
+      <div v-if="!loading && items.length > 1" class="flex items-center gap-2">
+        <button
+          data-testid="trending-scroll-previous"
+          type="button"
+          :aria-label="t('home.browse.scrollPrevious')"
+          class="flex size-10 items-center justify-center rounded-full border border-slate-700 bg-surface text-slate-300 transition-colors hover:border-teal-500/50 hover:bg-surface-hover hover:text-white"
+          @click="scrollCarousel('previous')"
+        >
+          <ChevronLeft class="size-5" />
+        </button>
+        <button
+          data-testid="trending-scroll-next"
+          type="button"
+          :aria-label="t('home.browse.scrollNext')"
+          class="flex size-10 items-center justify-center rounded-full border border-slate-700 bg-surface text-slate-300 transition-colors hover:border-teal-500/50 hover:bg-surface-hover hover:text-white"
+          @click="scrollCarousel('next')"
+        >
+          <ChevronRight class="size-5" />
+        </button>
+      </div>
+    </div>
 
     <!-- Skeleton loader during initial fetch -->
     <div v-if="loading" class="flex gap-4 overflow-hidden">
@@ -52,13 +107,14 @@ function getBackdropUrl(item: MediaResult) {
     <!-- Scrollable carousel -->
     <div
       v-else
+      ref="carouselRef"
       data-testid="trending-carousel"
-      class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x"
+      class="flex gap-4 overflow-x-auto pb-4 pr-2 snap-x scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
     >
       <div
         v-for="item in items"
         :key="`${item.media_type}-${item.id}`"
-        class="relative aspect-video w-64 flex-shrink-0 cursor-pointer overflow-hidden rounded-lg bg-surface transition-transform hover:scale-105 snap-start"
+        class="group relative aspect-video w-64 flex-shrink-0 cursor-pointer overflow-hidden rounded-xl bg-surface transition-transform duration-200 ease-in-out hover:scale-[1.02] snap-start"
         role="button"
         tabindex="0"
         :aria-label="getTitle(item)"
@@ -73,25 +129,15 @@ function getBackdropUrl(item: MediaResult) {
           loading="lazy"
         />
         <div
-          class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-3"
+          class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/85 via-black/15 to-transparent p-4"
         >
-          <h3 class="truncate text-sm font-bold text-white">{{ getTitle(item) }}</h3>
-          <p class="text-[10px] font-semibold text-slate-300 uppercase tracking-wider">
-            {{ item.media_type }}
+          <h3 class="truncate text-sm font-bold tracking-tight text-white">{{ getTitle(item) }}</h3>
+          <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-300">
+            {{ t(item.media_type === 'movie' ? 'page.movie.title' : 'page.show.title') }}
+            <span v-if="getYear(item)" class="text-slate-400">· {{ getYear(item) }}</span>
           </p>
         </div>
       </div>
     </div>
   </section>
 </template>
-
-<style scoped>
-/* Hide scrollbar but keep functionality */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-hide {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
-}
-</style>

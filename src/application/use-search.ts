@@ -33,6 +33,7 @@ export function useSearch() {
   const results: Ref<MediaResult[]> = ref([])
   const loading: Ref<boolean> = ref(false)
   const error: Ref<Error | null> = ref(null)
+  const hasSearched: Ref<boolean> = ref(false)
 
   let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -58,9 +59,11 @@ export function useSearch() {
     try {
       const response = await searchMulti(trimmedQuery, language.value)
       results.value = filterMediaResults(response.results)
+      hasSearched.value = true
     } catch (e) {
       error.value = e instanceof Error ? e : new Error('Search failed')
       results.value = []
+      hasSearched.value = false
     } finally {
       loading.value = false
     }
@@ -87,6 +90,7 @@ export function useSearch() {
     results.value = []
     error.value = null
     loading.value = false
+    hasSearched.value = false
   }
 
   // Watch query changes and trigger debounced search
@@ -103,8 +107,12 @@ export function useSearch() {
     if (!trimmedQuery) {
       results.value = []
       error.value = null
+      loading.value = false
+      hasSearched.value = false
       return
     }
+
+    hasSearched.value = false
 
     // Set up debounced search
     debounceTimer = setTimeout(() => {
@@ -117,6 +125,7 @@ export function useSearch() {
     results,
     loading,
     error,
+    hasSearched,
     isSearchMode,
     retry,
     clear,

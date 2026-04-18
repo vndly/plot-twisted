@@ -431,7 +431,7 @@ describe('useSearch', () => {
         total_results: 0,
       })
 
-      const { query, results, loading } = useSearch()
+      const { query, results, loading, hasSearched } = useSearch()
 
       // Act
       query.value = 'xyznonexistent'
@@ -442,6 +442,59 @@ describe('useSearch', () => {
       // Assert
       expect(loading.value).toBe(false)
       expect(results.value).toHaveLength(0)
+      expect(hasSearched.value).toBe(true)
+    })
+
+    it('does not mark search as completed before the debounced fetch resolves', async () => {
+      // Arrange
+      mockSearchMulti.mockResolvedValue({
+        page: 1,
+        results: [],
+        total_pages: 0,
+        total_results: 0,
+      })
+
+      const { query, hasSearched } = useSearch()
+
+      // Act
+      query.value = 'x'
+      await nextTick()
+
+      // Assert
+      expect(hasSearched.value).toBe(false)
+    })
+
+    it('resets completed-search state when the query changes', async () => {
+      // Arrange
+      mockSearchMulti
+        .mockResolvedValueOnce({
+          page: 1,
+          results: [mockMovieResult],
+          total_pages: 1,
+          total_results: 1,
+        })
+        .mockResolvedValueOnce({
+          page: 1,
+          results: [],
+          total_pages: 0,
+          total_results: 0,
+        })
+
+      const { query, hasSearched } = useSearch()
+
+      // First search completes
+      query.value = 'fight'
+      await nextTick()
+      await vi.advanceTimersByTimeAsync(300)
+      await vi.runAllTimersAsync()
+      expect(hasSearched.value).toBe(true)
+
+      // Act
+      query.value = 'x'
+      await nextTick()
+
+      // Assert
+      expect(hasSearched.value).toBe(false)
     })
   })
 

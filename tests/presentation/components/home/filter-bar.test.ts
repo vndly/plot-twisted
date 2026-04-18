@@ -44,6 +44,8 @@ const i18n = createI18n({
       'home.filters.mediaType.tv': 'TV Shows',
       'home.filters.yearFrom': 'From Year',
       'home.filters.yearTo': 'To Year',
+      'home.filters.year.decrement': 'Decrease {label}',
+      'home.filters.year.increment': 'Increase {label}',
       'home.filters.clear': 'Clear All',
     },
   },
@@ -82,6 +84,18 @@ describe('FilterBar', () => {
     expect(wrapper.text()).toContain('Comedy')
   })
 
+  it('applies custom scrollbar styling to the genre dropdown', async () => {
+    const wrapper = mount(FilterBar, {
+      global: { plugins: [i18n, router] },
+    })
+
+    await wrapper.find('button').trigger('click')
+
+    const dropdown = wrapper.get('[data-testid="genre-dropdown-menu"]')
+    expect(dropdown.classes()).toContain('[&::-webkit-scrollbar]:w-2')
+    expect(dropdown.classes()).toContain('[&::-webkit-scrollbar-thumb]:bg-teal-500/70')
+  })
+
   it('updates media type when clicked', async () => {
     const wrapper = mount(FilterBar, {
       global: { plugins: [i18n, router] },
@@ -107,5 +121,39 @@ describe('FilterBar', () => {
     const clearButton = wrapper.findAll('button').find((b) => b.text() === 'Clear All')
     await clearButton?.trigger('click')
     expect(mockClearAll).toHaveBeenCalled()
+  })
+
+  it('increments the starting year with the custom stepper', async () => {
+    mockFilters.value.yearFrom = 2020
+
+    const wrapper = mount(FilterBar, {
+      global: { plugins: [i18n, router] },
+    })
+
+    await wrapper.get('[data-testid="year-from-increment"]').trigger('click')
+
+    expect(mockFilters.value.yearFrom).toBe(2021)
+  })
+
+  it('allows entering a year directly from the keyboard', async () => {
+    const wrapper = mount(FilterBar, {
+      global: { plugins: [i18n, router] },
+    })
+
+    await wrapper.get('[data-testid="year-from-input"]').setValue('2')
+
+    expect(mockFilters.value.yearFrom).toBe(2)
+  })
+
+  it('decrements the ending year with the custom stepper', async () => {
+    mockFilters.value.yearTo = 2025
+
+    const wrapper = mount(FilterBar, {
+      global: { plugins: [i18n, router] },
+    })
+
+    await wrapper.get('[data-testid="year-to-decrement"]').trigger('click')
+
+    expect(mockFilters.value.yearTo).toBe(2024)
   })
 })

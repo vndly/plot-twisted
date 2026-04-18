@@ -207,6 +207,19 @@ describe('HomeScreen', () => {
       expect(wrapper.find('[data-testid="browse-sections"]').exists()).toBe(false)
     })
 
+    it('does not show empty state before the debounced search completes', async () => {
+      // Arrange
+      const wrapper = mountComponent()
+      const input = wrapper.find('input[type="search"]')
+
+      // Act
+      await input.setValue('f')
+      await nextTick()
+
+      // Assert
+      expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(false)
+    })
+
     it('whitespace-only query stays in browse mode (HS-10-05)', async () => {
       // Arrange
       const wrapper = mountComponent()

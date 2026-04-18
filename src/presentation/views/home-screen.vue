@@ -20,6 +20,7 @@ const {
   results,
   loading: searchLoading,
   error: searchError,
+  hasSearched,
   isSearchMode,
   retry: retrySearch,
 } = useSearch()
@@ -73,7 +74,7 @@ function handleBrowseRetry() {
 </script>
 
 <template>
-  <div class="space-y-8">
+  <div class="space-y-8 px-2 pb-8 pt-2 md:px-3 md:pb-10">
     <!-- Search and Filters Section -->
     <div class="sticky top-0 z-40 space-y-4 bg-background pb-2">
       <SearchBar v-model="query" />
@@ -90,6 +91,7 @@ function handleBrowseRetry() {
       :results="results"
       :loading="searchLoading"
       :error="searchError"
+      :has-searched="hasSearched"
       :query="query"
       @retry="handleSearchRetry"
     />

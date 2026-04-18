@@ -69,6 +69,7 @@ describe('SearchResults', () => {
         results: [],
         loading: false,
         error: null,
+        hasSearched: false,
         query: '',
         ...props,
       },
@@ -165,6 +166,7 @@ describe('SearchResults', () => {
       // Arrange
       const wrapper = mountComponent({
         results: [],
+        hasSearched: true,
         query: 'xyznonexistent',
       })
 
@@ -176,6 +178,7 @@ describe('SearchResults', () => {
       // Arrange
       const wrapper = mountComponent({
         results: [],
+        hasSearched: true,
         query: 'xyznonexistent',
       })
 
@@ -188,6 +191,7 @@ describe('SearchResults', () => {
       // Arrange
       const wrapper = mountComponent({
         results: [],
+        hasSearched: true,
         query: 'xyznonexistent',
       })
 
@@ -209,10 +213,23 @@ describe('SearchResults', () => {
       expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(false)
     })
 
+    it('does not show empty state before a search completes', () => {
+      // Arrange
+      const wrapper = mountComponent({
+        results: [],
+        hasSearched: false,
+        query: 'f',
+      })
+
+      // Assert
+      expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(false)
+    })
+
     it('does not show empty state when loading', () => {
       // Arrange
       const wrapper = mountComponent({
         results: [],
+        hasSearched: false,
         query: 'test',
         loading: true,
       })
@@ -227,6 +244,7 @@ describe('SearchResults', () => {
       // Arrange
       const wrapper = mountComponent({
         results: [mockMovieResult, mockTvResult],
+        hasSearched: true,
         query: 'test',
       })
 
@@ -239,6 +257,7 @@ describe('SearchResults', () => {
       // Arrange
       const wrapper = mountComponent({
         results: [mockMovieResult],
+        hasSearched: true,
         query: 'test',
       })
 
@@ -253,6 +272,7 @@ describe('SearchResults', () => {
       const pushSpy = vi.spyOn(router, 'push')
       const wrapper = mountComponent({
         results: [mockMovieResult],
+        hasSearched: true,
         query: 'test',
       })
 
@@ -268,6 +288,7 @@ describe('SearchResults', () => {
       const pushSpy = vi.spyOn(router, 'push')
       const wrapper = mountComponent({
         results: [mockTvResult],
+        hasSearched: true,
         query: 'test',
       })
 
