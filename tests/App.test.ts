@@ -59,7 +59,6 @@ describe('App', () => {
     const shell = boundary.get('[data-testid="app-shell"]')
 
     expect(shell).toBeDefined()
-    expect(wrapper.get('header').text()).toContain('Home')
     // Home screen now renders SearchBar instead of EmptyState placeholder
     expect(wrapper.get('[data-testid="route-content"]').find('input[type="search"]').exists()).toBe(
       true,

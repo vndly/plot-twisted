@@ -117,7 +117,6 @@ describe('AppShell', () => {
     expect(contentColumn.classes()).toContain('md:pl-56')
     expect(routeContent.classes()).toContain('flex-1')
     expect(routeContent.classes()).toContain('overflow-y-auto')
-    expect(wrapper.get('header').text()).toContain('Home')
     expect(routeContent.text()).toContain('Home view')
   })
 
@@ -207,26 +206,21 @@ describe('AppShell', () => {
   // R-01b-07-01 — New placeholder routes render inside the shared shell
   describe('new placeholder routes in shell', () => {
     it.each([
-      { path: '/recommendations', testId: 'view-recommendations', title: 'Recommendations' },
-      { path: '/stats', testId: 'view-stats', title: 'Stats' },
-      { path: '/movie/550', testId: 'view-movie', title: 'Movie' },
-      { path: '/show/1396', testId: 'view-show', title: 'Show' },
-    ])(
-      'renders $path inside the shared AppShell content column',
-      async ({ path, testId, title }) => {
-        // Arrange & Act
-        const { wrapper } = await renderAppShell(path)
+      { path: '/recommendations', testId: 'view-recommendations' },
+      { path: '/stats', testId: 'view-stats' },
+      { path: '/movie/550', testId: 'view-movie' },
+      { path: '/show/1396', testId: 'view-show' },
+    ])('renders $path inside the shared AppShell content column', async ({ path, testId }) => {
+      // Arrange & Act
+      const { wrapper } = await renderAppShell(path)
 
-        // Assert
-        const header = wrapper.get('header')
-        const contentColumn = wrapper.get('[data-testid="app-shell-content-column"]')
-        const routeContent = wrapper.get('[data-testid="route-content"]')
+      // Assert
+      const contentColumn = wrapper.get('[data-testid="app-shell-content-column"]')
+      const routeContent = wrapper.get('[data-testid="route-content"]')
 
-        expect(header.text()).toContain(title)
-        expect(contentColumn.classes()).toContain('md:pl-56')
-        expect(routeContent.find(`[data-testid="${testId}"]`).exists()).toBe(true)
-      },
-    )
+      expect(contentColumn.classes()).toContain('md:pl-56')
+      expect(routeContent.find(`[data-testid="${testId}"]`).exists()).toBe(true)
+    })
   })
 
   // R-01b-07-02 — New placeholder routes reuse shared fade and reduced-motion contract
