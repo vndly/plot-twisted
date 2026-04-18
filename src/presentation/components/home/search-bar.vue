@@ -47,7 +47,7 @@ function handleClear() {
       type="search"
       :value="modelValue"
       :placeholder="t('home.search.placeholder')"
-      class="w-full rounded-lg bg-surface py-3 pl-10 pr-10 text-white placeholder-slate-400 outline-none ring-accent focus:ring-2"
+      class="w-full rounded-lg bg-surface py-3 pl-10 pr-10 text-white placeholder-slate-400 outline-none ring-accent focus:ring-2 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none"
       @input="handleInput"
     />
 

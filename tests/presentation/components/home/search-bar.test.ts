@@ -90,6 +90,18 @@ describe('SearchBar', () => {
     expect(input.attributes('type')).toBe('search')
   })
 
+  it('suppresses native search field controls in favor of the custom clear button', () => {
+    // Arrange
+    const wrapper = mountComponent({ modelValue: 'test' })
+
+    // Assert
+    const input = wrapper.find('input')
+    expect(input.attributes('class')).toContain('[&::-webkit-search-cancel-button]:appearance-none')
+    expect(input.attributes('class')).toContain('[&::-webkit-search-decoration]:appearance-none')
+    expect(wrapper.findAll('button')).toHaveLength(1)
+    expect(wrapper.find('[aria-label="Clear search"]').exists()).toBe(true)
+  })
+
   it('has placeholder text (HS-NFR-06)', () => {
     // Arrange
     const wrapper = mountComponent()
