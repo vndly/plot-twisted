@@ -1,4 +1,3 @@
- 
 import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
@@ -171,7 +170,9 @@ describe('FilterBar', () => {
     await yearFromInput.setValue('')
     await yearToInput.setValue('2023.6')
 
-    const emissions = wrapper.emitted('update:modelValue')?.map(([payload]) => payload as FilterModel)
+    const emissions = wrapper
+      .emitted('update:modelValue')
+      ?.map(([payload]) => payload as FilterModel)
     expect(emissions?.[0].yearFrom).toBe(1900)
     expect(emissions?.[1].yearTo).toBe(2031)
     expect(emissions?.[2].yearFrom).toBeNull()
@@ -237,9 +238,9 @@ describe('FilterBar', () => {
     const updatePayloads = wrapper
       .emitted('update:modelValue')
       ?.map(([payload]) => payload as FilterModel)
-    expect(updatePayloads?.some((payload) => JSON.stringify(payload.listIds) === '["list-1"]')).toBe(
-      true,
-    )
+    expect(
+      updatePayloads?.some((payload) => JSON.stringify(payload.listIds) === '["list-1"]'),
+    ).toBe(true)
     expect(updatePayloads?.some((payload) => payload.yearFrom === 2027)).toBe(true)
   })
 })
