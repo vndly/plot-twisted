@@ -33,7 +33,7 @@ function isActiveRoute(path: string) {
       <p class="text-lg font-bold text-white">{{ $t('app.title') }}</p>
     </div>
 
-    <nav class="flex flex-1 flex-col gap-2 px-4 py-6" aria-label="Primary navigation">
+    <nav class="flex flex-1 flex-col gap-2 pb-6" aria-label="Primary navigation">
       <RouterLink
         v-for="item in navItems"
         :key="item.to"

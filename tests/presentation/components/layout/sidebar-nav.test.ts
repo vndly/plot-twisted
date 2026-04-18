@@ -50,11 +50,15 @@ describe('SidebarNav', () => {
 
     // Assert
     const sidebar = wrapper.get('aside')
+    const nav = wrapper.get('nav[aria-label="Primary navigation"]')
     const links = wrapper.findAll('a')
 
     expect(sidebar.classes()).toContain('fixed')
     expect(sidebar.classes()).toContain('w-56')
     expect(sidebar.classes()).toContain('bg-bg-secondary')
+    expect(nav.classes()).toContain('pb-6')
+    expect(nav.classes()).not.toContain('px-4')
+    expect(nav.classes()).not.toContain('py-6')
     expect(wrapper.text()).toContain('Plot Twisted')
     expect(links).toHaveLength(5)
 
