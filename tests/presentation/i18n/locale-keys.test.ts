@@ -80,6 +80,8 @@ const EXPECTED_KEYS = [
   'library.empty.watchlist.description',
   'library.empty.watchlist.title',
   'library.filters.rating',
+  'library.filters.ratingMax',
+  'library.filters.ratingMin',
   'library.sort.dateAdded',
   'library.sort.label',
   'library.sort.order.dateAdded.asc',

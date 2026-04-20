@@ -25,6 +25,7 @@ const props = defineProps<{
   showMediaType?: boolean
   showYearRange?: boolean
   showRatingRange?: boolean
+  compactClear?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -40,6 +41,11 @@ const genreFilterInputRef = ref<HTMLInputElement | null>(null)
 const genreDropdownRef = ref<HTMLElement | null>(null)
 const MIN_YEAR = 1900
 const MAX_YEAR = new Date().getFullYear() + 5
+const MIN_RATING = 0
+const MAX_RATING = 5
+const RATING_STEP = 0.5
+
+type RatingField = 'ratingMin' | 'ratingMax'
 
 const filteredGenres = computed(() => {
   const query = genreSearch.value.trim().toLocaleLowerCase()
@@ -119,6 +125,52 @@ function stepYear(field: 'yearFrom' | 'yearTo', delta: -1 | 1) {
  */
 function getYearLabel(field: 'yearFrom' | 'yearTo') {
   return t(field === 'yearFrom' ? 'home.filters.yearFrom' : 'home.filters.yearTo')
+}
+
+/**
+ * Emits a normalized rating value for the requested field.
+ */
+function updateRating(field: RatingField, rawValue: number | null) {
+  const fallback = field === 'ratingMin' ? MIN_RATING : MAX_RATING
+  const roundedValue =
+    rawValue === null || Number.isNaN(rawValue)
+      ? fallback
+      : Math.round(rawValue / RATING_STEP) * RATING_STEP
+  const nextValue = Math.min(MAX_RATING, Math.max(MIN_RATING, roundedValue))
+
+  emit('update:modelValue', {
+    ...props.modelValue,
+    [field]: nextValue,
+  })
+}
+
+/**
+ * Handles direct typing into a rating field.
+ */
+function handleRatingInput(field: RatingField, event: Event) {
+  const input = event.target as HTMLInputElement
+  updateRating(field, input.value === '' ? null : input.valueAsNumber)
+}
+
+/**
+ * Steps a rating field up or down using the custom controls.
+ */
+function stepRating(field: RatingField, delta: -1 | 1) {
+  const currentValue = props.modelValue[field]
+  const fallback = field === 'ratingMin' ? MIN_RATING : MAX_RATING
+  const baseRating =
+    currentValue === null || currentValue === undefined || Number.isNaN(currentValue)
+      ? fallback
+      : currentValue
+
+  updateRating(field, baseRating + RATING_STEP * delta)
+}
+
+/**
+ * Returns the translated label for a rating field.
+ */
+function getRatingLabel(field: RatingField) {
+  return t(field === 'ratingMin' ? 'library.filters.ratingMin' : 'library.filters.ratingMax')
 }
 
 onMounted(() => {
@@ -297,47 +349,84 @@ watch(isGenreOpen, async (open) => {
     <!-- Rating Range (Library Only) -->
     <div v-if="showRatingRange" class="flex items-center gap-2">
       <span class="text-xs font-medium text-slate-400">{{ t('library.filters.rating') }}</span>
-      <input
-        :value="modelValue.ratingMin"
-        type="number"
-        step="0.5"
-        min="0"
-        max="5"
-        class="w-16 rounded-lg bg-surface px-3 py-2 text-sm text-white outline-none ring-accent focus:ring-2"
-        @input="
-          (e) =>
-            emit('update:modelValue', {
-              ...modelValue,
-              ratingMin: parseFloat((e.target as HTMLInputElement).value),
-            })
-        "
-      />
+      <div
+        data-testid="rating-min-control"
+        class="flex h-9 items-center overflow-hidden rounded-lg border border-slate-700 bg-surface shadow-lg shadow-black/10"
+      >
+        <button
+          data-testid="rating-min-decrement"
+          type="button"
+          :aria-label="t('home.filters.year.decrement', { label: getRatingLabel('ratingMin') })"
+          class="flex h-full w-9 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          @click="stepRating('ratingMin', -1)"
+        >
+          <Minus class="size-4" />
+        </button>
+        <input
+          data-testid="rating-min-input"
+          :value="modelValue.ratingMin"
+          type="number"
+          step="0.5"
+          :min="MIN_RATING"
+          :max="MAX_RATING"
+          class="h-full w-12 border-x border-slate-700 bg-transparent px-2 text-center text-sm text-white placeholder-slate-500 outline-none ring-accent [appearance:textfield] focus:ring-2 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          @input="handleRatingInput('ratingMin', $event)"
+        />
+        <button
+          data-testid="rating-min-increment"
+          type="button"
+          :aria-label="t('home.filters.year.increment', { label: getRatingLabel('ratingMin') })"
+          class="flex h-full w-9 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          @click="stepRating('ratingMin', 1)"
+        >
+          <Plus class="size-4" />
+        </button>
+      </div>
       <span class="text-slate-500">-</span>
-      <input
-        :value="modelValue.ratingMax"
-        type="number"
-        step="0.5"
-        min="0"
-        max="5"
-        class="w-16 rounded-lg bg-surface px-3 py-2 text-sm text-white outline-none ring-accent focus:ring-2"
-        @input="
-          (e) =>
-            emit('update:modelValue', {
-              ...modelValue,
-              ratingMax: parseFloat((e.target as HTMLInputElement).value),
-            })
-        "
-      />
+      <div
+        data-testid="rating-max-control"
+        class="flex h-9 items-center overflow-hidden rounded-lg border border-slate-700 bg-surface shadow-lg shadow-black/10"
+      >
+        <button
+          data-testid="rating-max-decrement"
+          type="button"
+          :aria-label="t('home.filters.year.decrement', { label: getRatingLabel('ratingMax') })"
+          class="flex h-full w-9 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          @click="stepRating('ratingMax', -1)"
+        >
+          <Minus class="size-4" />
+        </button>
+        <input
+          data-testid="rating-max-input"
+          :value="modelValue.ratingMax"
+          type="number"
+          step="0.5"
+          :min="MIN_RATING"
+          :max="MAX_RATING"
+          class="h-full w-12 border-x border-slate-700 bg-transparent px-2 text-center text-sm text-white placeholder-slate-500 outline-none ring-accent [appearance:textfield] focus:ring-2 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          @input="handleRatingInput('ratingMax', $event)"
+        />
+        <button
+          data-testid="rating-max-increment"
+          type="button"
+          :aria-label="t('home.filters.year.increment', { label: getRatingLabel('ratingMax') })"
+          class="flex h-full w-9 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          @click="stepRating('ratingMax', 1)"
+        >
+          <Plus class="size-4" />
+        </button>
+      </div>
     </div>
 
     <!-- Clear All -->
     <button
       v-if="activeFilterCount > 0"
       type="button"
-      class="ml-auto inline-flex items-center gap-2 rounded-full border border-slate-700 bg-surface px-4 py-2 text-sm font-medium text-white shadow-lg shadow-black/10 transition-colors hover:border-teal-500/60 hover:bg-surface-hover"
+      class="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-surface font-medium text-white shadow-lg shadow-black/10 transition-colors hover:border-teal-500/60 hover:bg-surface-hover"
+      :class="compactClear ? 'h-8 px-3 text-xs' : 'ml-auto px-4 py-2 text-sm'"
       @click="emit('clear')"
     >
-      <X class="size-4 text-teal-400" />
+      <X class="text-teal-400" :class="compactClear ? 'size-3.5' : 'size-4'" />
       <span>{{ t('home.filters.clear') }}</span>
     </button>
   </div>

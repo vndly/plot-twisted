@@ -110,6 +110,8 @@
   "library.sort.order.userRating.asc": "Lowest First",
   "library.sort.order.userRating.desc": "Highest First",
   "library.filters.rating": "Rating",
+  "library.filters.ratingMin": "Minimum rating",
+  "library.filters.ratingMax": "Maximum rating",
   "library.empty.filtered.title": "No items match your filters",
   "library.empty.filtered.description": "Try adjusting your filters to see more results.",
   "stats.title": "Your Library Insights",

@@ -110,6 +110,8 @@
   "library.sort.order.userRating.asc": "Menor calificación primero",
   "library.sort.order.userRating.desc": "Mayor calificación primero",
   "library.filters.rating": "Calificación",
+  "library.filters.ratingMin": "Calificación mínima",
+  "library.filters.ratingMax": "Calificación máxima",
   "library.empty.filtered.title": "No hay elementos que coincidan con tus filtros",
   "library.empty.filtered.description": "Intenta ajustar tus filtros para ver más resultados.",
   "stats.title": "Perspectivas de tu biblioteca",

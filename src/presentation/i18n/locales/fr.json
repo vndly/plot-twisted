@@ -110,6 +110,8 @@
   "library.sort.order.userRating.asc": "Plus bas d'abord",
   "library.sort.order.userRating.desc": "Plus haut d'abord",
   "library.filters.rating": "Note",
+  "library.filters.ratingMin": "Note minimale",
+  "library.filters.ratingMax": "Note maximale",
   "library.empty.filtered.title": "Aucun élément ne correspond à vos filtres",
   "library.empty.filtered.description": "Essayez d'ajuster vos filtres pour voir plus de résultats.",
   "stats.title": "Aperçu de votre bibliothèque",

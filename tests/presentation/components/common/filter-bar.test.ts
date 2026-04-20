@@ -33,6 +33,8 @@ const i18n = createI18n({
       'home.filters.year.decrement': 'Decrement {label}',
       'home.filters.clear': 'Clear filters',
       'library.filters.rating': 'Rating',
+      'library.filters.ratingMin': 'Minimum rating',
+      'library.filters.ratingMax': 'Maximum rating',
     },
   },
 })
@@ -71,6 +73,7 @@ describe('FilterBar', () => {
       showMediaType: boolean
       showYearRange: boolean
       showRatingRange: boolean
+      compactClear: boolean
     }> = {},
   ) {
     return mount(FilterBar, {
@@ -193,6 +196,45 @@ describe('FilterBar', () => {
     expect(updatePayloads?.some((payload) => payload.ratingMin === 2.5)).toBe(true)
     expect(updatePayloads?.some((payload) => payload.ratingMax === 4.5)).toBe(true)
     expect(wrapper.emitted('clear')).toHaveLength(1)
+  })
+
+  it('renders rating controls with the compact stepper treatment', async () => {
+    const wrapper = renderFilterBar({
+      showRatingRange: true,
+      compactClear: true,
+      activeFilterCount: 1,
+      modelValue: createModelValue({ ratingMin: 2.5, ratingMax: 4.5 }),
+    })
+
+    const ratingMinControl = wrapper.get('[data-testid="rating-min-control"]')
+    const ratingMinInput = wrapper.get('[data-testid="rating-min-input"]')
+    const ratingMaxControl = wrapper.get('[data-testid="rating-max-control"]')
+    const ratingMaxInput = wrapper.get('[data-testid="rating-max-input"]')
+    const clearButton = wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Clear filters')
+
+    expect(ratingMinControl.classes()).toContain('h-9')
+    expect(ratingMaxControl.classes()).toContain('h-9')
+    expect(ratingMinInput.classes()).toContain('h-full')
+    expect(ratingMinInput.classes()).toContain('w-12')
+    expect(ratingMinInput.classes()).not.toContain('w-16')
+    expect(ratingMaxInput.classes()).toContain('w-12')
+    expect(ratingMaxInput.classes()).not.toContain('w-16')
+    expect(clearButton?.classes()).toContain('h-8')
+    expect(clearButton?.classes()).toContain('text-xs')
+    expect(clearButton?.classes()).not.toContain('ml-auto')
+
+    await wrapper.get('[data-testid="rating-min-increment"]').trigger('click')
+    await wrapper.get('[data-testid="rating-max-decrement"]').trigger('click')
+    await ratingMinInput.setValue('6')
+
+    const updatePayloads = wrapper
+      .emitted('update:modelValue')
+      ?.map(([payload]) => payload as FilterModel)
+    expect(updatePayloads?.some((payload) => payload.ratingMin === 3)).toBe(true)
+    expect(updatePayloads?.some((payload) => payload.ratingMax === 4)).toBe(true)
+    expect(updatePayloads?.some((payload) => payload.ratingMin === 5)).toBe(true)
   })
 
   it('uses the current year when stepping an empty year control', async () => {

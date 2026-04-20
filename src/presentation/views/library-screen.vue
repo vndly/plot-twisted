@@ -65,27 +65,30 @@ function handleTabChange(tabId: string) {
 
 <template>
   <div class="flex flex-col gap-6 p-4 md:p-6">
-    <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <h1 class="text-2xl font-bold text-white">{{ t('page.library.title') }}</h1>
-      <div class="flex flex-col items-end gap-4 sm:flex-row sm:items-center">
-        <SortDropdown v-model="sortField" v-model:order="sortOrder" />
-        <div class="w-full sm:w-64">
-          <TabToggle :tabs="tabs" :active-tab="activeTab" @update:active-tab="handleTabChange" />
+    <!-- Library Controls -->
+    <div class="sticky top-0 z-40 -mx-4 bg-background px-4 py-2 md:-mx-6 md:px-6">
+      <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <FilterBar
+          v-model="filters"
+          :genres="genres"
+          :active-filter-count="activeFilterCount"
+          class="min-w-0 flex-1"
+          show-genre
+          show-media-type
+          show-rating-range
+          compact-clear
+          @clear="clearFilters"
+        />
+
+        <div
+          class="ml-auto flex w-full flex-wrap items-center justify-start gap-3 lg:w-auto lg:justify-end"
+        >
+          <SortDropdown v-model="sortField" v-model:order="sortOrder" />
+          <div class="w-full sm:w-64">
+            <TabToggle :tabs="tabs" :active-tab="activeTab" @update:active-tab="handleTabChange" />
+          </div>
         </div>
       </div>
-    </header>
-
-    <!-- Filter Bar -->
-    <div class="sticky top-0 z-40 -mx-4 bg-background px-4 py-2 md:-mx-6 md:px-6">
-      <FilterBar
-        v-model="filters"
-        :genres="genres"
-        :active-filter-count="activeFilterCount"
-        show-genre
-        show-media-type
-        show-rating-range
-        @clear="clearFilters"
-      />
     </div>
 
     <!-- Main Content -->

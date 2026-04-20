@@ -136,7 +136,7 @@ describe('LibraryScreen', () => {
   it('renders the default watchlist empty state and fetches genres on mount', () => {
     const wrapper = renderLibraryScreen()
 
-    expect(wrapper.get('h1').text()).toBe('Library')
+    expect(wrapper.find('h1').exists()).toBe(false)
     expect(fetchGenres).toHaveBeenCalledWith('en')
     expect(wrapper.get('[data-testid="empty-state"] h2').text()).toBe('Your watchlist is empty')
     expect(wrapper.get('[data-testid="filter-bar"]').text()).toBe('0')
