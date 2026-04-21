@@ -64,9 +64,9 @@ function handleTabChange(tabId: string) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-6 p-4 md:p-6">
+  <div class="flex flex-col gap-6 px-4 pb-4 pt-2 md:px-6 md:pb-6">
     <!-- Library Controls -->
-    <div class="sticky top-0 z-40 -mx-4 bg-background px-4 py-2 md:-mx-6 md:px-6">
+    <div class="sticky top-0 z-40 -mx-4 bg-background px-4 pb-2 md:-mx-6 md:px-6">
       <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
         <FilterBar
           v-model="filters"
