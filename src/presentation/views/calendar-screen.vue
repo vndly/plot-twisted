@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { ChevronLeft, ChevronRight, MapPin } from 'lucide-vue-next'
 import { useCalendar } from '@/application/use-calendar'
+import { useSettings } from '@/application/use-settings'
 import { useUpcomingMovies } from '@/application/use-upcoming-movies'
 import CalendarGrid from '@/presentation/components/calendar/calendar-grid.vue'
 import { useI18n } from 'vue-i18n'
 
 const { t, locale } = useI18n()
 const { year, month, nextMonth, previousMonth, goToToday } = useCalendar()
+const { preferredRegion } = useSettings()
 const { movies, calendarDays, moviesByDate, loading, error, retry } = useUpcomingMovies(year, month)
+const regionCode = computed(() => preferredRegion.value.trim().toUpperCase())
+const regionDisplayName = computed(() => getRegionDisplayName(regionCode.value))
 
 /**
  * Returns the localized month name for the current view.
@@ -16,20 +21,40 @@ function getMonthName(year: number, month: number) {
   const date = new Date(year, month, 1)
   return new Intl.DateTimeFormat(locale.value, { month: 'long' }).format(date)
 }
+
+/**
+ * Returns a localized display name for an ISO region code.
+ */
+function getRegionDisplayName(region: string) {
+  if (!region) return region
+
+  try {
+    return new Intl.DisplayNames([locale.value], { type: 'region' }).of(region) ?? region
+  } catch {
+    return region
+  }
+}
 </script>
 
 <template>
   <div class="flex flex-col gap-6 px-2 pb-8 pt-2 md:px-3 md:pb-10">
-    <!-- Header with Month/Year and Navigation -->
-    <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
+    <!-- Header with Month/Year, Location, and Navigation -->
+    <header class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
+      <div class="min-w-0">
         <h1 class="text-3xl font-bold tracking-tight text-white">
           {{ getMonthName(year, month) }}
           <span class="text-slate-500 font-medium">{{ year }}</span>
         </h1>
       </div>
 
-      <div class="flex items-center gap-2">
+      <p
+        class="flex max-w-full flex-wrap items-center gap-2 text-sm text-slate-400 sm:max-w-md sm:justify-center sm:justify-self-center sm:text-center"
+      >
+        <MapPin class="size-4 text-teal-400" aria-hidden="true" />
+        <span class="font-medium text-slate-200">{{ regionDisplayName }}</span>
+      </p>
+
+      <div class="flex items-center gap-2 sm:justify-self-end">
         <button
           class="flex size-10 items-center justify-center rounded-lg bg-slate-800 text-white transition-colors hover:bg-slate-700"
           :title="t('calendar.nav.previous')"

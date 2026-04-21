@@ -16,6 +16,7 @@ const moviesByDate = ref<Record<string, any[]>>({})
 const loading = ref(false)
 const error = ref<Error | null>(null)
 const retry = vi.fn()
+const preferredRegion = ref('US')
 
 vi.mock('@/application/use-calendar', () => ({
   useCalendar: () => ({
@@ -35,6 +36,12 @@ vi.mock('@/application/use-upcoming-movies', () => ({
     loading,
     error,
     retry,
+  }),
+}))
+
+vi.mock('@/application/use-settings', () => ({
+  useSettings: () => ({
+    preferredRegion,
   }),
 }))
 
@@ -86,6 +93,7 @@ describe('CalendarScreen', () => {
     moviesByDate.value = {}
     loading.value = false
     error.value = null
+    preferredRegion.value = 'US'
     nextMonth.mockReset()
     previousMonth.mockReset()
     goToToday.mockReset()
@@ -97,6 +105,9 @@ describe('CalendarScreen', () => {
 
     expect(wrapper.get('h1').text()).toContain('April')
     expect(wrapper.get('h1').text()).toContain('2026')
+    expect(wrapper.text()).toContain('United States')
+    expect(wrapper.text()).not.toContain('Region')
+    expect(wrapper.text()).not.toContain('US')
     expect(wrapper.get('[data-testid="calendar-grid"]').text()).toBe('2026-3-0-false')
   })
 
