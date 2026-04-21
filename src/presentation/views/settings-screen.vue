@@ -13,6 +13,7 @@ const { language, theme, triggerExport, handleImportFile, deleteAllData } = useS
 
 const { open: openModal } = useModal()
 const { addToast } = useToast()
+const appVersion = import.meta.env.VITE_APP_VERSION
 
 const languages = [
   { value: 'en', label: 'English' },
@@ -209,7 +210,7 @@ function performDeleteAllData() {
 
     <!-- App Info -->
     <footer class="pt-8 text-center text-xs text-slate-500">
-      <p>Plot Twisted v1.0.0</p>
+      <p>Plot Twisted v{{ appVersion }}</p>
     </footer>
   </div>
 </template>
