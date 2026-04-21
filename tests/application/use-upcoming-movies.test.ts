@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
 import { useUpcomingMovies } from '@/application/use-upcoming-movies'
 import * as providerClient from '@/infrastructure/provider.client'
@@ -27,7 +27,12 @@ const TestComponent = defineComponent({
     month: { type: Number, required: true },
   },
   setup(props) {
-    return { ...useUpcomingMovies(props.year, props.month) }
+    return {
+      ...useUpcomingMovies(
+        () => props.year,
+        () => props.month,
+      ),
+    }
   },
   template: '<div></div>',
 })
@@ -173,6 +178,40 @@ describe('useUpcomingMovies', () => {
 
     expect(vm.movies).toHaveLength(1)
     expect(vm.movies[0].id).toBe(1)
+  })
+
+  it('refetches movies when the reactive month changes', async () => {
+    vi.mocked(providerClient.getUpcomingMovies)
+      .mockResolvedValueOnce({
+        page: 1,
+        total_pages: 1,
+        total_results: 1,
+        results: [{ id: 1, title: 'April Movie', release_date: '2026-04-05' } as any],
+      })
+      .mockResolvedValueOnce({
+        page: 1,
+        total_pages: 1,
+        total_results: 1,
+        results: [{ id: 2, title: 'May Movie', release_date: '2026-05-10' } as any],
+      })
+
+    const wrapper = mount(TestComponent, {
+      props: { year: 2026, month: 3 },
+    })
+    const vm = wrapper.vm as any
+
+    await flushPromises()
+    await nextTick()
+
+    expect(vm.movies).toHaveLength(1)
+    expect(vm.movies[0].id).toBe(1)
+
+    await wrapper.setProps({ month: 4 })
+    await flushPromises()
+
+    expect(vm.movies).toHaveLength(1)
+    expect(vm.movies[0].id).toBe(2)
+    expect(providerClient.getUpcomingMovies).toHaveBeenCalledTimes(2)
   })
 
   it('normalizes non-Error failures into a default upcoming error', async () => {

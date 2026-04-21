@@ -7,10 +7,7 @@ import { useI18n } from 'vue-i18n'
 
 const { t, locale } = useI18n()
 const { year, month, nextMonth, previousMonth, goToToday } = useCalendar()
-const { movies, calendarDays, moviesByDate, loading, error, retry } = useUpcomingMovies(
-  year.value,
-  month.value,
-)
+const { movies, calendarDays, moviesByDate, loading, error, retry } = useUpcomingMovies(year, month)
 
 /**
  * Returns the localized month name for the current view.
