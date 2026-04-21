@@ -23,6 +23,7 @@ const i18n = createI18n({
   messages: {
     en: {
       'home.filters.genre': 'Genre',
+      'home.filters.genreClear': 'Clear',
       'home.filters.genreSearch': 'Search genres',
       'home.filters.mediaType.all': 'All',
       'home.filters.mediaType.movie': 'Movies',
@@ -140,6 +141,38 @@ describe('FilterBar', () => {
 
     wrapper.unmount()
     expect(removeEventListener).toHaveBeenCalledWith('click', expect.any(Function))
+  })
+
+  it('shows a genre clear button only when genres are selected and clears only genres', async () => {
+    const wrapper = renderFilterBar({
+      showGenre: true,
+      showMediaType: true,
+    })
+
+    await wrapper.get('button').trigger('click')
+    expect(wrapper.find('[data-testid="genre-clear-button"]').exists()).toBe(false)
+
+    await wrapper.setProps({
+      modelValue: createModelValue({
+        genres: [1, 2],
+        mediaType: 'movie',
+        yearFrom: 1999,
+        yearTo: 2024,
+        ratingMin: 2,
+        ratingMax: 4,
+      }),
+    })
+    await wrapper.get('[data-testid="genre-clear-button"]').trigger('click')
+
+    const payload = wrapper.emitted('update:modelValue')?.[0][0] as FilterModel
+    expect(payload).toMatchObject({
+      genres: [],
+      mediaType: 'movie',
+      yearFrom: 1999,
+      yearTo: 2024,
+      ratingMin: 2,
+      ratingMax: 4,
+    })
   })
 
   it('emits normalized year changes for buttons and typed input', async () => {

@@ -141,18 +141,17 @@ describe('router', () => {
     })
   })
 
-  // SC-01d-10-01, SC-01d-10-02, SC-01d-10-03
   describe('document title', () => {
     beforeEach(() => {
       document.title = ''
     })
 
-    it('sets document.title using i18n on navigation', async () => {
+    it('sets document.title to the app title using i18n on navigation', async () => {
       // Arrange & Act
       await router.push('/library')
 
       // Assert — i18n mock returns the key as-is
-      expect(document.title).toBe('page.library.title \u2014 app.title')
+      expect(document.title).toBe('app.title')
     })
 
     it('uses i18n t() function for title', async () => {
@@ -160,16 +159,15 @@ describe('router', () => {
       await router.push('/settings')
 
       // Assert — mock identity function returns the key, proving i18n is used
-      expect(document.title).toContain('page.settings.title')
-      expect(document.title).toContain('app.title')
+      expect(document.title).toBe('app.title')
     })
 
-    it('sets home route title correctly', async () => {
+    it('keeps the home route title fixed to the app title', async () => {
       // Arrange & Act
       await router.push('/')
 
       // Assert
-      expect(document.title).toBe('page.home.title \u2014 app.title')
+      expect(document.title).toBe('app.title')
     })
 
     it('falls back to app.title when route has no titleKey', async () => {
@@ -192,18 +190,16 @@ describe('router', () => {
     })
 
     // R-01b-01-01, R-01b-03-01, R-01b-04-01
-    it.each([
-      { path: '/recommendations', expected: 'page.recommendations.title \u2014 app.title' },
-      { path: '/stats', expected: 'page.stats.title \u2014 app.title' },
-      { path: '/movie/550', expected: 'page.movie.title \u2014 app.title' },
-      { path: '/show/1396', expected: 'page.show.title \u2014 app.title' },
-    ])('sets document.title for $path', async ({ path, expected }) => {
-      // Arrange & Act
-      await router.push(path)
+    it.each(['/recommendations', '/stats', '/movie/550', '/show/1396'])(
+      'keeps document.title fixed for %s',
+      async (path) => {
+        // Arrange & Act
+        await router.push(path)
 
-      // Assert
-      expect(document.title).toBe(expected)
-    })
+        // Assert
+        expect(document.title).toBe('app.title')
+      },
+    )
   })
 
   // R-01b-05-01 — non-numeric detail IDs redirect to home

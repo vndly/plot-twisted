@@ -43,6 +43,7 @@
   "home.browse.error.message": "Échec du chargement du contenu",
   "home.browse.error.retry": "Réessayer",
   "home.filters.genre": "Genre",
+  "home.filters.genreClear": "Effacer",
   "home.filters.genreSearch": "Rechercher des genres",
   "home.filters.mediaType.all": "Tout",
   "home.filters.mediaType.movie": "Films",

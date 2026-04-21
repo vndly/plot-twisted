@@ -68,6 +68,10 @@ function toggleGenre(id: number) {
   emit('update:modelValue', { ...props.modelValue, genres })
 }
 
+function clearGenres() {
+  emit('update:modelValue', { ...props.modelValue, genres: [] })
+}
+
 /**
  * Closes the genre dropdown if clicking outside.
  */
@@ -215,14 +219,26 @@ watch(isGenreOpen, async (open) => {
         v-if="isGenreOpen"
         class="absolute left-0 z-50 mt-2 w-56 rounded-lg border border-slate-700 bg-surface p-2 shadow-xl"
       >
-        <input
-          ref="genreFilterInputRef"
-          v-model="genreSearch"
-          data-testid="genre-filter-input"
-          type="text"
-          :placeholder="t('home.filters.genreSearch')"
-          class="w-full rounded-md border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none ring-accent transition focus:border-teal-500/60 focus:ring-2"
-        />
+        <div class="flex items-center gap-2">
+          <input
+            ref="genreFilterInputRef"
+            v-model="genreSearch"
+            data-testid="genre-filter-input"
+            type="text"
+            :placeholder="t('home.filters.genreSearch')"
+            class="min-w-0 flex-1 rounded-md border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none ring-accent transition focus:border-teal-500/60 focus:ring-2"
+          />
+          <button
+            v-if="modelValue.genres.length > 0"
+            data-testid="genre-clear-button"
+            type="button"
+            class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md border border-slate-700 px-2.5 text-xs font-medium text-slate-200 transition-colors hover:border-teal-500/60 hover:bg-slate-800 hover:text-white"
+            @click="clearGenres"
+          >
+            <X class="size-3.5 text-teal-400" />
+            <span>{{ t('home.filters.genreClear') }}</span>
+          </button>
+        </div>
 
         <div
           data-testid="genre-dropdown-menu"

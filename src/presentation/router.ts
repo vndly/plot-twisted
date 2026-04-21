@@ -88,10 +88,9 @@ const router = createRouter({
   ],
 })
 
-router.afterEach((to) => {
+router.afterEach(() => {
   const t = i18n.global.t
-  const titleKey = to.meta.titleKey
-  document.title = titleKey ? `${t(titleKey)} \u2014 ${t('app.title')}` : t('app.title')
+  document.title = t('app.title')
 })
 
 export default router

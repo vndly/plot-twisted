@@ -39,6 +39,7 @@ const i18n = createI18n({
   messages: {
     en: {
       'home.filters.genre': 'Genre',
+      'home.filters.genreClear': 'Clear',
       'home.filters.genreSearch': 'Search genres',
       'home.filters.mediaType.all': 'All',
       'home.filters.mediaType.movie': 'Movies',
@@ -135,6 +136,22 @@ describe('FilterBar', () => {
     await wrapper.get('[data-testid="genre-option"]').trigger('click')
 
     expect(mockFilters.value.genres).toEqual([28])
+  })
+
+  it('clears selected genres from inside the genre dropdown', async () => {
+    mockFilters.value.genres = [28]
+    mockFilters.value.mediaType = 'movie'
+
+    const wrapper = mount(FilterBar, {
+      global: { plugins: [i18n, router] },
+    })
+
+    await wrapper.find('button').trigger('click')
+    await wrapper.get('[data-testid="genre-clear-button"]').trigger('click')
+
+    expect(mockFilters.value.genres).toEqual([])
+    expect(mockFilters.value.mediaType).toBe('movie')
+    expect(mockClearAll).not.toHaveBeenCalled()
   })
 
   it('updates media type when clicked', async () => {
