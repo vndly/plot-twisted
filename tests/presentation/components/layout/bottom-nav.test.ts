@@ -104,7 +104,8 @@ describe('BottomNav', () => {
     const homeLink = wrapper.get('a[href="/"]')
 
     expect(activeLink.classes()).toContain('text-accent')
-    expect(homeLink.classes()).toContain('text-slate-400')
+    expect(homeLink.classes()).toContain('text-slate-500')
+    expect(homeLink.classes()).toContain('dark:text-slate-400')
     expect(homeLink.classes()).not.toContain('text-accent')
   })
 
@@ -118,7 +119,7 @@ describe('BottomNav', () => {
     const homeLink = wrapper.get('a[href="/"]')
 
     expect(recommendationsLink.classes()).toContain('text-accent')
-    expect(homeLink.classes()).toContain('text-slate-400')
+    expect(homeLink.classes()).toContain('text-slate-500')
     expect(homeLink.classes()).not.toContain('text-accent')
   })
 
@@ -132,7 +133,7 @@ describe('BottomNav', () => {
     const libraryLink = wrapper.get('a[href="/library"]')
 
     expect(homeLink.classes()).toContain('text-accent')
-    expect(libraryLink.classes()).toContain('text-slate-400')
+    expect(libraryLink.classes()).toContain('text-slate-500')
   })
 
   // Implementation detail — Inactive items use muted styling
@@ -141,8 +142,8 @@ describe('BottomNav', () => {
     const { wrapper } = await renderBottomNav('/settings')
 
     // Assert
-    expect(wrapper.get('a[href="/"]').classes()).toContain('text-slate-400')
-    expect(wrapper.get('a[href="/calendar"]').classes()).toContain('text-slate-400')
-    expect(wrapper.get('a[href="/library"]').classes()).toContain('text-slate-400')
+    expect(wrapper.get('a[href="/"]').classes()).toContain('text-slate-500')
+    expect(wrapper.get('a[href="/calendar"]').classes()).toContain('text-slate-500')
+    expect(wrapper.get('a[href="/library"]').classes()).toContain('text-slate-500')
   })
 })

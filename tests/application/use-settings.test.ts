@@ -8,6 +8,7 @@ vi.mock('@/infrastructure/storage.service', () => ({
   importData: vi.fn(),
   downloadFile: vi.fn(),
   parseFile: vi.fn(),
+  clearAllData: vi.fn(),
 }))
 
 const baseSettings = {
@@ -123,6 +124,28 @@ describe('useSettings', () => {
     expect(preferredRegion.value).toBe('FR')
     expect(layoutMode.value).toBe('list')
     expect(defaultHomeSection.value).toBe('popular')
+  })
+
+  it('clears local data and resets settings refs', async () => {
+    vi.mocked(storageService.getSettings)
+      .mockReturnValueOnce(baseSettings)
+      .mockReturnValueOnce({
+        ...baseSettings,
+        preferredRegion: 'GB',
+      })
+
+    const { useSettings } = await loadComposable()
+    const { deleteAllData, theme, language, preferredRegion } = useSettings()
+
+    theme.value = 'light'
+    language.value = 'fr'
+
+    deleteAllData()
+
+    expect(storageService.clearAllData).toHaveBeenCalled()
+    expect(theme.value).toBe('dark')
+    expect(language.value).toBe('en')
+    expect(preferredRegion.value).toBe('GB')
   })
 
   it('skips document synchronization when document is unavailable', async () => {

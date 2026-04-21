@@ -29,16 +29,16 @@ function getBorderClass(type: 'error' | 'success' | 'info'): string {
         :key="toast.id"
         :data-toast-id="toast.id"
         data-testid="toast-item"
-        class="flex min-w-72 items-center gap-3 rounded-lg border-l-4 bg-surface p-4 shadow-lg"
+        class="flex min-w-72 items-center gap-3 rounded-lg border-l-4 bg-white p-4 shadow-lg dark:bg-surface"
         :class="getBorderClass(toast.type)"
       >
-        <span class="flex-1 text-sm text-white">{{ toast.message }}</span>
+        <span class="flex-1 text-sm text-slate-950 dark:text-white">{{ toast.message }}</span>
 
         <div class="flex items-center gap-1">
           <button
             v-if="toast.action"
             data-testid="toast-action"
-            class="min-h-11 min-w-11 cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-accent transition-colors hover:bg-white/10"
+            class="min-h-11 min-w-11 cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-accent transition-colors hover:bg-teal-50 dark:hover:bg-white/10"
             @click="toast.action.handler"
           >
             {{ toast.action.label }}
@@ -47,7 +47,7 @@ function getBorderClass(type: 'error' | 'success' | 'info'): string {
           <button
             data-testid="toast-dismiss"
             :aria-label="t('toast.dismiss')"
-            class="flex min-h-11 min-w-11 cursor-pointer items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+            class="flex min-h-11 min-w-11 cursor-pointer items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white"
             @click="removeToast(toast.id)"
           >
             <X class="size-5" />

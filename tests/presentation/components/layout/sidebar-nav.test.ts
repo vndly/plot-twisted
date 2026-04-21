@@ -56,7 +56,8 @@ describe('SidebarNav', () => {
 
     expect(sidebar.classes()).toContain('fixed')
     expect(sidebar.classes()).toContain('w-56')
-    expect(sidebar.classes()).toContain('bg-bg-secondary')
+    expect(sidebar.classes()).toContain('bg-white')
+    expect(sidebar.classes()).toContain('dark:bg-bg-secondary')
     expect(brandHeader.classes()).toContain('py-4')
     expect(brandHeader.classes()).not.toContain('py-6')
     expect(nav.classes()).toContain('pb-6')
@@ -119,8 +120,10 @@ describe('SidebarNav', () => {
 
     expect(recommendationsLink.classes()).toContain('border-accent')
     expect(recommendationsLink.classes()).toContain('bg-accent/10')
-    expect(recommendationsLink.classes()).toContain('text-white')
-    expect(homeLink.classes()).toContain('text-slate-400')
+    expect(recommendationsLink.classes()).toContain('text-slate-950')
+    expect(recommendationsLink.classes()).toContain('dark:text-white')
+    expect(homeLink.classes()).toContain('text-slate-500')
+    expect(homeLink.classes()).toContain('dark:text-slate-400')
     expect(homeLink.classes()).not.toContain('border-accent')
   })
 
@@ -136,11 +139,12 @@ describe('SidebarNav', () => {
 
     expect(activeLink.classes()).toContain('border-accent')
     expect(activeLink.classes()).toContain('bg-accent/10')
-    expect(activeLink.classes()).toContain('text-white')
-    expect(homeLink.classes()).toContain('text-slate-400')
+    expect(activeLink.classes()).toContain('text-slate-950')
+    expect(activeLink.classes()).toContain('dark:text-white')
+    expect(homeLink.classes()).toContain('text-slate-500')
     expect(homeLink.classes()).not.toContain('border-accent')
     expect(homeLink.classes()).not.toContain('bg-accent/10')
-    expect(calendarLink.classes()).toContain('text-slate-400')
+    expect(calendarLink.classes()).toContain('text-slate-500')
   })
 
   // SC-07-04, SC-25-07 — Home uses exact-match positive behavior on the root route
@@ -154,8 +158,9 @@ describe('SidebarNav', () => {
 
     expect(homeLink.classes()).toContain('border-accent')
     expect(homeLink.classes()).toContain('bg-accent/10')
-    expect(homeLink.classes()).toContain('text-white')
-    expect(libraryLink.classes()).toContain('text-slate-400')
+    expect(homeLink.classes()).toContain('text-slate-950')
+    expect(homeLink.classes()).toContain('dark:text-white')
+    expect(libraryLink.classes()).toContain('text-slate-500')
   })
 
   // Implementation detail — Inactive links use muted text styling
@@ -164,8 +169,8 @@ describe('SidebarNav', () => {
     const { wrapper } = await renderSidebarNav('/settings')
 
     // Assert
-    expect(wrapper.get('a[href="/"]').classes()).toContain('text-slate-400')
-    expect(wrapper.get('a[href="/calendar"]').classes()).toContain('text-slate-400')
-    expect(wrapper.get('a[href="/library"]').classes()).toContain('text-slate-400')
+    expect(wrapper.get('a[href="/"]').classes()).toContain('text-slate-500')
+    expect(wrapper.get('a[href="/calendar"]').classes()).toContain('text-slate-500')
+    expect(wrapper.get('a[href="/library"]').classes()).toContain('text-slate-500')
   })
 })

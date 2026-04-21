@@ -11,6 +11,7 @@ const theme = ref<'dark' | 'light'>('dark')
 const defaultHomeSection = ref<'trending' | 'popular' | 'search'>('trending')
 const triggerExport = vi.fn()
 const handleImportFile = vi.fn()
+const deleteAllData = vi.fn()
 const openModal = vi.fn()
 const addToast = vi.fn()
 
@@ -23,6 +24,7 @@ vi.mock('@/application/use-settings', () => ({
     defaultHomeSection,
     triggerExport,
     handleImportFile,
+    deleteAllData,
   }),
 }))
 
@@ -50,18 +52,11 @@ function createTestI18n() {
         'settings.description': 'Customize your experience',
         'settings.sections.appearance': 'Appearance',
         'settings.sections.content': 'Content',
-        'settings.sections.navigation': 'Navigation',
         'settings.sections.data': 'Data',
         'settings.appearance.theme.label': 'Theme',
         'settings.appearance.theme.description': 'Switch between light and dark modes.',
-        'settings.appearance.layout.label': 'Layout',
-        'settings.appearance.layout.description': 'Choose your browsing layout.',
         'settings.content.language.label': 'Language',
         'settings.content.language.description': 'Pick the interface language.',
-        'settings.content.region.label': 'Region',
-        'settings.content.region.description': 'Set your preferred region.',
-        'settings.navigation.home.label': 'Home Section',
-        'settings.navigation.home.description': 'Select the default home section.',
         'settings.data.info.title': 'Manage your library',
         'settings.data.info.description': 'Export or import your local data.',
         'settings.data.export': 'Export',
@@ -77,7 +72,12 @@ function createTestI18n() {
         'settings.import.confirmOverwriteTitle': 'Confirm overwrite',
         'settings.import.confirmOverwriteDescription': 'This replaces your current data.',
         'settings.import.confirmOverwriteButton': 'Confirm overwrite',
-        'settings.footer.legal': 'For personal use only.',
+        'settings.delete.button': 'Delete all data',
+        'settings.delete.title': 'Delete all data?',
+        'settings.delete.description': 'This permanently deletes local data.',
+        'settings.delete.confirm': 'Delete all data',
+        'settings.delete.success': 'All data deleted',
+        'settings.delete.error': 'Delete failed',
         'home.sections.trending': 'Trending',
         'home.sections.popular': 'Popular',
         'home.sections.search': 'Search',
@@ -102,10 +102,6 @@ function renderSettingsScreen() {
           name: 'ThemeToggle',
           template: '<div data-testid="theme-toggle"></div>',
         },
-        LayoutModeToggle: {
-          name: 'LayoutModeToggle',
-          template: '<div data-testid="layout-mode-toggle"></div>',
-        },
         SettingsSelect: {
           name: 'SettingsSelect',
           template: '<div data-testid="settings-select"></div>',
@@ -126,6 +122,7 @@ describe('SettingsScreen', () => {
     defaultHomeSection.value = 'trending'
     triggerExport.mockReset()
     handleImportFile.mockReset()
+    deleteAllData.mockReset()
     openModal.mockReset()
     addToast.mockReset()
   })
@@ -138,14 +135,16 @@ describe('SettingsScreen', () => {
     const wrapper = renderSettingsScreen()
 
     expect(wrapper.get('h1').text()).toBe('Settings')
-    expect(wrapper.findAll('[data-testid="settings-row"]')).toHaveLength(5)
-    expect(wrapper.findAll('[data-testid="settings-select"]')).toHaveLength(3)
+    expect(wrapper.findAll('[data-testid="settings-row"]')).toHaveLength(2)
+    expect(wrapper.findAll('[data-testid="settings-select"]')).toHaveLength(1)
     expect(wrapper.find('[data-testid="theme-toggle"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="layout-mode-toggle"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="layout-mode-toggle"]').exists()).toBe(false)
     expect(wrapper.text()).toContain('Export')
     expect(wrapper.text()).toContain('Import')
+    expect(wrapper.text()).toContain('Delete all data')
     expect(wrapper.text()).toContain('Plot Twisted v1.0.0')
-    expect(wrapper.text()).toContain('For personal use only.')
+    expect(wrapper.text()).not.toContain('Preferred Region')
+    expect(wrapper.text()).not.toContain('Navigation')
   })
 
   it('handles export success and failure with toasts', async () => {
@@ -242,22 +241,55 @@ describe('SettingsScreen', () => {
     expect(addToast).toHaveBeenCalledWith({ message: 'Import failed', type: 'error' })
   })
 
+  it('confirms and deletes all local data', async () => {
+    const wrapper = renderSettingsScreen()
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Delete all data')
+      ?.trigger('click')
+
+    expect(openModal).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Delete all data?',
+        confirmLabel: 'Delete all data',
+      }),
+    )
+
+    const modalConfig = openModal.mock.calls[0][0]
+    modalConfig.onConfirm()
+
+    expect(deleteAllData).toHaveBeenCalled()
+    expect(addToast).toHaveBeenCalledWith({ message: 'All data deleted', type: 'success' })
+  })
+
+  it('shows an error toast when deleting local data fails', async () => {
+    deleteAllData.mockImplementationOnce(() => {
+      throw new Error('nope')
+    })
+
+    const wrapper = renderSettingsScreen()
+
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Delete all data')
+      ?.trigger('click')
+
+    const modalConfig = openModal.mock.calls[0][0]
+    modalConfig.onConfirm()
+
+    expect(addToast).toHaveBeenCalledWith({ message: 'Delete failed', type: 'error' })
+  })
+
   it('updates reactive settings refs from child v-model emissions', async () => {
     const wrapper = renderSettingsScreen()
     const toggles = wrapper.findAllComponents({ name: 'ThemeToggle' })
-    const layoutToggles = wrapper.findAllComponents({ name: 'LayoutModeToggle' })
     const selects = wrapper.findAllComponents({ name: 'SettingsSelect' })
 
     toggles[0].vm.$emit('update:modelValue', 'light')
-    layoutToggles[0].vm.$emit('update:modelValue', 'list')
     selects[0].vm.$emit('update:modelValue', 'fr')
-    selects[1].vm.$emit('update:modelValue', 'FR')
-    selects[2].vm.$emit('update:modelValue', 'popular')
 
     expect(theme.value).toBe('light')
-    expect(layoutMode.value).toBe('list')
     expect(language.value).toBe('fr')
-    expect(preferredRegion.value).toBe('FR')
-    expect(defaultHomeSection.value).toBe('popular')
   })
 })

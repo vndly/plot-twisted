@@ -50,25 +50,25 @@ function selectOption(value: string) {
   <div ref="dropdownRef" class="relative">
     <button
       type="button"
-      class="flex min-w-[120px] items-center justify-between gap-2 rounded-lg bg-surface px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
+      class="flex min-w-[120px] items-center justify-between gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-950 transition-colors hover:bg-slate-200 dark:bg-surface dark:text-white dark:hover:bg-slate-700"
       @click="isOpen = !isOpen"
     >
       <span>{{ currentLabel }}</span>
-      <ChevronDown class="size-4 text-slate-400" />
+      <ChevronDown class="size-4 text-slate-500 dark:text-slate-400" />
     </button>
 
     <div
       v-if="isOpen"
-      class="absolute right-0 z-50 mt-2 w-full min-w-[160px] rounded-lg border border-slate-700 bg-surface p-1 shadow-xl"
+      class="absolute right-0 z-50 mt-2 w-full min-w-[160px] rounded-lg border border-slate-200 bg-white p-1 shadow-xl dark:border-slate-700 dark:bg-surface"
     >
       <button
         v-for="option in options"
         :key="option.value"
         type="button"
-        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-slate-700"
+        class="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors hover:bg-slate-100 dark:hover:bg-slate-700"
         :class="{
           'text-accent': modelValue === option.value,
-          'text-white': modelValue !== option.value,
+          'text-slate-800 dark:text-white': modelValue !== option.value,
         }"
         @click="selectOption(option.value)"
       >

@@ -26,11 +26,13 @@ function isActiveRoute(path: string) {
 
 <template>
   <aside
-    class="fixed inset-y-0 left-0 flex w-56 flex-col bg-bg-secondary max-md:hidden"
+    class="fixed inset-y-0 left-0 flex w-56 flex-col bg-white shadow-sm max-md:hidden dark:bg-bg-secondary dark:shadow-none"
     aria-label="Desktop sidebar"
   >
-    <div class="border-b border-white/10 px-6 py-4">
-      <p class="flex items-center gap-3 text-lg font-bold tracking-tight text-white">
+    <div class="border-b border-slate-200 px-6 py-4 dark:border-white/10">
+      <p
+        class="flex items-center gap-3 text-lg font-bold tracking-tight text-slate-950 dark:text-white"
+      >
         <span aria-hidden="true" class="text-base leading-none">🎬</span>
         <span>{{ $t('app.title') }}</span>
       </p>
@@ -44,8 +46,8 @@ function isActiveRoute(path: string) {
         class="flex items-center gap-3 rounded-r-lg border-l-2 px-4 py-3 transition-colors"
         :class="
           isActiveRoute(item.to)
-            ? 'border-accent bg-accent/10 text-white'
-            : 'border-transparent text-slate-400 hover:text-white'
+            ? 'border-accent bg-accent/10 text-slate-950 dark:text-white'
+            : 'border-transparent text-slate-500 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white'
         "
       >
         <component :is="item.icon" class="size-5" />

@@ -60,21 +60,25 @@ onUnmounted(() => {
     >
       <div
         data-testid="modal-content"
-        class="mx-4 max-h-[80vh] w-full max-w-md overflow-y-auto rounded-lg bg-surface p-6 shadow-lg"
+        class="mx-4 max-h-[80vh] w-full max-w-md overflow-y-auto rounded-lg bg-white p-6 text-slate-950 shadow-lg dark:bg-surface dark:text-white"
         @click.stop
       >
-        <h2 data-testid="modal-title" class="text-lg font-bold text-white">
+        <h2 data-testid="modal-title" class="text-lg font-bold text-slate-950 dark:text-white">
           {{ props.title }}
         </h2>
 
-        <p v-if="props.content" data-testid="modal-body" class="mt-3 text-sm text-slate-300">
+        <p
+          v-if="props.content"
+          data-testid="modal-body"
+          class="mt-3 text-sm text-slate-600 dark:text-slate-300"
+        >
           {{ props.content }}
         </p>
 
         <div data-testid="modal-footer" class="mt-6 flex justify-end gap-3">
           <button
             data-testid="modal-cancel"
-            class="min-h-11 cursor-pointer rounded-md px-4 py-2 text-sm font-medium text-slate-300 transition-colors hover:bg-white/10 hover:text-white"
+            class="min-h-11 cursor-pointer rounded-md px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white"
             @click="handleCancel"
           >
             {{ props.cancelLabel ?? t('modal.cancel') }}

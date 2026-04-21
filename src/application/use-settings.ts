@@ -6,6 +6,7 @@ import {
   importData,
   downloadFile,
   parseFile,
+  clearAllData,
 } from '@/infrastructure/storage.service'
 import { type LayoutMode, type Settings } from '@/domain/settings.schema'
 
@@ -18,6 +19,20 @@ const theme = ref(settings.theme)
 const defaultHomeSection = ref(settings.defaultHomeSection)
 const librarySortField = ref(settings.librarySortField)
 const librarySortOrder = ref(settings.librarySortOrder)
+
+/**
+ * Synchronizes all reactive refs from a settings object.
+ * @param newSettings - Settings to apply to local state
+ */
+function syncSettingsRefs(newSettings: Settings): void {
+  language.value = newSettings.language
+  preferredRegion.value = newSettings.preferredRegion
+  layoutMode.value = newSettings.layoutMode
+  theme.value = newSettings.theme
+  defaultHomeSection.value = newSettings.defaultHomeSection
+  librarySortField.value = newSettings.librarySortField
+  librarySortOrder.value = newSettings.librarySortOrder
+}
 
 // Global watcher for persistence and UI state sync
 // This runs once for the application lifecycle
@@ -88,15 +103,16 @@ export function useSettings() {
 
     // Refresh local refs if overwrite happened
     if (strategy === 'overwrite') {
-      const newSettings = getSettings()
-      language.value = newSettings.language
-      preferredRegion.value = newSettings.preferredRegion
-      layoutMode.value = newSettings.layoutMode
-      theme.value = newSettings.theme
-      defaultHomeSection.value = newSettings.defaultHomeSection
-      librarySortField.value = newSettings.librarySortField
-      librarySortOrder.value = newSettings.librarySortOrder
+      syncSettingsRefs(getSettings())
     }
+  }
+
+  /**
+   * Deletes all locally stored user data and resets settings refs.
+   */
+  function deleteAllData() {
+    clearAllData()
+    syncSettingsRefs(getSettings())
   }
 
   return {
@@ -110,5 +126,6 @@ export function useSettings() {
     triggerExport,
     handleImportFile,
     importLibrary,
+    deleteAllData,
   }
 }

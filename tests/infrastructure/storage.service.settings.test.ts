@@ -1,11 +1,32 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { getSettings, saveSettings, STORAGE_KEY_SETTINGS } from '@/infrastructure/storage.service'
+import {
+  clearAllData,
+  getSettings,
+  saveSettings,
+  STORAGE_KEY,
+  STORAGE_KEY_SETTINGS,
+} from '@/infrastructure/storage.service'
 import { DEFAULT_SETTINGS } from '@/domain/settings.schema'
 
 describe('storage.service settings', () => {
+  const originalLanguage = navigator.language
+  const originalLanguages = navigator.languages
+
   beforeEach(() => {
     localStorage.clear()
+    setNavigatorLocales(originalLanguage, [...originalLanguages])
   })
+
+  function setNavigatorLocales(language: string, languages: readonly string[] = [language]) {
+    Object.defineProperty(navigator, 'language', {
+      configurable: true,
+      value: language,
+    })
+    Object.defineProperty(navigator, 'languages', {
+      configurable: true,
+      value: languages,
+    })
+  }
 
   it('returns default settings when none exist', () => {
     const settings = getSettings()
@@ -49,6 +70,28 @@ describe('storage.service settings', () => {
     expect(settings.librarySortField).toBe(DEFAULT_SETTINGS.librarySortField)
   })
 
+  it('uses the browser locale region for default settings', () => {
+    setNavigatorLocales('de-CH')
+
+    const settings = getSettings()
+
+    expect(settings.preferredRegion).toBe('CH')
+  })
+
+  it('overrides stored preferred region with the browser locale region', () => {
+    setNavigatorLocales('fr-FR')
+    localStorage.setItem(
+      STORAGE_KEY_SETTINGS,
+      JSON.stringify({ ...DEFAULT_SETTINGS, preferredRegion: 'US' }),
+    )
+
+    const settings = getSettings()
+    const storedSettings = JSON.parse(localStorage.getItem(STORAGE_KEY_SETTINGS) || '{}')
+
+    expect(settings.preferredRegion).toBe('FR')
+    expect(storedSettings.preferredRegion).toBe('FR')
+  })
+
   it('falls back to defaults for invalid settings', () => {
     localStorage.setItem(STORAGE_KEY_SETTINGS, 'invalid json')
     const settings = getSettings()
@@ -60,11 +103,25 @@ describe('storage.service settings', () => {
       STORAGE_KEY_SETTINGS,
       JSON.stringify({
         theme: 'light',
-        preferredRegion: 42,
+        layoutMode: 'masonry',
       }),
     )
 
     const settings = getSettings()
     expect(settings).toEqual(DEFAULT_SETTINGS)
+  })
+
+  it('clears all local app data', () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([{ id: 1 }]))
+    localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(DEFAULT_SETTINGS))
+    localStorage.setItem('plot-twisted-lists', JSON.stringify([{ name: 'Old list' }]))
+    localStorage.setItem('layoutMode', 'list')
+
+    clearAllData()
+
+    expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
+    expect(localStorage.getItem(STORAGE_KEY_SETTINGS)).toBeNull()
+    expect(localStorage.getItem('plot-twisted-lists')).toBeNull()
+    expect(localStorage.getItem('layoutMode')).toBeNull()
   })
 })

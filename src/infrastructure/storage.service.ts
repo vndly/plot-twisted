@@ -12,6 +12,48 @@ export const STORAGE_KEY_SETTINGS = 'plot-twisted-settings'
 /** Legacy storage key for data removed with the list feature. */
 const LEGACY_LISTS_STORAGE_KEY = 'plot-twisted-lists'
 
+/** Legacy standalone key for layout preference. */
+const LEGACY_LAYOUT_STORAGE_KEY = 'layoutMode'
+
+/**
+ * Resolves the user's region from the browser locale.
+ * @returns ISO 3166-1 alpha-2 region, or the default region when unavailable
+ */
+export function getBrowserRegion(): string {
+  const localeCandidates =
+    typeof navigator === 'undefined'
+      ? []
+      : [...(navigator.languages ?? []), navigator.language].filter(Boolean)
+
+  for (const locale of localeCandidates) {
+    try {
+      const region = new Intl.Locale(locale).region
+      if (region && /^[A-Z]{2}$/i.test(region)) {
+        return region.toUpperCase()
+      }
+    } catch {
+      const region = locale.match(/[-_]([A-Z]{2})(?:[-_]|$)/i)?.[1]
+      if (region) {
+        return region.toUpperCase()
+      }
+    }
+  }
+
+  return DEFAULT_SETTINGS.preferredRegion
+}
+
+/**
+ * Applies browser-derived settings that are no longer manually configurable.
+ * @param settings - Parsed settings
+ * @returns Settings with browser-controlled values
+ */
+function applyBrowserSettings(settings: Settings): Settings {
+  return {
+    ...settings,
+    preferredRegion: getBrowserRegion(),
+  }
+}
+
 /**
  * Retrieves user settings from localStorage.
  * Handles migration from standalone layoutMode key.
@@ -29,7 +71,11 @@ export function getSettings(): Settings {
       const parsed = JSON.parse(stored)
       const result = SettingsSchema.safeParse(parsed)
       if (result.success) {
-        return result.data
+        const browserSettings = applyBrowserSettings(result.data)
+        if (browserSettings.preferredRegion !== result.data.preferredRegion) {
+          saveSettings(browserSettings)
+        }
+        return browserSettings
       }
       settings = parsed
     } catch {
@@ -38,14 +84,14 @@ export function getSettings(): Settings {
   }
 
   // Handle migration of standalone layoutMode
-  const standaloneLayout = localStorage.getItem('layoutMode')
+  const standaloneLayout = localStorage.getItem(LEGACY_LAYOUT_STORAGE_KEY)
   if (standaloneLayout === 'grid' || standaloneLayout === 'list') {
     settings.layoutMode = standaloneLayout
     // Clean up standalone key
-    localStorage.removeItem('layoutMode')
+    localStorage.removeItem(LEGACY_LAYOUT_STORAGE_KEY)
   }
 
-  const merged = { ...DEFAULT_SETTINGS, ...settings }
+  const merged = applyBrowserSettings({ ...DEFAULT_SETTINGS, ...settings })
   const result = SettingsSchema.safeParse(merged)
 
   if (result.success) {
@@ -63,6 +109,16 @@ export function getSettings(): Settings {
  */
 export function saveSettings(settings: Settings): void {
   localStorage.setItem(STORAGE_KEY_SETTINGS, JSON.stringify(settings))
+}
+
+/**
+ * Clears all locally stored Plot Twisted user data.
+ */
+export function clearAllData(): void {
+  localStorage.removeItem(STORAGE_KEY)
+  localStorage.removeItem(STORAGE_KEY_SETTINGS)
+  localStorage.removeItem(LEGACY_LISTS_STORAGE_KEY)
+  localStorage.removeItem(LEGACY_LAYOUT_STORAGE_KEY)
 }
 
 /**

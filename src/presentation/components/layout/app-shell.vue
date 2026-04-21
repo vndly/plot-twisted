@@ -9,7 +9,10 @@ const route = useRoute()
 </script>
 
 <template>
-  <div data-testid="app-shell" class="min-h-screen bg-bg-primary text-white">
+  <div
+    data-testid="app-shell"
+    class="min-h-screen bg-slate-50 text-slate-950 dark:bg-bg-primary dark:text-white"
+  >
     <SidebarNav />
 
     <div data-testid="app-shell-content-column" class="flex min-h-screen flex-col md:pl-56">
