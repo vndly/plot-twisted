@@ -33,7 +33,7 @@ vi.mock('@/application/use-browse', () => ({
 vi.mock('@/application/use-settings', () => ({
   useSettings: () => ({
     language: { value: 'en' },
-    layoutMode: ref('grid'),
+    layoutMode: ref('list'),
   }),
 }))
 
@@ -142,6 +142,38 @@ describe('HomeScreen', () => {
 
       // Assert
       expect(wrapper.find('input[type="search"]').exists()).toBe(true)
+    })
+
+    it('does not show a layout selector on the home screen', () => {
+      // Arrange
+      const wrapper = mountComponent()
+
+      // Assert
+      expect(wrapper.find('[title="Grid View"]').exists()).toBe(false)
+      expect(wrapper.find('[title="List View"]').exists()).toBe(false)
+    })
+
+    it('renders popular sections in grid layout even when browsing settings differ', () => {
+      // Arrange
+      vi.mocked(useBrowse).mockReturnValue({
+        trending: ref([]),
+        popularMovies: ref([mockMovieResult]),
+        popularShows: ref([mockMovieResult]),
+        loading: ref(false),
+        error: ref(null),
+        retry: vi.fn(),
+      } as any)
+
+      const wrapper = mountComponent()
+
+      // Assert
+      const popularSections = wrapper.findAll('[data-testid="popular-grid"]')
+      expect(popularSections).toHaveLength(2)
+
+      for (const section of popularSections) {
+        expect(section.classes()).toContain('grid')
+        expect(section.classes()).not.toContain('flex')
+      }
     })
 
     it('does not show search results in browse mode (HS-09-03)', () => {

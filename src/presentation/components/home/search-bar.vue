@@ -1,20 +1,33 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, useTemplateRef } from 'vue'
 import { Search, X } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 
-const props = defineProps<{
-  modelValue: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    modelValue: string
+    autofocus?: boolean
+  }>(),
+  {
+    autofocus: false,
+  },
+)
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
 const { t } = useI18n()
+const searchInput = useTemplateRef<HTMLInputElement>('searchInput')
 
 /** Whether the clear button should be visible. */
 const showClear = computed(() => props.modelValue.length > 0)
+
+onMounted(() => {
+  if (props.autofocus) {
+    searchInput.value?.focus()
+  }
+})
 
 /**
  * Handles input changes and emits the new value.
@@ -44,6 +57,7 @@ function handleClear() {
 
     <!-- Search input -->
     <input
+      ref="searchInput"
       type="search"
       :value="modelValue"
       :placeholder="t('home.search.placeholder')"

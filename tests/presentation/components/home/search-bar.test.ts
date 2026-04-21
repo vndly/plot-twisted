@@ -90,6 +90,25 @@ describe('SearchBar', () => {
     expect(input.attributes('type')).toBe('search')
   })
 
+  it('focuses the input on mount when autofocus is enabled', () => {
+    // Arrange
+    const wrapper = mount(SearchBar, {
+      props: {
+        modelValue: '',
+        autofocus: true,
+      },
+      attachTo: document.body,
+      global: {
+        plugins: [i18n],
+      },
+    })
+
+    // Assert
+    expect(document.activeElement).toBe(wrapper.get('input').element)
+
+    wrapper.unmount()
+  })
+
   it('suppresses native search field controls in favor of the custom clear button', () => {
     // Arrange
     const wrapper = mountComponent({ modelValue: 'test' })

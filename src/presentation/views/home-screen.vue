@@ -5,11 +5,9 @@ import { AlertCircle } from 'lucide-vue-next'
 import { useSearch } from '@/application/use-search'
 import { useBrowse, type MediaResult } from '@/application/use-browse'
 import { useFilters } from '@/application/use-filters'
-import { useSettings } from '@/application/use-settings'
 import { filterResults } from '@/domain/filter.logic'
 import SearchBar from '@/presentation/components/home/search-bar.vue'
 import FilterBar from '@/presentation/components/home/filter-bar.vue'
-import ViewToggle from '@/presentation/components/home/view-toggle.vue'
 import SearchResults from '@/presentation/components/home/search-results.vue'
 import TrendingCarousel from '@/presentation/components/home/trending-carousel.vue'
 import PopularGrid from '@/presentation/components/home/popular-grid.vue'
@@ -34,7 +32,6 @@ const {
 } = useBrowse()
 
 const { filters, clearAll } = useFilters()
-const { layoutMode } = useSettings()
 
 /** Filtered trending results. */
 const filteredTrending = computed(
@@ -77,11 +74,10 @@ function handleBrowseRetry() {
   <div class="space-y-8 px-2 pb-8 pt-2 md:px-3 md:pb-10">
     <!-- Search and Filters Section -->
     <div class="sticky top-0 z-40 space-y-4 bg-background pb-2">
-      <SearchBar v-model="query" />
+      <SearchBar v-model="query" autofocus />
 
-      <div v-if="!isSearchMode" class="flex flex-col gap-2 md:flex-row md:items-center">
+      <div v-if="!isSearchMode">
         <FilterBar class="flex-1" />
-        <ViewToggle class="self-end md:self-auto" />
       </div>
     </div>
 
@@ -128,7 +124,7 @@ function handleBrowseRetry() {
           :title="t('home.browse.popularMovies')"
           :items="filteredPopularMovies"
           :loading="browseLoading"
-          :variant="layoutMode"
+          variant="grid"
         />
 
         <!-- Popular Shows -->
@@ -137,7 +133,7 @@ function handleBrowseRetry() {
           :title="t('home.browse.popularShows')"
           :items="filteredPopularShows"
           :loading="browseLoading"
-          :variant="layoutMode"
+          variant="grid"
         />
 
         <!-- Empty state when filters return nothing -->
