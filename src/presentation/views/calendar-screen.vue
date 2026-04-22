@@ -41,35 +41,35 @@ function getRegionDisplayName(region: string) {
     <!-- Header with Month/Year, Location, and Navigation -->
     <header class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center">
       <div class="min-w-0">
-        <h1 class="text-3xl font-bold tracking-tight text-white">
+        <h1 class="text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
           {{ getMonthName(year, month) }}
-          <span class="text-slate-500 font-medium">{{ year }}</span>
+          <span class="font-medium text-slate-500 dark:text-slate-500">{{ year }}</span>
         </h1>
       </div>
 
       <p
-        class="flex max-w-full flex-wrap items-center gap-2 text-sm text-slate-400 sm:max-w-md sm:justify-center sm:justify-self-center sm:text-center"
+        class="flex max-w-full flex-wrap items-center gap-2 text-sm text-slate-600 sm:max-w-md sm:justify-center sm:justify-self-center sm:text-center dark:text-slate-400"
       >
         <MapPin class="size-4 text-teal-400" aria-hidden="true" />
-        <span class="font-medium text-slate-200">{{ regionDisplayName }}</span>
+        <span class="font-medium text-slate-800 dark:text-slate-200">{{ regionDisplayName }}</span>
       </p>
 
       <div class="flex items-center gap-2 sm:justify-self-end">
         <button
-          class="flex size-10 items-center justify-center rounded-lg bg-slate-800 text-white transition-colors hover:bg-slate-700"
+          class="flex size-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm transition-colors hover:bg-slate-100 hover:text-slate-950 dark:border-transparent dark:bg-slate-800 dark:text-white dark:shadow-none dark:hover:bg-slate-700"
           :title="t('calendar.nav.previous')"
           @click="previousMonth"
         >
           <ChevronLeft class="size-6" />
         </button>
         <button
-          class="flex h-10 px-4 items-center justify-center rounded-lg bg-slate-800 text-sm font-medium text-white transition-colors hover:bg-slate-700"
+          class="flex h-10 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-100 hover:text-slate-950 dark:border-transparent dark:bg-slate-800 dark:text-white dark:shadow-none dark:hover:bg-slate-700"
           @click="goToToday"
         >
           {{ t('calendar.nav.today') }}
         </button>
         <button
-          class="flex size-10 items-center justify-center rounded-lg bg-slate-800 text-white transition-colors hover:bg-slate-700"
+          class="flex size-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm transition-colors hover:bg-slate-100 hover:text-slate-950 dark:border-transparent dark:bg-slate-800 dark:text-white dark:shadow-none dark:hover:bg-slate-700"
           :title="t('calendar.nav.next')"
           @click="nextMonth"
         >
@@ -80,8 +80,11 @@ function getRegionDisplayName(region: string) {
 
     <!-- Calendar Grid -->
     <main>
-      <div v-if="error" class="bg-red-900/20 border border-red-500/50 rounded-lg p-6 text-center">
-        <p class="text-red-400 mb-4">{{ error.message }}</p>
+      <div
+        v-if="error"
+        class="rounded-lg border border-red-200 bg-red-50 p-6 text-center dark:border-red-500/50 dark:bg-red-900/20"
+      >
+        <p class="mb-4 text-red-700 dark:text-red-400">{{ error.message }}</p>
         <button
           class="rounded-md bg-red-500 px-4 py-2 text-white transition-colors hover:bg-red-600"
           @click="retry"

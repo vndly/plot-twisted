@@ -15,7 +15,7 @@ withDefaults(
 
 <template>
   <div
-    class="animate-pulse bg-surface"
+    class="animate-pulse bg-slate-200 dark:bg-surface"
     :class="rounded"
     :style="{ width, height }"
     aria-hidden="true"

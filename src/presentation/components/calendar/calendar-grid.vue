@@ -49,11 +49,11 @@ function isToday(date: Date) {
     <!-- Desktop/Tablet Grid (7 columns) -->
     <div class="hidden sm:block">
       <!-- Weekday headers -->
-      <div class="grid grid-cols-7 border-b border-slate-700/50 pb-2">
+      <div class="grid grid-cols-7 border-b border-slate-200 pb-2 dark:border-slate-700/50">
         <div
           v-for="name in weekdayNames"
           :key="name"
-          class="text-center text-xs font-bold uppercase tracking-wider text-slate-500"
+          class="text-center text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-500"
         >
           {{ name }}
         </div>
@@ -61,11 +61,11 @@ function isToday(date: Date) {
 
       <!-- Calendar cells -->
       <div
-        class="grid grid-cols-7 gap-px bg-slate-700/50 border border-slate-700/50 rounded-lg overflow-hidden mt-2"
+        class="mt-2 grid grid-cols-7 gap-px overflow-hidden rounded-lg border border-slate-200 bg-slate-200 shadow-sm dark:border-slate-700/50 dark:bg-slate-700/50 dark:shadow-none"
       >
         <template v-if="loading">
-          <div v-for="i in 35" :key="i" class="min-h-[120px] bg-slate-900/50 p-2">
-            <div class="flex items-center justify-between mb-2">
+          <div v-for="i in 35" :key="i" class="min-h-[120px] bg-white p-2 dark:bg-slate-900/50">
+            <div class="mb-2 flex items-center justify-between">
               <SkeletonLoader width="20px" height="12px" />
             </div>
             <div class="flex flex-col gap-1">
@@ -78,16 +78,22 @@ function isToday(date: Date) {
           <div
             v-for="date in calendarDays"
             :key="date.toISOString()"
-            class="min-h-[120px] bg-slate-900/50 p-2 transition-colors"
+            class="min-h-[120px] p-2 transition-colors"
             :class="[
               !isCurrentMonth(date) ? 'opacity-30' : '',
-              isToday(date) ? 'bg-teal-900/10 ring-1 ring-inset ring-teal-500/30' : '',
+              isToday(date)
+                ? 'bg-teal-50 ring-1 ring-inset ring-teal-500/30 dark:bg-teal-900/10'
+                : 'bg-white dark:bg-slate-900/50',
             ]"
           >
-            <div class="flex items-center justify-between mb-2">
+            <div class="mb-2 flex items-center justify-between">
               <span
                 class="text-xs font-medium"
-                :class="isToday(date) ? 'text-teal-400 font-bold' : 'text-slate-400'"
+                :class="
+                  isToday(date)
+                    ? 'font-bold text-teal-600 dark:text-teal-400'
+                    : 'text-slate-500 dark:text-slate-400'
+                "
               >
                 {{ date.getDate() }}
               </span>
@@ -111,7 +117,9 @@ function isToday(date: Date) {
     <div class="flex flex-col gap-8 sm:hidden">
       <template v-if="loading">
         <div v-for="i in 5" :key="i" class="flex flex-col gap-3">
-          <div class="flex items-center gap-3 border-b border-slate-700/50 pb-2">
+          <div
+            class="flex items-center gap-3 border-b border-slate-200 pb-2 dark:border-slate-700/50"
+          >
             <SkeletonLoader width="30px" height="30px" />
             <SkeletonLoader width="60px" height="20px" />
           </div>
@@ -129,9 +137,13 @@ function isToday(date: Date) {
           :key="date.toISOString()"
           class="flex flex-col gap-3"
         >
-          <div class="flex items-center gap-3 border-b border-slate-700/50 pb-2">
+          <div
+            class="flex items-center gap-3 border-b border-slate-200 pb-2 dark:border-slate-700/50"
+          >
             <span class="text-xl font-bold text-teal-400">{{ date.getDate() }}</span>
-            <span class="text-sm font-medium text-slate-400 uppercase tracking-widest">
+            <span
+              class="text-sm font-medium uppercase tracking-widest text-slate-500 dark:text-slate-400"
+            >
               {{ weekdayNames[date.getDay()] }}
             </span>
           </div>
