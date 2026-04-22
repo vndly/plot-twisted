@@ -73,7 +73,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
 <template>
   <section ref="sectionRef" class="space-y-4">
     <div class="flex items-center justify-between gap-4">
-      <h3 class="text-lg font-bold text-white">
+      <h3 class="text-lg font-bold text-slate-950 dark:text-white">
         <!-- eslint-disable-next-line @typescript-eslint/no-explicit-any -->
         {{ t(titleKey, titleParams as any) }}
       </h3>
@@ -83,7 +83,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
           data-testid="recommendation-scroll-previous"
           type="button"
           :aria-label="t('recommendations.scrollPrevious')"
-          class="flex size-10 items-center justify-center rounded-full border border-slate-700 bg-surface text-slate-300 transition-colors hover:border-teal-500/50 hover:bg-surface-hover hover:text-white"
+          class="flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:border-teal-500/50 hover:bg-slate-100 hover:text-slate-950 dark:border-slate-700 dark:bg-surface dark:text-slate-300 dark:shadow-none dark:hover:bg-surface-hover dark:hover:text-white"
           @click="scrollCarousel('previous')"
         >
           <ChevronLeft class="size-5" />
@@ -92,7 +92,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
           data-testid="recommendation-scroll-next"
           type="button"
           :aria-label="t('recommendations.scrollNext')"
-          class="flex size-10 items-center justify-center rounded-full border border-slate-700 bg-surface text-slate-300 transition-colors hover:border-teal-500/50 hover:bg-surface-hover hover:text-white"
+          class="flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:border-teal-500/50 hover:bg-slate-100 hover:text-slate-950 dark:border-slate-700 dark:bg-surface dark:text-slate-300 dark:shadow-none dark:hover:bg-surface-hover dark:hover:text-white"
           @click="scrollCarousel('next')"
         >
           <ChevronRight class="size-5" />
@@ -103,9 +103,9 @@ function scrollCarousel(direction: 'previous' | 'next') {
     <!-- Error state -->
     <div
       v-if="error"
-      class="flex flex-col items-center justify-center p-8 rounded-lg bg-surface border border-red-500/20 text-center"
+      class="flex flex-col items-center justify-center p-8 rounded-lg border border-red-200 bg-white text-center shadow-sm dark:border-red-500/20 dark:bg-surface dark:shadow-none"
     >
-      <p class="text-slate-400 mb-4">{{ t('errors.generic') }}</p>
+      <p class="text-slate-600 mb-4 dark:text-slate-400">{{ t('errors.generic') }}</p>
       <button
         class="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600 transition-colors"
         @click="$emit('intersect')"
@@ -119,7 +119,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
       <div
         v-for="n in 6"
         :key="n"
-        class="aspect-[2/3] w-32 md:w-40 flex-shrink-0 animate-pulse rounded-lg bg-surface"
+        class="aspect-[2/3] w-32 md:w-40 flex-shrink-0 animate-pulse rounded-lg bg-slate-200 dark:bg-surface"
       ></div>
     </div>
 
@@ -136,7 +136,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
       <div
         v-for="item in items as any[]"
         :key="`${item.media_type}-${item.id}`"
-        class="relative aspect-[2/3] w-32 md:w-40 flex-shrink-0 cursor-pointer overflow-hidden rounded-lg bg-surface transition-transform hover:scale-105 snap-start group"
+        class="relative aspect-[2/3] w-32 md:w-40 flex-shrink-0 cursor-pointer overflow-hidden rounded-lg bg-slate-200 transition-transform hover:scale-105 snap-start group dark:bg-surface"
         role="button"
         tabindex="0"
         @click="handleItemClick(item)"
@@ -150,7 +150,10 @@ function scrollCarousel(direction: 'previous' | 'next') {
           class="size-full object-cover"
           loading="lazy"
         />
-        <div v-else class="size-full flex items-center justify-center bg-slate-800 text-slate-500">
+        <div
+          v-else
+          class="size-full flex items-center justify-center bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-500"
+        >
           <span class="text-xs text-center px-2">{{ getTitle(item) }}</span>
         </div>
 

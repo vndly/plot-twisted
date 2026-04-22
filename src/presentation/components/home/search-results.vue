@@ -87,8 +87,10 @@ function handleRetry() {
     data-testid="empty-state"
     class="flex min-h-48 flex-col items-center justify-center gap-2 py-16 text-center"
   >
-    <h3 class="text-lg font-bold text-white">{{ t('home.search.empty.title') }}</h3>
-    <p class="text-slate-400">{{ t('home.search.empty.subtitle') }}</p>
+    <h3 class="text-lg font-bold text-slate-950 dark:text-white">
+      {{ t('home.search.empty.title') }}
+    </h3>
+    <p class="text-slate-600 dark:text-slate-400">{{ t('home.search.empty.subtitle') }}</p>
   </div>
 
   <!-- Results grid -->

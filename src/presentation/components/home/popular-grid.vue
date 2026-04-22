@@ -28,7 +28,7 @@ function handleCardClick(item: MediaResult) {
 
 <template>
   <section class="space-y-4">
-    <h2 class="text-xl font-bold text-white">{{ title }}</h2>
+    <h2 class="text-xl font-bold text-slate-950 dark:text-white">{{ title }}</h2>
 
     <!-- Loading state -->
     <div

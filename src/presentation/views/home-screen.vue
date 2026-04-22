@@ -73,7 +73,7 @@ function handleBrowseRetry() {
 <template>
   <div class="space-y-8 px-2 pb-8 pt-2 md:px-3 md:pb-10">
     <!-- Search and Filters Section -->
-    <div class="sticky top-0 z-40 space-y-4 bg-background pb-2">
+    <div class="sticky top-0 z-40 space-y-4 bg-slate-50 pb-2 dark:bg-bg-primary">
       <SearchBar v-model="query" autofocus />
 
       <div v-if="!isSearchMode">
@@ -144,9 +144,11 @@ function handleBrowseRetry() {
             filteredPopularMovies.length === 0 &&
             filteredPopularShows.length === 0
           "
-          class="flex flex-col items-center gap-2 py-20 text-slate-400"
+          class="flex flex-col items-center gap-2 py-20 text-slate-600 dark:text-slate-400"
         >
-          <p class="text-lg font-medium text-white">{{ t('home.search.empty.title') }}</p>
+          <p class="text-lg font-medium text-slate-950 dark:text-white">
+            {{ t('home.search.empty.title') }}
+          </p>
           <p>{{ t('home.search.empty.subtitle') }}</p>
           <button class="mt-4 text-accent hover:underline font-medium" @click="clearAll">
             {{ t('home.filters.clear') }}

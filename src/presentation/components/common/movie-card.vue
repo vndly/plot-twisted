@@ -82,7 +82,11 @@ function handleKeydown(event: KeyboardEvent) {
 <template>
   <article
     class="group cursor-pointer transition-all duration-200"
-    :class="[variant === 'grid' ? 'hover:scale-105' : 'hover:bg-surface-hover rounded-lg p-2']"
+    :class="[
+      variant === 'grid'
+        ? 'hover:scale-105'
+        : 'rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-surface-hover',
+    ]"
     role="button"
     tabindex="0"
     :aria-label="displayTitle"
@@ -91,7 +95,7 @@ function handleKeydown(event: KeyboardEvent) {
   >
     <!-- Grid Layout -->
     <template v-if="variant === 'grid'">
-      <div class="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface">
+      <div class="relative aspect-[2/3] overflow-hidden rounded-lg bg-slate-200 dark:bg-surface">
         <img
           v-if="posterUrl"
           :src="posterUrl"
@@ -99,7 +103,10 @@ function handleKeydown(event: KeyboardEvent) {
           loading="lazy"
           class="size-full object-cover"
         />
-        <div v-else class="flex size-full items-center justify-center text-slate-500">
+        <div
+          v-else
+          class="flex size-full items-center justify-center text-slate-400 dark:text-slate-500"
+        >
           <Film class="size-12" />
         </div>
         <div
@@ -111,15 +118,21 @@ function handleKeydown(event: KeyboardEvent) {
         </div>
       </div>
       <div class="mt-2">
-        <h3 class="truncate text-sm font-medium text-white">{{ displayTitle }}</h3>
-        <p v-if="displayYear" class="text-xs text-slate-400">{{ displayYear }}</p>
+        <h3 class="truncate text-sm font-medium text-slate-950 dark:text-white">
+          {{ displayTitle }}
+        </h3>
+        <p v-if="displayYear" class="text-xs text-slate-500 dark:text-slate-400">
+          {{ displayYear }}
+        </p>
       </div>
     </template>
 
     <!-- List Layout -->
     <template v-else>
       <div class="flex items-center gap-4">
-        <div class="relative size-12 flex-shrink-0 overflow-hidden rounded bg-surface">
+        <div
+          class="relative size-12 flex-shrink-0 overflow-hidden rounded bg-slate-200 dark:bg-surface"
+        >
           <img
             v-if="posterUrl"
             :src="posterUrl"
@@ -127,13 +140,18 @@ function handleKeydown(event: KeyboardEvent) {
             loading="lazy"
             class="size-full object-cover"
           />
-          <div v-else class="flex size-full items-center justify-center text-slate-500">
+          <div
+            v-else
+            class="flex size-full items-center justify-center text-slate-400 dark:text-slate-500"
+          >
             <Film class="size-6" />
           </div>
         </div>
         <div class="min-w-0 flex-1">
-          <h3 class="truncate text-base font-medium text-white">{{ displayTitle }}</h3>
-          <div class="flex items-center gap-2 text-xs text-slate-400">
+          <h3 class="truncate text-base font-medium text-slate-950 dark:text-white">
+            {{ displayTitle }}
+          </h3>
+          <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
             <span>{{ mediaTypeLabel }}</span>
             <span v-if="displayYear">• {{ displayYear }}</span>
             <span

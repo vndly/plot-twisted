@@ -202,7 +202,7 @@ watch(isGenreOpen, async (open) => {
     <div v-if="showGenre" ref="genreDropdownRef" class="relative">
       <button
         type="button"
-        class="flex items-center gap-2 rounded-lg bg-surface px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-surface-hover"
+        class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-950 shadow-sm transition-colors hover:bg-slate-100 dark:border-transparent dark:bg-surface dark:text-white dark:shadow-none dark:hover:bg-surface-hover"
         @click="isGenreOpen = !isGenreOpen"
       >
         <span>{{ t('home.filters.genre') }}</span>
@@ -212,12 +212,12 @@ watch(isGenreOpen, async (open) => {
         >
           {{ modelValue.genres.length }}
         </span>
-        <ChevronDown class="size-4 text-slate-400" />
+        <ChevronDown class="size-4 text-slate-500 dark:text-slate-400" />
       </button>
 
       <div
         v-if="isGenreOpen"
-        class="absolute left-0 z-50 mt-2 w-56 rounded-lg border border-slate-700 bg-surface p-2 shadow-xl"
+        class="absolute left-0 z-50 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-surface"
       >
         <div class="flex items-center gap-2">
           <input
@@ -226,13 +226,13 @@ watch(isGenreOpen, async (open) => {
             data-testid="genre-filter-input"
             type="text"
             :placeholder="t('home.filters.genreSearch')"
-            class="min-w-0 flex-1 rounded-md border border-slate-700 bg-slate-900/80 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none ring-accent transition focus:border-teal-500/60 focus:ring-2"
+            class="min-w-0 flex-1 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-950 placeholder-slate-500 outline-none ring-accent transition focus:border-teal-500/60 focus:ring-2 dark:border-slate-700 dark:bg-slate-900/80 dark:text-white"
           />
           <button
             v-if="modelValue.genres.length > 0"
             data-testid="genre-clear-button"
             type="button"
-            class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md border border-slate-700 px-2.5 text-xs font-medium text-slate-200 transition-colors hover:border-teal-500/60 hover:bg-slate-800 hover:text-white"
+            class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md border border-slate-200 px-2.5 text-xs font-medium text-slate-700 transition-colors hover:border-teal-500/60 hover:bg-slate-100 hover:text-slate-950 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
             @click="clearGenres"
           >
             <X class="size-3.5 text-teal-400" />
@@ -242,18 +242,21 @@ watch(isGenreOpen, async (open) => {
 
         <div
           data-testid="genre-dropdown-menu"
-          class="mt-2 max-h-52 overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#14b8a6_#1e293b] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-slate-800 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-teal-500/70 hover:[&::-webkit-scrollbar-thumb]:bg-teal-400"
+          class="mt-2 max-h-52 overflow-y-auto [scrollbar-width:thin] [scrollbar-color:#14b8a6_#e2e8f0] dark:[scrollbar-color:#14b8a6_#1e293b] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-slate-200 dark:[&::-webkit-scrollbar-track]:bg-slate-800 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-teal-500/70 hover:[&::-webkit-scrollbar-thumb]:bg-teal-400"
         >
           <div
             v-for="genre in filteredGenres"
             :key="genre.id"
             data-testid="genre-option"
-            class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-slate-700"
-            :class="{ 'bg-accent/20 text-accent': modelValue.genres.includes(genre.id) }"
+            class="flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700"
+            :class="{
+              'bg-accent/15 text-teal-700 dark:bg-accent/20 dark:text-accent':
+                modelValue.genres.includes(genre.id),
+            }"
             @click="toggleGenre(genre.id)"
           >
             <div
-              class="size-4 rounded border border-slate-500"
+              class="size-4 rounded border border-slate-400 dark:border-slate-500"
               :class="{ 'bg-accent border-accent': modelValue.genres.includes(genre.id) }"
             >
               <svg
@@ -274,7 +277,10 @@ watch(isGenreOpen, async (open) => {
     </div>
 
     <!-- Media Type Toggle -->
-    <div v-if="showMediaType" class="flex overflow-hidden rounded-lg bg-surface">
+    <div
+      v-if="showMediaType"
+      class="flex overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-transparent dark:bg-surface dark:shadow-none"
+    >
       <button
         v-for="type in ['all', 'movie', 'tv'] as const"
         :key="type"
@@ -283,7 +289,7 @@ watch(isGenreOpen, async (open) => {
         :class="[
           modelValue.mediaType === type
             ? 'bg-accent text-white'
-            : 'text-slate-400 hover:text-white hover:bg-surface-hover',
+            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-surface-hover dark:hover:text-white',
         ]"
         @click="emit('update:modelValue', { ...modelValue, mediaType: type })"
       >
@@ -295,13 +301,13 @@ watch(isGenreOpen, async (open) => {
     <div v-if="showYearRange" class="flex items-center gap-2">
       <div
         data-testid="year-from-control"
-        class="flex h-9 items-center overflow-hidden rounded-lg border border-slate-700 bg-surface shadow-lg shadow-black/10"
+        class="flex h-9 items-center overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-surface dark:shadow-lg dark:shadow-black/10"
       >
         <button
           data-testid="year-from-decrement"
           type="button"
           :aria-label="t('home.filters.year.decrement', { label: getYearLabel('yearFrom') })"
-          class="flex h-full w-9 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          class="flex h-full w-9 items-center justify-center text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-surface-hover dark:hover:text-white"
           @click="stepYear('yearFrom', -1)"
         >
           <Minus class="size-4" />
@@ -311,7 +317,7 @@ watch(isGenreOpen, async (open) => {
           :value="modelValue.yearFrom ?? ''"
           type="number"
           :placeholder="t('home.filters.yearFrom')"
-          class="h-full w-16 border-x border-slate-700 bg-transparent px-2 text-center text-sm text-white placeholder-slate-500 outline-none ring-accent [appearance:textfield] focus:ring-2 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          class="h-full w-16 border-x border-slate-200 bg-transparent px-2 text-center text-sm text-slate-950 placeholder-slate-500 outline-none ring-accent [appearance:textfield] focus:ring-2 dark:border-slate-700 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           :min="MIN_YEAR"
           :max="MAX_YEAR"
           @input="handleYearInput('yearFrom', $event)"
@@ -320,22 +326,22 @@ watch(isGenreOpen, async (open) => {
           data-testid="year-from-increment"
           type="button"
           :aria-label="t('home.filters.year.increment', { label: getYearLabel('yearFrom') })"
-          class="flex h-full w-9 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          class="flex h-full w-9 items-center justify-center text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-surface-hover dark:hover:text-white"
           @click="stepYear('yearFrom', 1)"
         >
           <Plus class="size-4" />
         </button>
       </div>
-      <span class="text-slate-500">-</span>
+      <span class="text-slate-400 dark:text-slate-500">-</span>
       <div
         data-testid="year-to-control"
-        class="flex h-9 items-center overflow-hidden rounded-lg border border-slate-700 bg-surface shadow-lg shadow-black/10"
+        class="flex h-9 items-center overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-surface dark:shadow-lg dark:shadow-black/10"
       >
         <button
           data-testid="year-to-decrement"
           type="button"
           :aria-label="t('home.filters.year.decrement', { label: getYearLabel('yearTo') })"
-          class="flex h-full w-9 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          class="flex h-full w-9 items-center justify-center text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-surface-hover dark:hover:text-white"
           @click="stepYear('yearTo', -1)"
         >
           <Minus class="size-4" />
@@ -345,7 +351,7 @@ watch(isGenreOpen, async (open) => {
           :value="modelValue.yearTo ?? ''"
           type="number"
           :placeholder="t('home.filters.yearTo')"
-          class="h-full w-16 border-x border-slate-700 bg-transparent px-2 text-center text-sm text-white placeholder-slate-500 outline-none ring-accent [appearance:textfield] focus:ring-2 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          class="h-full w-16 border-x border-slate-200 bg-transparent px-2 text-center text-sm text-slate-950 placeholder-slate-500 outline-none ring-accent [appearance:textfield] focus:ring-2 dark:border-slate-700 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           :min="MIN_YEAR"
           :max="MAX_YEAR"
           @input="handleYearInput('yearTo', $event)"
@@ -354,7 +360,7 @@ watch(isGenreOpen, async (open) => {
           data-testid="year-to-increment"
           type="button"
           :aria-label="t('home.filters.year.increment', { label: getYearLabel('yearTo') })"
-          class="flex h-full w-9 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          class="flex h-full w-9 items-center justify-center text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-surface-hover dark:hover:text-white"
           @click="stepYear('yearTo', 1)"
         >
           <Plus class="size-4" />
@@ -364,16 +370,18 @@ watch(isGenreOpen, async (open) => {
 
     <!-- Rating Range (Library Only) -->
     <div v-if="showRatingRange" class="flex items-center gap-2">
-      <span class="text-xs font-medium text-slate-400">{{ t('library.filters.rating') }}</span>
+      <span class="text-xs font-medium text-slate-600 dark:text-slate-400">
+        {{ t('library.filters.rating') }}
+      </span>
       <div
         data-testid="rating-min-control"
-        class="flex h-9 items-center overflow-hidden rounded-lg border border-slate-700 bg-surface shadow-lg shadow-black/10"
+        class="flex h-9 items-center overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-surface dark:shadow-lg dark:shadow-black/10"
       >
         <button
           data-testid="rating-min-decrement"
           type="button"
           :aria-label="t('home.filters.year.decrement', { label: getRatingLabel('ratingMin') })"
-          class="flex h-full w-9 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          class="flex h-full w-9 items-center justify-center text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-surface-hover dark:hover:text-white"
           @click="stepRating('ratingMin', -1)"
         >
           <Minus class="size-4" />
@@ -385,29 +393,29 @@ watch(isGenreOpen, async (open) => {
           step="0.5"
           :min="MIN_RATING"
           :max="MAX_RATING"
-          class="h-full w-12 border-x border-slate-700 bg-transparent px-2 text-center text-sm text-white placeholder-slate-500 outline-none ring-accent [appearance:textfield] focus:ring-2 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          class="h-full w-12 border-x border-slate-200 bg-transparent px-2 text-center text-sm text-slate-950 placeholder-slate-500 outline-none ring-accent [appearance:textfield] focus:ring-2 dark:border-slate-700 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           @input="handleRatingInput('ratingMin', $event)"
         />
         <button
           data-testid="rating-min-increment"
           type="button"
           :aria-label="t('home.filters.year.increment', { label: getRatingLabel('ratingMin') })"
-          class="flex h-full w-9 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          class="flex h-full w-9 items-center justify-center text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-surface-hover dark:hover:text-white"
           @click="stepRating('ratingMin', 1)"
         >
           <Plus class="size-4" />
         </button>
       </div>
-      <span class="text-slate-500">-</span>
+      <span class="text-slate-400 dark:text-slate-500">-</span>
       <div
         data-testid="rating-max-control"
-        class="flex h-9 items-center overflow-hidden rounded-lg border border-slate-700 bg-surface shadow-lg shadow-black/10"
+        class="flex h-9 items-center overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-surface dark:shadow-lg dark:shadow-black/10"
       >
         <button
           data-testid="rating-max-decrement"
           type="button"
           :aria-label="t('home.filters.year.decrement', { label: getRatingLabel('ratingMax') })"
-          class="flex h-full w-9 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          class="flex h-full w-9 items-center justify-center text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-surface-hover dark:hover:text-white"
           @click="stepRating('ratingMax', -1)"
         >
           <Minus class="size-4" />
@@ -419,14 +427,14 @@ watch(isGenreOpen, async (open) => {
           step="0.5"
           :min="MIN_RATING"
           :max="MAX_RATING"
-          class="h-full w-12 border-x border-slate-700 bg-transparent px-2 text-center text-sm text-white placeholder-slate-500 outline-none ring-accent [appearance:textfield] focus:ring-2 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          class="h-full w-12 border-x border-slate-200 bg-transparent px-2 text-center text-sm text-slate-950 placeholder-slate-500 outline-none ring-accent [appearance:textfield] focus:ring-2 dark:border-slate-700 dark:text-white [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           @input="handleRatingInput('ratingMax', $event)"
         />
         <button
           data-testid="rating-max-increment"
           type="button"
           :aria-label="t('home.filters.year.increment', { label: getRatingLabel('ratingMax') })"
-          class="flex h-full w-9 items-center justify-center text-slate-300 transition-colors hover:bg-surface-hover hover:text-white"
+          class="flex h-full w-9 items-center justify-center text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-surface-hover dark:hover:text-white"
           @click="stepRating('ratingMax', 1)"
         >
           <Plus class="size-4" />
@@ -438,7 +446,7 @@ watch(isGenreOpen, async (open) => {
     <button
       v-if="activeFilterCount > 0"
       type="button"
-      class="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-surface font-medium text-white shadow-lg shadow-black/10 transition-colors hover:border-teal-500/60 hover:bg-surface-hover"
+      class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white font-medium text-slate-950 shadow-sm transition-colors hover:border-teal-500/60 hover:bg-slate-100 dark:border-slate-700 dark:bg-surface dark:text-white dark:shadow-lg dark:shadow-black/10 dark:hover:bg-surface-hover"
       :class="compactClear ? 'h-8 px-3 text-xs' : 'ml-auto px-4 py-2 text-sm'"
       @click="emit('clear')"
     >

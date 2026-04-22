@@ -180,7 +180,8 @@ describe('FilterBar', () => {
 
     const clearButton = wrapper.findAll('button').find((b) => b.text() === 'Clear All')
     expect(clearButton?.classes()).toContain('rounded-full')
-    expect(clearButton?.classes()).toContain('bg-surface')
+    expect(clearButton?.classes()).toContain('bg-white')
+    expect(clearButton?.classes()).toContain('dark:bg-surface')
   })
 
   it('renders the year controls with the same compact height as the genre selector', () => {

@@ -14,19 +14,19 @@ function handleIntersect(index: number) {
 <template>
   <div class="space-y-8 px-2 pb-8 pt-2 md:px-3 md:pb-10">
     <header class="space-y-2">
-      <h2 class="text-2xl font-bold text-white">
+      <h2 class="text-2xl font-bold text-slate-950 dark:text-white">
         {{ t('recommendations.title') }}
       </h2>
     </header>
 
     <div v-if="loading" class="space-y-10">
       <div v-for="n in 3" :key="n" class="space-y-4">
-        <div class="h-6 w-48 animate-pulse rounded bg-surface"></div>
+        <div class="h-6 w-48 animate-pulse rounded bg-slate-200 dark:bg-surface"></div>
         <div class="flex gap-4 overflow-hidden">
           <div
             v-for="i in 6"
             :key="i"
-            class="aspect-[2/3] w-32 md:w-40 flex-shrink-0 animate-pulse rounded-lg bg-surface"
+            class="aspect-[2/3] w-32 md:w-40 flex-shrink-0 animate-pulse rounded-lg bg-slate-200 dark:bg-surface"
           ></div>
         </div>
       </div>

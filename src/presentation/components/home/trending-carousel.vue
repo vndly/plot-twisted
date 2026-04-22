@@ -71,14 +71,16 @@ function scrollCarousel(direction: 'previous' | 'next') {
 <template>
   <section class="space-y-4">
     <div class="flex items-center justify-between gap-4">
-      <h2 class="text-xl font-bold tracking-tight text-white">{{ t('home.browse.trending') }}</h2>
+      <h2 class="text-xl font-bold tracking-tight text-slate-950 dark:text-white">
+        {{ t('home.browse.trending') }}
+      </h2>
 
       <div v-if="!loading && items.length > 1" class="flex items-center gap-2">
         <button
           data-testid="trending-scroll-previous"
           type="button"
           :aria-label="t('home.browse.scrollPrevious')"
-          class="flex size-10 items-center justify-center rounded-full border border-slate-700 bg-surface text-slate-300 transition-colors hover:border-teal-500/50 hover:bg-surface-hover hover:text-white"
+          class="flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:border-teal-500/50 hover:bg-slate-100 hover:text-slate-950 dark:border-slate-700 dark:bg-surface dark:text-slate-300 dark:shadow-none dark:hover:bg-surface-hover dark:hover:text-white"
           @click="scrollCarousel('previous')"
         >
           <ChevronLeft class="size-5" />
@@ -87,7 +89,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
           data-testid="trending-scroll-next"
           type="button"
           :aria-label="t('home.browse.scrollNext')"
-          class="flex size-10 items-center justify-center rounded-full border border-slate-700 bg-surface text-slate-300 transition-colors hover:border-teal-500/50 hover:bg-surface-hover hover:text-white"
+          class="flex size-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:border-teal-500/50 hover:bg-slate-100 hover:text-slate-950 dark:border-slate-700 dark:bg-surface dark:text-slate-300 dark:shadow-none dark:hover:bg-surface-hover dark:hover:text-white"
           @click="scrollCarousel('next')"
         >
           <ChevronRight class="size-5" />
@@ -100,7 +102,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
       <div
         v-for="n in 3"
         :key="n"
-        class="aspect-video w-64 flex-shrink-0 animate-pulse rounded-lg bg-surface"
+        class="aspect-video w-64 flex-shrink-0 animate-pulse rounded-lg bg-slate-200 dark:bg-surface"
       ></div>
     </div>
 
@@ -114,7 +116,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
       <div
         v-for="item in items"
         :key="`${item.media_type}-${item.id}`"
-        class="group relative aspect-video w-64 flex-shrink-0 cursor-pointer overflow-hidden rounded-xl bg-surface transition-transform duration-200 ease-in-out hover:scale-[1.02] snap-start"
+        class="group relative aspect-video w-64 flex-shrink-0 cursor-pointer overflow-hidden rounded-xl bg-slate-200 transition-transform duration-200 ease-in-out hover:scale-[1.02] snap-start dark:bg-surface"
         role="button"
         tabindex="0"
         :aria-label="getTitle(item)"
