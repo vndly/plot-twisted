@@ -124,4 +124,38 @@ describe('storage.service settings', () => {
     expect(localStorage.getItem('plot-twisted-lists')).toBeNull()
     expect(localStorage.getItem('layoutMode')).toBeNull()
   })
+
+  it('falls back to regex region extraction when Intl.Locale throws', () => {
+    // Use a locale format that causes Intl.Locale to throw but has region in the string
+    const originalLocale = Intl.Locale
+    const throwingLocale = function (this: Intl.Locale, locale: string) {
+      if (locale === 'invalid-DE') {
+        throw new Error('Invalid locale')
+      }
+      return new originalLocale(locale)
+    } as unknown as typeof Intl.Locale
+    throwingLocale.prototype = originalLocale.prototype
+
+    vi.stubGlobal('Intl', {
+      ...Intl,
+      Locale: throwingLocale,
+    })
+
+    setNavigatorLocales('invalid-DE', ['invalid-DE'])
+
+    const settings = getSettings()
+
+    expect(settings.preferredRegion).toBe('DE')
+
+    vi.unstubAllGlobals()
+  })
+
+  it('falls back to default region when no locale contains a valid region', () => {
+    // Use a language-only locale with no region part
+    setNavigatorLocales('en', ['en', 'fr'])
+
+    const settings = getSettings()
+
+    expect(settings.preferredRegion).toBe(DEFAULT_SETTINGS.preferredRegion)
+  })
 })

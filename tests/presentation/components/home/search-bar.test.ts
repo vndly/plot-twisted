@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { ref, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
 import SearchBar from '@/presentation/components/home/search-bar.vue'
@@ -136,5 +137,49 @@ describe('SearchBar', () => {
 
     // Assert - check for the lucide search icon by data-testid or svg presence
     expect(wrapper.find('[data-testid="search-icon"]').exists()).toBe(true)
+  })
+
+  it('focuses the input on activation when autofocus is enabled', async () => {
+    // Arrange - Use KeepAlive to trigger onActivated
+    const showSearch = ref(true)
+    const WrapperComponent = {
+      components: { SearchBar },
+      setup() {
+        return { showSearch }
+      },
+      template: `
+        <KeepAlive>
+          <SearchBar v-if="showSearch" modelValue="" autofocus />
+        </KeepAlive>
+      `,
+    }
+
+    const wrapper = mount(WrapperComponent, {
+      attachTo: document.body,
+      global: {
+        plugins: [i18n],
+      },
+    })
+
+    // Wait for initial mount
+    await nextTick()
+
+    // Deactivate the component
+    showSearch.value = false
+    await nextTick()
+
+    // Focus something else
+    document.body.focus()
+
+    // Reactivate the component (triggers onActivated)
+    showSearch.value = true
+    await nextTick()
+    await nextTick()
+
+    // Assert - input should be focused again
+    const input = wrapper.find('input')
+    expect(document.activeElement).toBe(input.element)
+
+    wrapper.unmount()
   })
 })

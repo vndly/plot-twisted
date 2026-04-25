@@ -134,4 +134,85 @@ describe('CastCarousel', () => {
     // Assert
     expect(wrapper.find('[data-testid="cast-carousel"]').exists()).toBe(false)
   })
+
+  it('renders scroll buttons when more than 3 cast members', () => {
+    // Arrange
+    const cast = Array.from({ length: 5 }, (_, i) => createCastMember(i, i))
+
+    // Act
+    const wrapper = mount(CastCarousel, {
+      props: { cast },
+      global: { plugins: [i18n] },
+    })
+
+    // Assert
+    expect(wrapper.find('[data-testid="cast-scroll-previous"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="cast-scroll-next"]').exists()).toBe(true)
+  })
+
+  it('does not render scroll buttons when 3 or fewer cast members', () => {
+    // Arrange
+    const cast = [createCastMember(1, 0), createCastMember(2, 1), createCastMember(3, 2)]
+
+    // Act
+    const wrapper = mount(CastCarousel, {
+      props: { cast },
+      global: { plugins: [i18n] },
+    })
+
+    // Assert
+    expect(wrapper.find('[data-testid="cast-scroll-previous"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="cast-scroll-next"]').exists()).toBe(false)
+  })
+
+  it('scrolls carousel when scroll buttons are clicked', async () => {
+    // Arrange
+    const cast = Array.from({ length: 5 }, (_, i) => createCastMember(i, i))
+    const i18nWithScrollLabels = createI18n({
+      legacy: false,
+      locale: 'en',
+      messages: {
+        en: {
+          details: {
+            cast: {
+              title: 'Cast',
+              scrollPrevious: 'Scroll left',
+              scrollNext: 'Scroll right',
+            },
+          },
+        },
+      },
+    })
+    const wrapper = mount(CastCarousel, {
+      props: { cast },
+      global: { plugins: [i18nWithScrollLabels] },
+      attachTo: document.body,
+    })
+
+    const scrollContainer = wrapper.find('[data-testid="cast-scroll-container"]')
+      .element as HTMLElement
+
+    // Define scrollBy since jsdom doesn't have it
+    const scrollByCalls: ScrollToOptions[] = []
+    scrollContainer.scrollBy = ((options?: ScrollToOptions | number) => {
+      if (options && typeof options === 'object') scrollByCalls.push(options)
+    }) as typeof scrollContainer.scrollBy
+
+    // Act - click next
+    await wrapper.find('[data-testid="cast-scroll-next"]').trigger('click')
+
+    // Assert
+    expect(scrollByCalls.length).toBe(1)
+    expect(scrollByCalls[0].left).toBeGreaterThan(0)
+    expect(scrollByCalls[0].behavior).toBe('smooth')
+
+    // Act - click previous
+    await wrapper.find('[data-testid="cast-scroll-previous"]').trigger('click')
+
+    // Assert
+    expect(scrollByCalls.length).toBe(2)
+    expect(scrollByCalls[1].left).toBeLessThan(0)
+
+    wrapper.unmount()
+  })
 })

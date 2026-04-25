@@ -227,4 +227,83 @@ describe('useUpcomingMovies', () => {
 
     expect(vm.error?.message).toBe('Failed to fetch upcoming movies')
   })
+
+  it('ignores stale request results when month changes during fetch', async () => {
+    let resolveFirst: ((value: PaginatedResponse<MovieListItem>) => void) | undefined
+    const firstPromise = new Promise<PaginatedResponse<MovieListItem>>((resolve) => {
+      resolveFirst = resolve
+    })
+
+    vi.mocked(providerClient.getUpcomingMovies)
+      .mockReturnValueOnce(firstPromise)
+      .mockResolvedValueOnce({
+        page: 1,
+        total_pages: 1,
+        total_results: 1,
+        results: [{ id: 2, title: 'May Movie', release_date: '2026-05-10' } as any],
+      })
+
+    const wrapper = mount(TestComponent, {
+      props: { year: 2026, month: 3 },
+    })
+    const vm = wrapper.vm as any
+
+    await nextTick()
+
+    // Change month while first request is pending
+    await wrapper.setProps({ month: 4 })
+    await flushPromises()
+
+    // Now resolve the first (stale) request
+    if (resolveFirst) {
+      resolveFirst({
+        page: 1,
+        total_pages: 1,
+        total_results: 1,
+        results: [{ id: 1, title: 'April Movie', release_date: '2026-04-05' } as any],
+      })
+    }
+    await flushPromises()
+
+    // Should have May movie, not April movie
+    expect(vm.movies).toHaveLength(1)
+    expect(vm.movies[0].id).toBe(2)
+  })
+
+  it('ignores stale errors when month changes during fetch', async () => {
+    let rejectFirst: ((error: Error) => void) | undefined
+    const firstPromise = new Promise<PaginatedResponse<MovieListItem>>((_, reject) => {
+      rejectFirst = reject
+    })
+
+    vi.mocked(providerClient.getUpcomingMovies)
+      .mockReturnValueOnce(firstPromise)
+      .mockResolvedValueOnce({
+        page: 1,
+        total_pages: 1,
+        total_results: 1,
+        results: [{ id: 2, title: 'May Movie', release_date: '2026-05-10' } as any],
+      })
+
+    const wrapper = mount(TestComponent, {
+      props: { year: 2026, month: 3 },
+    })
+    const vm = wrapper.vm as any
+
+    await nextTick()
+
+    // Change month while first request is pending
+    await wrapper.setProps({ month: 4 })
+    await flushPromises()
+
+    // Now reject the first (stale) request
+    if (rejectFirst) {
+      rejectFirst(new Error('Stale error'))
+    }
+    await flushPromises()
+
+    // Should have movies and no error from the stale request
+    expect(vm.movies).toHaveLength(1)
+    expect(vm.error).toBeNull()
+  })
 })

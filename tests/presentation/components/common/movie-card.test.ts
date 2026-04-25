@@ -173,4 +173,42 @@ describe('MovieCard', () => {
 
     expect(wrapper.emitted('click')).toBeUndefined()
   })
+
+  it('renders grid layout without srcset when posterSrcSet is null', () => {
+    const wrapper = mount(MovieCard, {
+      props: {
+        item: {
+          id: 1,
+          media_type: 'movie',
+          title: 'Test Movie',
+          poster_path: null,
+          vote_average: 8.0,
+        } as any,
+        variant: 'grid',
+      },
+    })
+
+    // Should show placeholder instead of img
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Test Movie')
+  })
+
+  it('renders list layout without srcset when posterSrcSet is null', () => {
+    const wrapper = mount(MovieCard, {
+      props: {
+        item: {
+          id: 1,
+          media_type: 'movie',
+          title: 'Test Movie',
+          poster_path: null,
+          vote_average: 8.0,
+        } as any,
+        variant: 'list',
+      },
+    })
+
+    // Should show placeholder instead of img
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Test Movie')
+  })
 })

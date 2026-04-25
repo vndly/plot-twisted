@@ -384,4 +384,45 @@ describe('HomeScreen', () => {
       expect(wrapper.find('[data-testid="empty-state"]').exists()).toBe(false)
     })
   })
+
+  describe('onActivated reset handling', () => {
+    it('clears filters and search when navigating with reset query param', async () => {
+      // Arrange - Create a wrapper component with KeepAlive
+      const showHome = ref(true)
+      const WrapperComponent = {
+        components: { HomeScreen },
+        setup() {
+          return { showHome }
+        },
+        template: `
+          <KeepAlive>
+            <HomeScreen v-if="showHome" />
+          </KeepAlive>
+        `,
+      }
+
+      // Set initial route with reset query param
+      await router.push({ path: '/', query: { reset: 'true' } })
+      await flushPromises()
+
+      mount(WrapperComponent, {
+        global: {
+          plugins: [i18n, router],
+        },
+      })
+
+      // Deactivate the component
+      showHome.value = false
+      await nextTick()
+      await flushPromises()
+
+      // Reactivate the component (this triggers onActivated)
+      showHome.value = true
+      await nextTick()
+      await flushPromises()
+
+      // Assert - route should be cleared of the reset param
+      expect(router.currentRoute.value.query.reset).toBeUndefined()
+    })
+  })
 })

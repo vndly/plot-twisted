@@ -283,4 +283,20 @@ describe('FilterBar', () => {
       ?.map(([payload]) => payload as FilterModel)
     expect(updatePayloads?.some((payload) => payload.yearFrom === 2027)).toBe(true)
   })
+
+  it('decrements ratingMin and increments ratingMax when buttons clicked', async () => {
+    const wrapper = renderFilterBar({
+      showRatingRange: true,
+      modelValue: createModelValue({ ratingMin: 2.5, ratingMax: 4 }),
+    })
+
+    await wrapper.get('[data-testid="rating-min-decrement"]').trigger('click')
+    await wrapper.get('[data-testid="rating-max-increment"]').trigger('click')
+
+    const updatePayloads = wrapper
+      .emitted('update:modelValue')
+      ?.map(([payload]) => payload as FilterModel)
+    expect(updatePayloads?.some((payload) => payload.ratingMin === 2)).toBe(true)
+    expect(updatePayloads?.some((payload) => payload.ratingMax === 4.5)).toBe(true)
+  })
 })

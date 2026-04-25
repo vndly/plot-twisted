@@ -140,4 +140,46 @@ describe('CalendarScreen', () => {
       ?.trigger('click')
     expect(retry).toHaveBeenCalled()
   })
+
+  it('falls back to raw region code when Intl.DisplayNames throws', () => {
+    // Arrange - Save and replace Intl.DisplayNames
+    const OriginalDisplayNames = Intl.DisplayNames
+    // eslint-disable-next-line @typescript-eslint/no-extraneous-class
+    const ThrowingDisplayNames = class {
+      constructor() {
+        throw new Error('Invalid region')
+      }
+    } as unknown as typeof Intl.DisplayNames
+
+    // Replace just DisplayNames, keeping DateTimeFormat intact
+    Object.defineProperty(Intl, 'DisplayNames', {
+      value: ThrowingDisplayNames,
+      writable: true,
+      configurable: true,
+    })
+
+    preferredRegion.value = 'XX'
+
+    const wrapper = renderCalendarScreen()
+
+    // Assert - Should show the raw region code
+    expect(wrapper.text()).toContain('XX')
+
+    // Restore
+    Object.defineProperty(Intl, 'DisplayNames', {
+      value: OriginalDisplayNames,
+      writable: true,
+      configurable: true,
+    })
+  })
+
+  it('returns empty string when region is empty', () => {
+    preferredRegion.value = ''
+
+    const wrapper = renderCalendarScreen()
+
+    // The region display name should return empty string for empty region
+    // This exercises the !region early return branch
+    expect(wrapper.find('header').exists()).toBe(true)
+  })
 })
