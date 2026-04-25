@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import CastCarousel from '@/presentation/components/details/cast-carousel.vue'
@@ -214,5 +215,25 @@ describe('CastCarousel', () => {
     expect(scrollByCalls[1].left).toBeLessThan(0)
 
     wrapper.unmount()
+  })
+
+  it('scrollCarousel returns early when carouselRef is null', () => {
+    // Arrange - mount with empty cast so carousel container is not rendered
+    const wrapper = mount(CastCarousel, {
+      props: { cast: [] },
+      global: { plugins: [i18n] },
+    })
+
+    // Access the internal scrollCarousel function
+    const vm = wrapper.vm as any
+    const scrollCarousel = vm.$.setupState.scrollCarousel
+
+    // Act - call scrollCarousel directly (carouselRef is null since no carousel rendered)
+    // This should return early without throwing
+    scrollCarousel('next')
+    scrollCarousel('previous')
+
+    // Assert - no error thrown, function handles null ref gracefully
+    expect(true).toBe(true)
   })
 })

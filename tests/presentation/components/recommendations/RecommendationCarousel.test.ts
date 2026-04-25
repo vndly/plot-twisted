@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ref, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
@@ -212,5 +213,26 @@ describe('RecommendationCarousel', () => {
 
     expect(wrapper.find('img').exists()).toBe(false)
     expect(wrapper.text()).toContain('Severance')
+  })
+
+  it('scrollCarousel returns early when carouselRef is null', () => {
+    // Arrange - mount with empty items so carousel container is not rendered
+    const wrapper = renderCarousel({
+      items: [],
+      loading: false,
+      fetched: true,
+    })
+
+    // Access the internal scrollCarousel function
+    const vm = wrapper.vm as any
+    const scrollCarousel = vm.$.setupState.scrollCarousel
+
+    // Act - call scrollCarousel directly (carouselRef is null since no carousel rendered)
+    // This should return early without throwing
+    scrollCarousel('next')
+    scrollCarousel('previous')
+
+    // Assert - no error thrown, function handles null ref gracefully
+    expect(true).toBe(true)
   })
 })
