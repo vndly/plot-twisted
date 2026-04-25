@@ -75,7 +75,6 @@ function handleTabChange(tabId: string) {
           class="min-w-0 flex-1"
           show-genre
           show-media-type
-          show-rating-range
           compact-clear
           @clear="clearFilters"
         />
