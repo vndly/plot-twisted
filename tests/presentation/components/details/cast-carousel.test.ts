@@ -136,7 +136,7 @@ describe('CastCarousel', () => {
     expect(wrapper.find('[data-testid="cast-carousel"]').exists()).toBe(false)
   })
 
-  it('renders scroll buttons when more than 3 cast members', () => {
+  it('renders scroll buttons when content overflows', async () => {
     // Arrange
     const cast = Array.from({ length: 5 }, (_, i) => createCastMember(i, i))
 
@@ -144,14 +144,27 @@ describe('CastCarousel', () => {
     const wrapper = mount(CastCarousel, {
       props: { cast },
       global: { plugins: [i18n] },
+      attachTo: document.body,
     })
+
+    // Simulate overflow by mocking scrollWidth > clientWidth
+    const container = wrapper.find('[data-testid="cast-scroll-container"]').element as HTMLElement
+    Object.defineProperty(container, 'scrollWidth', { value: 1000, configurable: true })
+    Object.defineProperty(container, 'clientWidth', { value: 500, configurable: true })
+
+    // Trigger the ResizeObserver callback manually
+    const vm = wrapper.vm as any
+    vm.$.setupState.updateCanScroll()
+    await wrapper.vm.$nextTick()
 
     // Assert
     expect(wrapper.find('[data-testid="cast-scroll-previous"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="cast-scroll-next"]').exists()).toBe(true)
+
+    wrapper.unmount()
   })
 
-  it('does not render scroll buttons when 3 or fewer cast members', () => {
+  it('does not render scroll buttons when content fits', () => {
     // Arrange
     const cast = [createCastMember(1, 0), createCastMember(2, 1), createCastMember(3, 2)]
 
@@ -161,7 +174,7 @@ describe('CastCarousel', () => {
       global: { plugins: [i18n] },
     })
 
-    // Assert
+    // Assert - canScroll is false by default since scrollWidth <= clientWidth in jsdom
     expect(wrapper.find('[data-testid="cast-scroll-previous"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="cast-scroll-next"]').exists()).toBe(false)
   })
@@ -192,6 +205,15 @@ describe('CastCarousel', () => {
 
     const scrollContainer = wrapper.find('[data-testid="cast-scroll-container"]')
       .element as HTMLElement
+
+    // Simulate overflow to show scroll buttons
+    Object.defineProperty(scrollContainer, 'scrollWidth', { value: 1000, configurable: true })
+    Object.defineProperty(scrollContainer, 'clientWidth', { value: 500, configurable: true })
+
+    // Trigger the ResizeObserver callback manually
+    const vm = wrapper.vm as any
+    vm.$.setupState.updateCanScroll()
+    await wrapper.vm.$nextTick()
 
     // Define scrollBy since jsdom doesn't have it
     const scrollByCalls: ScrollToOptions[] = []

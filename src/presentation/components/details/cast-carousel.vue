@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { User, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import type { CastMember } from '@/domain/shared.schema'
@@ -12,6 +12,27 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const carouselRef = ref<HTMLElement | null>(null)
+const canScroll = ref(false)
+let resizeObserver: globalThis.ResizeObserver | null = null
+
+/** Checks if the carousel has overflow and needs scroll buttons. */
+function updateCanScroll() {
+  if (carouselRef.value) {
+    canScroll.value = carouselRef.value.scrollWidth > carouselRef.value.clientWidth
+  }
+}
+
+onMounted(() => {
+  resizeObserver = new globalThis.ResizeObserver(updateCanScroll)
+  if (carouselRef.value) {
+    resizeObserver.observe(carouselRef.value)
+  }
+  updateCanScroll()
+})
+
+onUnmounted(() => {
+  resizeObserver?.disconnect()
+})
 
 /** Limits cast to first 20 members, sorted by order. */
 const displayCast = computed(() => {
@@ -44,7 +65,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
         {{ t('details.cast.title') }}
       </h2>
 
-      <div v-if="displayCast.length > 3" class="flex items-center gap-2">
+      <div v-if="canScroll" class="flex items-center gap-2">
         <button
           data-testid="cast-scroll-previous"
           type="button"
