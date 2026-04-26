@@ -23,14 +23,19 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 - As a user exploring an actor's profile, I want to see their filmography so that I can discover other movies and shows they've appeared in.
 - As a user viewing an actor's profile, I want to see external links (IMDB, social media) so that I can find more information elsewhere.
 
+### Personas
+
+- **Cinephiles**: Users who follow specific actors' careers and want to explore their complete body of work.
+- **Casual viewers**: Users discovering new content through familiar faces they recognize from other productions.
+
 ### Dependencies
 
-- **R-02 (Home Screen)**: Detail pages with cast carousel. This feature modifies the existing `CastCarousel` component to make cast member cards clickable. The change is additive (click handler) with no breaking changes to existing usage. Existing `CastCarousel` tests will need updates to verify click handlers and navigation behavior. The component's semantic HTML will change from `<div>` to `<RouterLink>` for cast member cards.
+- **CastCarousel component** (`src/presentation/components/details/cast-carousel.vue`): This feature modifies the existing `CastCarousel` component to make cast member cards clickable. The change is additive (click handler) with no breaking changes to existing usage. Existing `CastCarousel` tests will need updates to verify click handlers and navigation behavior. The component's semantic HTML will change from `<div>` to `<RouterLink>` for cast member cards.
 
 ### Affected Documents
 
-- **docs/technical/api.md**: New Person endpoint (`/person/{id}` with `append_to_response=combined_credits,external_ids`) needs to be documented with response schema (`PersonDetail`, `PersonCredit`, `ExternalIds` types) and usage patterns.
-- **docs/technical/architecture.md**: Routing table updated with `/person/:id` route.
+- **[docs/technical/api.md](../../technical/api.md)**: New Person endpoint (`/person/{id}` with `append_to_response=combined_credits,external_ids`) needs to be documented with response schema (`PersonDetail`, `PersonCredit`, `ExternalIds` types) and usage patterns.
+- **[docs/technical/architecture.md](../../technical/architecture.md)**: Routing table updated with `/person/:id` route.
 - **src/domain/**: New `person.schema.ts` with `PersonDetailSchema` and related types following existing schema patterns.
 
 ## Scope
@@ -38,7 +43,7 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 ### In Scope
 
 - Clickable cast member cards in the existing `CastCarousel` component (modification)
-- New `/person/:id` route for person detail pages
+- New `/person/:id` route for person detail pages (view component: `src/presentation/views/person-screen.vue`)
 - Person detail page displaying:
   - Profile image (hero section) with placeholder fallback
   - Name and known-for department (e.g., "Acting", "Directing")
@@ -93,7 +98,7 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 | CI-10 | Filmography navigation | Each filmography item navigates to `/movie/:id` or `/show/:id` when clicked                                                                                             | P0       |
 | CI-11 | Loading state          | Show skeleton loader while person data is being fetched                                                                                                                 | P0       |
 | CI-12 | Error handling         | Show appropriate error states for 404 (person not found) and network errors                                                                                             | P0       |
-| CI-13 | Back navigation        | Provide a way to navigate back to the previous page                                                                                                                     | P1       |
+| CI-13 | Back navigation        | Browser back button works correctly; include a back arrow button in the page header for discoverability                                                                 | P1       |
 | CI-14 | Empty filmography      | Handle empty filmography with appropriate message (e.g., "No credits available")                                                                                        | P1       |
 
 ## Non-Functional Requirements
@@ -103,7 +108,7 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 | ID        | Requirement              | Threshold                                          |
 | --------- | ------------------------ | -------------------------------------------------- |
 | CI-NFR-01 | Profile image sizing     | 160×160px on mobile, 200×200px on desktop          |
-| CI-NFR-02 | Filmography grid columns | 2 columns on mobile, 4-6 columns on desktop        |
+| CI-NFR-02 | Filmography grid columns | 2 columns at max-sm, 3 columns at max-md, 4 columns at max-lg, 6 columns at base (desktop) |
 | CI-NFR-03 | Biography text width     | Full width, readable line length with 16px padding |
 
 ### Performance
@@ -122,7 +127,7 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 | CI-NFR-08 | External link behavior | Open in new tab with `rel="noopener noreferrer"`                                                                                        |
 | CI-NFR-09 | Focus management       | Visible focus states on all interactive elements                                                                                        |
 | CI-NFR-10 | Keyboard navigation    | Filmography grid navigable via Tab key; Enter activates focused item (browser-default navigation per ui-ux.md accessibility guidelines) |
-| CI-NFR-11 | Screen reader support  | Loading/error states announced to screen readers                                                                                        |
+| CI-NFR-11 | Screen reader support  | Loading/error states announced via `aria-live="polite"` regions; errors use `role="alert"`                                              |
 
 ## Definitions
 
@@ -136,7 +141,7 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 - Biography text may be empty for lesser-known actors
 - Some external IDs may be null (no Instagram, no Twitter, etc.)
 - Filmography may include entries with null release dates (sort these last, display as "TBA")
-- Filmography entries with duplicate media IDs (same person in multiple roles) should be deduplicated, showing only the primary role
+- Filmography entries with duplicate media IDs (same person in multiple roles) should be deduplicated by `media_id`, keeping the entry with the lowest `order` value (most prominent billing)
 
 ## UI/UX Specs
 
@@ -166,7 +171,7 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 ### Filmography Section
 
 - Section heading: "Filmography" with count (e.g., "Filmography (42)")
-- Each item displays: poster thumbnail (with placeholder fallback), title, year (or "TBA"), media type badge (pill-shaped, `text-xs`, teal background for movies, purple for TV), character name
+- Each item displays: poster thumbnail (with placeholder fallback), title, year (or "TBA"), media type badge (pill-shaped, `text-xs`, teal background for movies, purple/violet for TV to differentiate media types), character name
 - Items styled consistently with existing `MovieCard` component
 - Hover state: subtle scale-up consistent with card hover patterns
 - Empty state: "No credits available." centered message
@@ -210,7 +215,9 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 - [ ] External links (IMDB, Instagram, Twitter) render as clickable icons (CI-07)
 - [ ] External links open in new tabs (CI-07)
 - [ ] Missing external links are not displayed (no broken icons) (CI-07)
+- [ ] External Links section is hidden entirely when no IMDB, Instagram, or Twitter links are available (CI-07)
 - [ ] Filmography displays as a combined grid of movies and TV shows (CI-08)
+- [ ] Filmography deduplicates entries where the same person appears in multiple roles (CI-08)
 - [ ] Each filmography item shows poster, title, year, media type badge, and character name (CI-08)
 - [ ] Filmography is sorted by release date descending (CI-09)
 - [ ] Entries with null release dates appear at the end of the list with "TBA" (CI-09)
@@ -221,6 +228,8 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 - [ ] Back navigation works correctly (CI-13)
 - [ ] Empty filmography shows appropriate message (CI-14)
 - [ ] Page is responsive across all breakpoints (CI-NFR-01, CI-NFR-02, CI-NFR-03)
+- [ ] Single API call fetches person details, credits, and external IDs (CI-NFR-04)
+- [ ] Filmography renders without visible jank for persons with 100+ credits (performance)
 - [ ] All UI text uses i18n translation keys
 - [ ] Keyboard navigation works for filmography grid (CI-NFR-10)
 - [ ] Focus states are visible on interactive elements (CI-NFR-09)
