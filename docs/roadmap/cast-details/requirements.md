@@ -1,7 +1,7 @@
 ---
 id: R-09
 title: Cast Information
-status: draft
+status: approved
 importance: medium
 type: functional
 tags: [details, api, navigation, ui]
@@ -25,22 +25,26 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 
 ### Dependencies
 
-- **R-02 (Home Screen)**: Detail pages with cast carousel (existing)
+- **R-02 (Home Screen)**: Detail pages with cast carousel. This feature modifies the existing `CastCarousel` component to make cast member cards clickable. The change is additive (click handler) with no breaking changes to existing usage.
+
+### Affected Documents
+
+- **docs/technical/api.md**: New Person endpoint (`/person/{id}` with `append_to_response=combined_credits,external_ids`) needs to be documented with response schema and usage patterns.
 
 ## Scope
 
 ### In Scope
 
-- Clickable cast member cards in the existing `CastCarousel` component
+- Clickable cast member cards in the existing `CastCarousel` component (modification)
 - New `/person/:id` route for person detail pages
 - Person detail page displaying:
-  - Profile image (hero section)
+  - Profile image (hero section) with placeholder fallback
   - Name and known-for department (e.g., "Acting", "Directing")
-  - Biography
+  - Biography with "Read more" expansion
   - Birth date, place of birth, death date (if applicable)
   - External links (IMDB, Instagram, Twitter)
-  - Combined filmography (movies + TV shows)
-- Filmography displayed as a combined list sorted by release date (newest first)
+  - Combined filmography (movies + TV shows) as a grid
+- Filmography displayed as a combined grid sorted by release date (newest first)
 - Clickable filmography items that navigate to `/movie/:id` or `/show/:id`
 - Loading skeleton states
 - Error handling (404, network errors)
@@ -51,64 +55,77 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 - Following/favoriting actors
 - Actor-related notifications
 - Comparing actors
-- Actor search
+- Dedicated person/actor search endpoint or filter (users can still find actors via multi-search if TMDB returns person results)
 - Person images gallery (multiple photos)
 - Actor awards and nominations
 - Filtering filmography by genre/year
 - Infinite scroll for filmography (display all results from single API call)
+- Other social links beyond IMDB, Instagram, Twitter (Facebook, TikTok, YouTube, etc. excluded for initial release)
 
 ## Decisions
 
 | Decision            | Choice                                | Rationale                                                                                |
 | ------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------- |
 | Page vs Modal       | Full page (`/person/:id`)             | Consistent with existing detail page patterns; supports deep linking and browser history |
-| Filmography display | Combined list                         | User preference; simpler UI than tabbed or carousel approach                             |
+| Filmography display | Combined grid                         | User preference; simpler UI than tabbed or carousel approach                             |
 | Filmography sorting | By release date (newest first)        | Most relevant/recent work appears first                                                  |
 | API strategy        | Single call with `append_to_response` | Minimizes API calls; consistent with existing movie/show detail fetching                 |
+| Poster fallback     | Placeholder image                     | Consistent with existing MovieCard pattern; uses generic media placeholder               |
 
 ## Functional Requirements
 
-| ID    | Requirement            | Description                                                                 | Priority |
-| ----- | ---------------------- | --------------------------------------------------------------------------- | -------- |
-| CI-01 | Clickable cast cards   | Cast member cards in `CastCarousel` navigate to `/person/:id` when clicked  | P0       |
-| CI-02 | Person route           | New route `/person/:id` with navigation guard rejecting non-numeric IDs     | P0       |
-| CI-03 | Profile hero           | Display person's profile image prominently at the top of the page           | P0       |
-| CI-04 | Basic info             | Display person's name and known-for department below the profile image      | P0       |
-| CI-05 | Biography              | Display person's biography text; handle empty biographies gracefully        | P0       |
-| CI-06 | Birth info             | Display birthday and place of birth; show death date if applicable          | P1       |
-| CI-07 | External links         | Display clickable links to IMDB, Instagram, and Twitter when available      | P1       |
-| CI-08 | Filmography list       | Display combined movie and TV credits as a scrollable list                  | P0       |
-| CI-09 | Filmography sorting    | Sort filmography by release date descending (newest first)                  | P0       |
-| CI-10 | Filmography navigation | Each filmography item navigates to `/movie/:id` or `/show/:id` when clicked | P0       |
-| CI-11 | Loading state          | Show skeleton loader while person data is being fetched                     | P0       |
-| CI-12 | Error handling         | Show appropriate error states for 404 (person not found) and network errors | P0       |
-| CI-13 | Back navigation        | Provide a way to navigate back to the previous page                         | P1       |
+| ID    | Requirement            | Description                                                                                                                                                             | Priority |
+| ----- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| CI-01 | Clickable cast cards   | Cast member cards in `CastCarousel` navigate to `/person/:id` when clicked                                                                                              | P0       |
+| CI-02 | Person route           | New route `/person/:id` with navigation guard rejecting non-numeric IDs                                                                                                 | P0       |
+| CI-03 | Profile hero           | Display person's profile image prominently at the top of the page; show placeholder avatar when profile image unavailable                                               | P0       |
+| CI-04 | Basic info             | Display person's name and known-for department below the profile image                                                                                                  | P0       |
+| CI-05 | Biography              | Display person's biography text; handle empty biographies gracefully with "No biography available" message                                                              | P0       |
+| CI-06 | Birth info             | Display birthday and place of birth; show death date if applicable                                                                                                      | P1       |
+| CI-07 | External links         | Display clickable links to IMDB, Instagram, and Twitter when available; hide icons for missing links                                                                    | P1       |
+| CI-08 | Filmography grid       | Display combined movie and TV credits as a responsive grid; each item shows poster thumbnail, title, release year, media type badge (movie/TV), and character/role name | P0       |
+| CI-09 | Filmography sorting    | Sort filmography by release date descending (newest first); entries with null release dates appear at the end with "TBA" displayed                                      | P0       |
+| CI-10 | Filmography navigation | Each filmography item navigates to `/movie/:id` or `/show/:id` when clicked                                                                                             | P0       |
+| CI-11 | Loading state          | Show skeleton loader while person data is being fetched                                                                                                                 | P0       |
+| CI-12 | Error handling         | Show appropriate error states for 404 (person not found) and network errors                                                                                             | P0       |
+| CI-13 | Back navigation        | Provide a way to navigate back to the previous page                                                                                                                     | P1       |
+| CI-14 | Empty filmography      | Handle empty filmography with appropriate message (e.g., "No credits available")                                                                                        | P1       |
 
 ## Non-Functional Requirements
 
 ### Responsive Design
 
-- Profile image: 160×160px on mobile, 200×200px on desktop
-- Filmography grid: 2 columns on mobile, 4-6 columns on desktop
-- Biography text: full width, readable line length with appropriate padding
+| ID        | Requirement              | Threshold                                          |
+| --------- | ------------------------ | -------------------------------------------------- |
+| CI-NFR-01 | Profile image sizing     | 160×160px on mobile, 200×200px on desktop          |
+| CI-NFR-02 | Filmography grid columns | 2 columns on mobile, 4-6 columns on desktop        |
+| CI-NFR-03 | Biography text width     | Full width, readable line length with 16px padding |
 
 ### Performance
 
-- Single API call using `append_to_response=combined_credits,external_ids`
-- Route lazy-loaded for code splitting
-- Filmography images lazy-loaded
+| ID        | Requirement        | Threshold                                                                |
+| --------- | ------------------ | ------------------------------------------------------------------------ |
+| CI-NFR-04 | API efficiency     | Single API call using `append_to_response=combined_credits,external_ids` |
+| CI-NFR-05 | Code splitting     | Route lazy-loaded via dynamic import                                     |
+| CI-NFR-06 | Image lazy loading | Filmography poster images lazy-loaded                                    |
 
 ### Accessibility
 
-- Semantic HTML (`<article>`, `<section>`, `<a>`)
-- External links open in new tab with `rel="noopener noreferrer"`
+| ID        | Requirement            | Threshold                                                   |
+| --------- | ---------------------- | ----------------------------------------------------------- |
+| CI-NFR-07 | Semantic HTML          | Use `<article>`, `<section>`, `<a>` elements appropriately  |
+| CI-NFR-08 | External link behavior | Open in new tab with `rel="noopener noreferrer"`            |
+| CI-NFR-09 | Focus management       | Visible focus states on all interactive elements            |
+| CI-NFR-10 | Keyboard navigation    | Filmography grid navigable via keyboard (arrow keys, Enter) |
+| CI-NFR-11 | Screen reader support  | Loading/error states announced to screen readers            |
 
 ## Constraints
 
 - TMDB API rate limit: ~40 requests per 10 seconds (shared with other API calls)
+- Uses TMDB `/person/{id}` endpoint with `append_to_response=combined_credits,external_ids`
 - Biography text may be empty for lesser-known actors
 - Some external IDs may be null (no Instagram, no Twitter, etc.)
-- Filmography may include entries with null release dates (sort these last)
+- Filmography may include entries with null release dates (sort these last, display as "TBA")
 
 ## UI/UX Specs
 
@@ -126,7 +143,7 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 ### Biography Section
 
 - Section heading: "Biography"
-- Body text: `text-sm text-slate-300`, max 6-8 lines with "Read more" expansion if longer
+- Body text: `text-sm text-slate-300`, truncated with `line-clamp-6` and "Read more" expansion if longer
 - Empty state: "No biography available." in muted text
 
 ### External Links
@@ -138,9 +155,10 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 ### Filmography Section
 
 - Section heading: "Filmography" with count (e.g., "Filmography (42)")
-- Each item displays: poster thumbnail, title, year, character name
+- Each item displays: poster thumbnail (with placeholder fallback), title, year (or "TBA"), media type badge, character name
 - Items styled consistently with existing `MovieCard` component
 - Hover state: subtle scale-up consistent with card hover patterns
+- Empty state: "No credits available." centered message
 
 ### Loading State
 
@@ -153,24 +171,28 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 
 ## Acceptance Criteria
 
-- [ ] Clicking a cast member card in the cast carousel navigates to `/person/:id`
-- [ ] `/person/:id` route renders the person detail page
-- [ ] Non-numeric IDs redirect to Home
-- [ ] Profile image displays correctly (or fallback placeholder if null)
-- [ ] Person name and known-for department display correctly
-- [ ] Biography text displays (or empty state message if null/empty)
-- [ ] Birth date and place of birth display when available
-- [ ] Death date displays when applicable
-- [ ] External links (IMDB, Instagram, Twitter) render as clickable icons
-- [ ] External links open in new tabs
-- [ ] Missing external links are not displayed (no broken icons)
-- [ ] Filmography displays as a combined list of movies and TV shows
-- [ ] Filmography is sorted by release date descending
-- [ ] Entries with null release dates appear at the end of the list
-- [ ] Clicking a filmography item navigates to the correct detail page
-- [ ] Skeleton loader displays while data is loading
-- [ ] Error toast appears on network failure with Retry action
-- [ ] "Person not found" message appears for invalid person IDs
-- [ ] Back navigation works correctly
-- [ ] Page is responsive across all breakpoints
+- [ ] Clicking a cast member card in the cast carousel navigates to `/person/:id` (CI-01)
+- [ ] `/person/:id` route renders the person detail page (CI-02)
+- [ ] Non-numeric IDs redirect to Home (CI-02)
+- [ ] Profile image displays correctly (or fallback placeholder if null) (CI-03)
+- [ ] Person name and known-for department display correctly (CI-04)
+- [ ] Biography text displays (or empty state message if null/empty) (CI-05)
+- [ ] Birth date and place of birth display when available (CI-06)
+- [ ] Death date displays when applicable (CI-06)
+- [ ] External links (IMDB, Instagram, Twitter) render as clickable icons (CI-07)
+- [ ] External links open in new tabs (CI-07)
+- [ ] Missing external links are not displayed (no broken icons) (CI-07)
+- [ ] Filmography displays as a combined grid of movies and TV shows (CI-08)
+- [ ] Each filmography item shows poster, title, year, media type badge, and character name (CI-08)
+- [ ] Filmography is sorted by release date descending (CI-09)
+- [ ] Entries with null release dates appear at the end of the list with "TBA" (CI-09)
+- [ ] Clicking a filmography item navigates to the correct detail page (CI-10)
+- [ ] Skeleton loader displays while data is loading (CI-11)
+- [ ] Error toast appears on network failure with Retry action (CI-12)
+- [ ] "Person not found" message appears for invalid person IDs (CI-12)
+- [ ] Back navigation works correctly (CI-13)
+- [ ] Empty filmography shows appropriate message (CI-14)
+- [ ] Page is responsive across all breakpoints (CI-NFR-01, CI-NFR-02, CI-NFR-03)
 - [ ] All UI text uses i18n translation keys
+- [ ] Keyboard navigation works for filmography grid (CI-NFR-10)
+- [ ] Focus states are visible on interactive elements (CI-NFR-09)
