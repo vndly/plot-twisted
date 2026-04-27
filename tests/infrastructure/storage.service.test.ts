@@ -339,5 +339,37 @@ describe('storage.service', () => {
       const region = getBrowserRegion()
       expect(region).toBe('GB')
     })
+
+    it('handles null navigator.languages', () => {
+      vi.stubGlobal('navigator', {
+        languages: null,
+        language: 'en-US',
+      })
+
+      const region = getBrowserRegion()
+      expect(region).toBe('US')
+    })
+
+    it('handles locale that throws and regex does not match', () => {
+      vi.stubGlobal('navigator', {
+        languages: ['invalid', 'en-GB'],
+        language: 'invalid',
+      })
+
+      const region = getBrowserRegion()
+      // 'invalid' throws on Intl.Locale and doesn't match regex, falls through to 'en-GB'
+      expect(region).toBe('GB')
+    })
+
+    it('returns default when catch regex does not match', () => {
+      vi.stubGlobal('navigator', {
+        languages: ['invalid'],
+        language: 'invalid',
+      })
+
+      const region = getBrowserRegion()
+      // 'invalid' throws and doesn't match regex, falls back to default
+      expect(region).toBe('US')
+    })
   })
 })

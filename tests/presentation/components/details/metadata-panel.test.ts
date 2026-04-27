@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import MetadataPanel from '@/presentation/components/details/metadata-panel.vue'
 import { createI18n } from 'vue-i18n'
@@ -229,7 +229,7 @@ describe('MetadataPanel', () => {
     expect(originalLang.text()).toBe('English')
   })
 
-  it('falls back to uppercase code for invalid language codes', () => {
+  it('handles unknown language codes gracefully', () => {
     const wrapper = mount(MetadataPanel, {
       props: { ...defaultProps, originalLanguage: 'xx' },
       global: { plugins: [i18n] },
@@ -237,8 +237,8 @@ describe('MetadataPanel', () => {
 
     const originalLang = wrapper.find('[data-testid="original-language"]')
     expect(originalLang.exists()).toBe(true)
-    // Invalid codes fall back to uppercase
-    expect(originalLang.text()).toBe('XX')
+    // Unknown codes are returned as-is by Intl.DisplayNames
+    expect(originalLang.text()).toBe('xx')
   })
 
   it('does not render original language when not provided', () => {
@@ -248,5 +248,27 @@ describe('MetadataPanel', () => {
     })
 
     expect(wrapper.find('[data-testid="original-language"]').exists()).toBe(false)
+  })
+
+  it('falls back to uppercase when Intl.DisplayNames throws', () => {
+    const originalDisplayNames = globalThis.Intl.DisplayNames
+    // @ts-expect-error - mocking Intl.DisplayNames to throw
+    globalThis.Intl.DisplayNames = class {
+      constructor() {
+        throw new Error('Not supported')
+      }
+    }
+
+    const wrapper = mount(MetadataPanel, {
+      props: { ...defaultProps, originalLanguage: 'en' },
+      global: { plugins: [i18n] },
+    })
+
+    const originalLang = wrapper.find('[data-testid="original-language"]')
+    expect(originalLang.exists()).toBe(true)
+    expect(originalLang.text()).toBe('EN')
+
+    // Restore
+    globalThis.Intl.DisplayNames = originalDisplayNames
   })
 })

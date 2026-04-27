@@ -299,4 +299,48 @@ describe('FilterBar', () => {
     expect(updatePayloads?.some((payload) => payload.ratingMin === 2)).toBe(true)
     expect(updatePayloads?.some((payload) => payload.ratingMax === 4.5)).toBe(true)
   })
+
+  it('handles NaN and null rating values with fallback', async () => {
+    const wrapper = renderFilterBar({
+      showRatingRange: true,
+      modelValue: createModelValue({ ratingMin: 2.5, ratingMax: 4.5 }),
+    })
+
+    const ratingMinInput = wrapper.get('[data-testid="rating-min-input"]')
+    const ratingMaxInput = wrapper.get('[data-testid="rating-max-input"]')
+
+    // Set empty value (null case)
+    await ratingMinInput.setValue('')
+    await ratingMaxInput.setValue('')
+
+    const updatePayloads = wrapper
+      .emitted('update:modelValue')
+      ?.map(([payload]) => payload as FilterModel)
+
+    // Empty ratingMin should fall back to MIN_RATING (0)
+    expect(updatePayloads?.some((payload) => payload.ratingMin === 0)).toBe(true)
+    // Empty ratingMax should fall back to MAX_RATING (5)
+    expect(updatePayloads?.some((payload) => payload.ratingMax === 5)).toBe(true)
+  })
+
+  it('uses fallback values when stepping rating from undefined/null', async () => {
+    // Create a model where ratingMin and ratingMax could be undefined/null
+    const wrapper = renderFilterBar({
+      showRatingRange: true,
+      // @ts-expect-error - Testing undefined values
+      modelValue: { ...createModelValue(), ratingMin: undefined, ratingMax: undefined },
+    })
+
+    await wrapper.get('[data-testid="rating-min-increment"]').trigger('click')
+    await wrapper.get('[data-testid="rating-max-decrement"]').trigger('click')
+
+    const updatePayloads = wrapper
+      .emitted('update:modelValue')
+      ?.map(([payload]) => payload as FilterModel)
+
+    // ratingMin should step from fallback MIN_RATING (0) to 0.5
+    expect(updatePayloads?.some((payload) => payload.ratingMin === 0.5)).toBe(true)
+    // ratingMax should step from fallback MAX_RATING (5) to 4.5
+    expect(updatePayloads?.some((payload) => payload.ratingMax === 4.5)).toBe(true)
+  })
 })

@@ -303,7 +303,6 @@ describe('ImagesGallery', () => {
     Object.defineProperty(carouselEl, 'scrollWidth', { value: 1000, configurable: true })
     Object.defineProperty(carouselEl, 'clientWidth', { value: 500, configurable: true })
 
-    const resizeCallback = (globalThis.ResizeObserver as any).mock.calls[0][0]
     resizeCallback()
     await nextTick()
 
@@ -330,7 +329,6 @@ describe('ImagesGallery', () => {
     Object.defineProperty(carouselEl, 'scrollWidth', { value: 500, configurable: true })
     Object.defineProperty(carouselEl, 'clientWidth', { value: 200, configurable: true })
 
-    const resizeCallback = (globalThis.ResizeObserver as any).mock.calls[0][0]
     resizeCallback()
     await nextTick()
 
@@ -375,16 +373,11 @@ describe('ImagesGallery', () => {
     expect(wrapper.find('[data-testid="lightbox"]').text()).toContain('1 / 3')
   })
 
-  it('scrollCarousel returns early when carouselRef is null', async () => {
-    // Mount with no images to ensure carousel is not rendered
-    const wrapper = renderImagesGallery({ posters: [], backdrops: [] })
+  it('does not show scroll buttons when canScroll is false', () => {
+    const wrapper = renderImagesGallery({ posters: mockPosters, backdrops: mockBackdrops })
 
-    // Access the internal scrollCarousel function
-    const vm = wrapper.vm as any
-    const scrollCarousel = vm.$.setupState?.scrollCarousel
-
-    // This should be undefined since component doesn't render
-    // Just verify no crash occurs
-    expect(wrapper.find('[data-testid="images-gallery"]').exists()).toBe(false)
+    // By default, canScroll should be false (no overflow)
+    expect(wrapper.find('[data-testid="images-scroll-previous"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="images-scroll-next"]').exists()).toBe(false)
   })
 })
