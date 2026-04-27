@@ -67,12 +67,17 @@ export function useRecommendations() {
       ]
     } else {
       sections.value = seeds.map((seed) => {
-        const isLiked = seed.rating >= 3
+        let titleKey: string
+        if (seed.status === 'watchlist') {
+          titleKey = 'recommendations.becauseYouWantToWatch'
+        } else if (seed.rating >= 3) {
+          titleKey = 'recommendations.becauseYouLiked'
+        } else {
+          titleKey = 'recommendations.becauseYouWatched'
+        }
         return {
           seed,
-          titleKey: isLiked
-            ? 'recommendations.becauseYouLiked'
-            : 'recommendations.becauseYouWatched',
+          titleKey,
           titleParams: { title: seed.title },
           results: [],
           loading: false,

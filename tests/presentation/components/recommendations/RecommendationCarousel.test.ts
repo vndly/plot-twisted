@@ -33,6 +33,8 @@ const i18n = createI18n({
       'recommendations.section.title': 'Because you liked {name}',
       'recommendations.scrollNext': 'Scroll recommendations right',
       'recommendations.scrollPrevious': 'Scroll recommendations left',
+      'recommendations.mediaType.movie': 'Movie',
+      'recommendations.mediaType.tv': 'Show',
       'errors.generic': 'Something went wrong',
       'common.retry': 'Retry',
     },
@@ -128,14 +130,15 @@ describe('RecommendationCarousel', () => {
       loading: true,
       fetched: false,
     })
-    expect(loadingWrapper.findAll('.animate-pulse')).toHaveLength(6)
+    // 6 skeleton cards × 3 animated elements each (poster, title, year)
+    expect(loadingWrapper.findAll('.animate-pulse')).toHaveLength(18)
 
     const pendingWrapper = renderCarousel({
       items: [],
       loading: false,
       fetched: false,
     })
-    expect(pendingWrapper.findAll('.animate-pulse')).toHaveLength(6)
+    expect(pendingWrapper.findAll('.animate-pulse')).toHaveLength(18)
 
     const emptyWrapper = renderCarousel({
       items: [],

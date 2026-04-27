@@ -62,6 +62,20 @@ function getPosterSrcSet(item: SearchResultItem) {
   ])
 }
 
+function getYear(item: SearchResultItem) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dateStr = item.media_type === 'movie' ? (item as any).release_date : (item as any).first_air_date
+  if (!dateStr) return null
+  const year = dateStr.slice(0, 4)
+  return year && year !== '0000' ? year : null
+}
+
+function getMediaTypeKey(item: SearchResultItem) {
+  return item.media_type === 'movie'
+    ? 'recommendations.mediaType.movie'
+    : 'recommendations.mediaType.tv'
+}
+
 /**
  * Scrolls the carousel in the requested direction.
  */
@@ -124,11 +138,13 @@ function scrollCarousel(direction: 'previous' | 'next') {
 
     <!-- Skeleton loader (while loading OR waiting for first fetch) -->
     <div v-else-if="loading || (!fetched && !error)" class="flex gap-4 overflow-hidden">
-      <div
-        v-for="n in 6"
-        :key="n"
-        class="aspect-[2/3] w-32 md:w-40 flex-shrink-0 animate-pulse rounded-lg bg-slate-200 dark:bg-surface"
-      ></div>
+      <div v-for="n in 6" :key="n" class="w-32 md:w-40 flex-shrink-0 space-y-2">
+        <div
+          class="aspect-[2/3] w-full animate-pulse rounded-lg bg-slate-200 dark:bg-surface"
+        ></div>
+        <div class="h-4 w-full animate-pulse rounded bg-slate-200 dark:bg-surface"></div>
+        <div class="h-3 w-2/3 animate-pulse rounded bg-slate-200 dark:bg-surface"></div>
+      </div>
     </div>
 
     <!-- Empty/No Results (after successful fetch) -->
@@ -144,33 +160,44 @@ function scrollCarousel(direction: 'previous' | 'next') {
       <div
         v-for="item in items as any[]"
         :key="`${item.media_type}-${item.id}`"
-        class="relative aspect-[2/3] w-32 md:w-40 flex-shrink-0 cursor-pointer overflow-hidden rounded-lg bg-slate-200 transition-transform hover:scale-105 snap-start group dark:bg-surface"
+        class="w-32 md:w-40 flex-shrink-0 cursor-pointer snap-start group"
         role="button"
         tabindex="0"
         @click="handleItemClick(item)"
         @keydown.enter.prevent="handleItemClick(item)"
         @keydown.space.prevent="handleItemClick(item)"
       >
-        <img
-          v-if="item.poster_path"
-          :src="getPosterUrl(item)!"
-          :srcset="getPosterSrcSet(item)!"
-          sizes="(max-width: 768px) 128px, 160px"
-          :alt="getTitle(item)"
-          class="size-full object-cover"
-          loading="lazy"
-        />
         <div
-          v-else
-          class="size-full flex items-center justify-center bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-500"
+          class="relative aspect-[2/3] w-full overflow-hidden rounded-lg bg-slate-200 transition-transform duration-200 group-hover:scale-105 dark:bg-surface"
         >
-          <span class="text-xs text-center px-2">{{ getTitle(item) }}</span>
+          <img
+            v-if="item.poster_path"
+            :src="getPosterUrl(item)!"
+            :srcset="getPosterSrcSet(item)!"
+            sizes="(max-width: 768px) 128px, 160px"
+            :alt="getTitle(item)"
+            class="size-full object-cover"
+            loading="lazy"
+          />
+          <div
+            v-else
+            class="size-full flex items-center justify-center bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-500"
+          >
+            <span class="text-xs text-center px-2">{{ getTitle(item) }}</span>
+          </div>
         </div>
 
-        <div
-          class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2"
-        >
-          <h4 class="truncate text-xs font-bold text-white">{{ getTitle(item) }}</h4>
+        <div class="mt-2 space-y-0.5">
+          <h4 class="truncate text-sm font-medium text-white">
+            {{ getTitle(item) }}
+          </h4>
+          <p class="text-xs text-slate-400">
+            <span>{{ t(getMediaTypeKey(item)) }}</span>
+            <template v-if="getYear(item)">
+              <span class="mx-1">·</span>
+              <span>{{ getYear(item) }}</span>
+            </template>
+          </p>
         </div>
       </div>
     </div>
