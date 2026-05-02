@@ -15,3 +15,9 @@ Feature: Error handling
     And a network error occurs
     Then an error toast appears
     And the toast has a "Retry" action
+
+  Scenario: CI-12-03 — Retry action refetches person data
+    Given a network error toast is displayed
+    When I click the "Retry" action
+    Then the person API request is attempted again
+    And the person detail page displays if the retry succeeds

@@ -45,3 +45,10 @@ Feature: Filmography grid
     When I view the filmography
     Then the movie appears only once
     And the character shown is from the highest billing
+
+  Scenario: CI-08-07 — Large filmography remains usable
+    Given a person with 120 combined movie and TV credits
+    When I view the filmography
+    Then the filmography displays all credits without duplicate media entries
+    And the credits remain sorted by release date descending
+    And the page remains responsive to scrolling and focus navigation

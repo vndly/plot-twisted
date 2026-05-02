@@ -1,7 +1,7 @@
 ---
 id: R-09
 title: Cast Information
-status: planned
+status: approved
 importance: medium
 type: functional
 tags: [details, api, navigation, ui]
@@ -31,12 +31,13 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 ### Dependencies
 
 - **CastCarousel component** (`src/presentation/components/details/cast-carousel.vue`): This feature modifies the existing `CastCarousel` component to make cast member cards clickable. The change is additive (click handler) with no breaking changes to existing usage. Existing `CastCarousel` tests will need updates to verify click handlers and navigation behavior. The component's semantic HTML will change from `<div>` to `<RouterLink>` for cast member cards.
-
-### Affected Documents
-
-- **[docs/technical/api.md](../../technical/api.md)**: New Person endpoint (`/person/{id}` with `append_to_response=combined_credits,external_ids`) needs to be documented with response schema (`PersonDetail`, `PersonCredit`, `ExternalIds` types) and usage patterns.
+- **[docs/product/04 - entry-details](../../product/04%20-%20entry-details/requirements.md)**: Existing detail-page cast behavior changes because `CastCarousel` cast cards become navigable links.
+- **[docs/product/02 - home](../../product/02%20-%20home/requirements.md)**: Related detail-page navigation documentation may need cross-reference updates when person pages are promoted.
+- **[docs/technical/api.md](../../technical/api.md)**: New Person endpoint (`/person/{id}` with `language={Settings.language}` and `append_to_response=combined_credits,external_ids`) needs to be documented with response schema (`PersonDetail`, `PersonCredit`, `ExternalIds` types) and usage patterns.
 - **[docs/technical/architecture.md](../../technical/architecture.md)**: Routing table updated with `/person/:id` route.
 - **src/domain/**: New `person.schema.ts` with `PersonDetailSchema` and related types following existing schema patterns.
+
+In this feature, **Person** means an individual in the TMDB database identified by a unique person ID. **Cast member** means a person's role in a specific movie or show. **Filmography** means the combined movie and TV credits sourced from TMDB `combined_credits`.
 
 ## Scope
 
@@ -62,7 +63,7 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 - Following/favoriting actors
 - Actor-related notifications
 - Comparing actors
-- Dedicated person/actor search endpoint or filter (users can still find actors via multi-search if TMDB returns person results)
+- Dedicated person/actor search endpoint or filter; actor search remains unavailable in this feature
 - Person images gallery (multiple photos)
 - Actor awards and nominations
 - Filtering filmography by genre/year
@@ -74,13 +75,13 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 
 ## Decisions
 
-| Decision            | Choice                                | Rationale                                                                                |
-| ------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Page vs Modal       | Full page (`/person/:id`)             | Consistent with existing detail page patterns; supports deep linking and browser history |
-| Filmography display | Combined grid                         | User preference; simpler UI than tabbed or carousel approach                             |
-| Filmography sorting | By release date (newest first)        | Most relevant/recent work appears first                                                  |
-| API strategy        | Single call with `append_to_response` | Minimizes API calls; consistent with existing movie/show detail fetching                 |
-| Poster fallback     | Placeholder image                     | Consistent with existing MovieCard pattern; uses generic media placeholder               |
+| Decision            | Choice                                      | Rationale                                                                                |
+| ------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Page vs Modal       | Full page (`/person/:id`)                   | Consistent with existing detail page patterns; supports deep linking and browser history |
+| Filmography display | Combined grid                               | User preference; simpler UI than tabbed or carousel approach                             |
+| Filmography sorting | By release date (newest first)              | Most relevant/recent work appears first                                                  |
+| API strategy        | Single localized call with appended credits | Minimizes API calls; consistent with existing movie/show detail fetching                 |
+| Poster fallback     | Placeholder image                           | Consistent with existing MovieCard pattern; uses generic media placeholder               |
 
 ## Functional Requirements
 
@@ -105,43 +106,38 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 
 ### Responsive Design
 
-| ID        | Requirement              | Threshold                                                                                  |
-| --------- | ------------------------ | ------------------------------------------------------------------------------------------ |
-| CI-NFR-01 | Profile image sizing     | 160×160px on mobile, 200×200px on desktop                                                  |
-| CI-NFR-02 | Filmography grid columns | 2 columns at max-sm, 3 columns at max-md, 4 columns at max-lg, 6 columns at base (desktop) |
-| CI-NFR-03 | Biography text width     | Full width, readable line length with 16px padding                                         |
+| ID        | Requirement              | Threshold                                                                                                 |
+| --------- | ------------------------ | --------------------------------------------------------------------------------------------------------- |
+| CI-NFR-01 | Profile image sizing     | 160×160px on mobile, 200×200px on desktop                                                                 |
+| CI-NFR-02 | Filmography grid columns | 2 columns at max-sm, 3 columns at max-md, 4 columns at max-lg, 6 columns at base (desktop)                |
+| CI-NFR-03 | Biography text width     | Biography text container uses `max-w-prose` (or max 72ch) with at least 16px horizontal padding on mobile |
 
 ### Performance
 
-| ID        | Requirement        | Threshold                                                                |
-| --------- | ------------------ | ------------------------------------------------------------------------ |
-| CI-NFR-04 | API efficiency     | Single API call using `append_to_response=combined_credits,external_ids` |
-| CI-NFR-05 | Code splitting     | Route lazy-loaded via dynamic import                                     |
-| CI-NFR-06 | Image lazy loading | Filmography poster images lazy-loaded                                    |
+| ID        | Requirement        | Threshold                                                                                                   |
+| --------- | ------------------ | ----------------------------------------------------------------------------------------------------------- |
+| CI-NFR-04 | API efficiency     | Single API call using `language={Settings.language}` and `append_to_response=combined_credits,external_ids` |
+| CI-NFR-05 | Code splitting     | Route lazy-loaded via dynamic import                                                                        |
+| CI-NFR-06 | Image lazy loading | Filmography poster images lazy-loaded                                                                       |
 
 ### Accessibility
 
-| ID        | Requirement            | Threshold                                                                                                                               |
-| --------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| CI-NFR-07 | Semantic HTML          | Use `<article>`, `<section>`, `<a>` elements appropriately                                                                              |
-| CI-NFR-08 | External link behavior | Open in new tab with `rel="noopener noreferrer"`                                                                                        |
-| CI-NFR-09 | Focus management       | Visible focus states on all interactive elements                                                                                        |
-| CI-NFR-10 | Keyboard navigation    | Filmography grid navigable via Tab key; Enter activates focused item (browser-default navigation per ui-ux.md accessibility guidelines) |
-| CI-NFR-11 | Screen reader support  | Loading/error states announced via `aria-live="polite"` regions; errors use `role="alert"`                                              |
-
-## Definitions
-
-- **Person**: An individual (actor, director, etc.) in the TMDB database, identified by a unique person ID. Distinct from "cast member" which refers to a person's role in a specific production.
-- **Filmography**: The combined movie and TV credits for a person, sourced from the TMDB `combined_credits` API response.
+| ID        | Requirement            | Threshold                                                                                                                                 |
+| --------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| CI-NFR-07 | Semantic HTML          | Person page root uses `<article>`; biography, info, links, and filmography use `<section>` with headings; external links use native `<a>` |
+| CI-NFR-08 | External link behavior | Open in new tab with `rel="noopener noreferrer"`                                                                                          |
+| CI-NFR-09 | Focus management       | Browser-default focus rings remain visible; do not use `focus:outline-none` unless paired with a visible `focus-visible` replacement      |
+| CI-NFR-10 | Keyboard navigation    | Filmography grid navigable via Tab key; Enter activates focused item (browser-default navigation per ui-ux.md accessibility guidelines)   |
+| CI-NFR-11 | Screen reader support  | Loading/error states announced via `aria-live="polite"` regions; errors use `role="alert"`                                                |
 
 ## Constraints
 
 - TMDB API rate limit: ~40 requests per 10 seconds (shared with other API calls)
-- Uses TMDB `/person/{id}` endpoint with `append_to_response=combined_credits,external_ids`
+- Uses TMDB `/person/{id}` endpoint with `language={Settings.language}` and `append_to_response=combined_credits,external_ids`
 - Biography text may be empty for lesser-known actors
 - Some external IDs may be null (no Instagram, no Twitter, etc.)
 - Filmography may include entries with null release dates (sort these last, display as "TBA")
-- Filmography entries with duplicate media IDs (same person in multiple roles) should be deduplicated by `media_id`, keeping the entry with the lowest `order` value (most prominent billing)
+- Filmography entries where the same person appears multiple times in the same title should be deduplicated by the composite key `(media_type, id)`, keeping the entry with the lowest `order` value (most prominent billing)
 
 ## UI/UX Specs
 
@@ -224,15 +220,21 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 - [ ] Clicking a filmography item navigates to the correct detail page (CI-10)
 - [ ] Skeleton loader displays while data is loading (CI-11)
 - [ ] Error toast appears on network failure with Retry action (CI-12)
-- [ ] "Person not found" message appears for invalid person IDs (CI-12)
+- [ ] Retry action re-attempts the failed person request (CI-12)
+- [ ] "Person not found" message appears for numeric person IDs that return 404 (CI-12)
 - [ ] Back navigation works correctly (CI-13)
 - [ ] Empty filmography shows appropriate message (CI-14)
 - [ ] Page is responsive across all breakpoints (CI-NFR-01, CI-NFR-02, CI-NFR-03)
-- [ ] Single API call fetches person details, credits, and external IDs (CI-NFR-04)
+- [ ] Single API call fetches person details, credits, and external IDs using the current `Settings.language` (CI-NFR-04)
+- [ ] Person route component is lazy-loaded via dynamic import (CI-NFR-05)
+- [ ] Filmography poster images use `loading="lazy"` (CI-NFR-06)
+- [ ] Person page uses the required semantic article, section, heading, and link structure (CI-NFR-07)
+- [ ] External links open in new tabs with `rel="noopener noreferrer"` (CI-NFR-08)
 - [ ] Filmography renders without visible jank for persons with 100+ credits (performance)
 - [ ] All UI text uses i18n translation keys
 - [ ] Keyboard navigation works for filmography grid (CI-NFR-10)
 - [ ] Focus states are visible on interactive elements (CI-NFR-09)
+- [ ] Loading and error states are announced through the specified live regions and alert role (CI-NFR-11)
 - [ ] Biography "Read more" button text uses i18n translation key
 - [ ] Empty biography message uses i18n translation key
 - [ ] `docs/technical/api.md` updated with `/person/{id}` endpoint documentation

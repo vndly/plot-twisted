@@ -12,3 +12,7 @@ Feature: Back navigation
   Scenario: CI-13-02 — Back arrow button navigates back
     When I click the back arrow in the page header
     Then I return to the previous page
+
+  Scenario: CI-13-03 — Back arrow has mobile touch target
+    When I view the person page on a mobile viewport
+    Then the back arrow button has a touch target at least 44x44px

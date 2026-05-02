@@ -2,202 +2,231 @@
 
 Feature ID: R-09
 
-## Phase 1: Domain Layer
+## Phase 1: Domain Testing
 
-- [ ] **1.1** Create `src/domain/person.schema.ts` with Zod schemas:
-  - `PersonDetailSchema` — id (number), name (string), biography (string), birthday (string|null), deathday (string|null), place_of_birth (string|null), profile_path (string|null), known_for_department (string), also_known_as (string[]), homepage (string|null)
-  - `ExternalIdsSchema` — imdb_id (string|null), instagram_id (string|null), twitter_id (string|null)
-  - `PersonCreditSchema` — id (number), title/name (string), media_type ('movie'|'tv'), character (string|null), release_date/first_air_date (string|null), poster_path (string|null), order (number|null)
-  - `PersonDetailWithCreditsSchema` — extends PersonDetailSchema with combined_credits.cast (PersonCreditSchema[]) and external_ids (ExternalIdsSchema)
+- [ ] **1.1** Create `tests/domain/person.schema.test.ts`:
+  - Test valid `PersonDetailSchema` parsing for profile, name, department, biography, birth/death fields, and external IDs (covering: CI-03-01, CI-04-01, CI-05-01, CI-06-01, CI-06-02, CI-07-01)
+  - Test movie and TV `PersonCreditSchema` variants with concrete TMDB fields (`title`/`release_date` for movies, `name`/`first_air_date` for TV) (covering: CI-08-03, CI-10-01, CI-10-02)
+  - Test null profile, null external IDs, null dates, and empty credits parse correctly (covering: CI-03-02, CI-07-03, CI-09-02, CI-14-01)
+  - (implementation detail) Test invalid API response data is rejected by Zod
+
+- [ ] **1.2** Create `tests/domain/person.logic.test.ts`:
+  - Test `sortCreditsByDate` with mixed movie/TV dates and null dates (covering: CI-09-01, CI-09-02)
+  - Test `deduplicateCredits` uses `(media_type, id)` and keeps the lowest `order` entry for duplicate roles in the same title (covering: CI-08-06)
+  - Test `formatBirthInfo` and `formatDeathInfo` for complete, partial, and missing dates (covering: CI-06-01, CI-06-02, CI-06-03)
+  - Test `hasExternalLinks` true/false cases and `buildExternalUrl` for IMDB, Instagram, and Twitter (covering: CI-07-01, CI-07-02, CI-07-03, CI-07-04)
+
+- [ ] **1.3** Run `npm run test -- tests/domain/person.schema.test.ts tests/domain/person.logic.test.ts` and confirm the new tests fail before implementation.
+
+## Phase 2: Domain Layer
+
+- [ ] **2.1** Create `src/domain/person.schema.ts` with Zod schemas:
+  - `PersonDetailSchema` — `id` (number), `name` (string), `biography` (string), `birthday` (string|null), `deathday` (string|null), `place_of_birth` (string|null), `profile_path` (string|null), `known_for_department` (string), `also_known_as` (string[]), `homepage` (string|null)
+  - `ExternalIdsSchema` — `imdb_id` (string|null), `instagram_id` (string|null), `twitter_id` (string|null)
+  - `PersonMovieCreditSchema` — `id` (number), `media_type` (`'movie'`), `title` (string), `character` (string|null), `release_date` (string|null), `poster_path` (string|null), `order` (number|null)
+  - `PersonTvCreditSchema` — `id` (number), `media_type` (`'tv'`), `name` (string), `character` (string|null), `first_air_date` (string|null), `poster_path` (string|null), `order` (number|null)
+  - `PersonCreditSchema` — discriminated union of movie and TV credit schemas
+  - `PersonDetailWithCreditsSchema` — extends `PersonDetailSchema` with `combined_credits.cast` (`PersonCreditSchema[]`) and `external_ids` (`ExternalIdsSchema`)
   - Export inferred types: `PersonDetail`, `ExternalIds`, `PersonCredit`, `PersonDetailWithCredits`
 
-- [ ] **1.2** Create `src/domain/person.logic.ts` with pure functions:
-  - `sortCreditsByDate(credits: PersonCredit[]): PersonCredit[]` — sorts descending by release_date/first_air_date, nulls last
-  - `deduplicateCredits(credits: PersonCredit[]): PersonCredit[]` — removes duplicate media_id entries, keeping lowest order value
-  - `formatBirthInfo(birthday: string|null, placeOfBirth: string|null): string|null` — formats as "Month DD, YYYY • City, Country" or partial
-  - `formatDeathInfo(deathday: string|null): string|null` — formats as "Month DD, YYYY"
-  - `hasExternalLinks(externalIds: ExternalIds): boolean` — returns true if any of imdb_id, instagram_id, twitter_id is non-null
-  - `buildExternalUrl(type: 'imdb'|'instagram'|'twitter', id: string): string` — returns full external URL
+- [ ] **2.2** Create `src/domain/person.logic.ts` with pure functions:
+  - `sortCreditsByDate(credits: PersonCredit[]): PersonCredit[]` — sorts descending by `release_date`/`first_air_date`, nulls last
+  - `deduplicateCredits(credits: PersonCredit[]): PersonCredit[]` — removes duplicate `(media_type, id)` entries, keeping the lowest `order` value
+  - `formatBirthInfo(birthday: string|null, placeOfBirth: string|null): string|null` — formats as `"Month DD, YYYY • City, Country"` or partial
+  - `formatDeathInfo(deathday: string|null): string|null` — formats as `"Month DD, YYYY"`
+  - `hasExternalLinks(externalIds: ExternalIds): boolean` — returns true if any of `imdb_id`, `instagram_id`, or `twitter_id` is non-null
+  - `buildExternalUrl(type: 'imdb'|'instagram'|'twitter', id: string): string` — returns the full external URL
 
-## Phase 2: Domain Testing
+- [ ] **2.3** Run `npm run test -- tests/domain/person.schema.test.ts tests/domain/person.logic.test.ts`; domain tests should pass.
 
-- [ ] **2.1** Create `tests/domain/person.schema.test.ts`:
-  - Test valid PersonDetailSchema parsing (covering: CI-08-01)
-  - Test invalid data rejection (covering: CI-08-02)
-  - Test external_ids parsing with null values (covering: CI-07-01, CI-07-02)
-  - Test combined_credits parsing (covering: CI-08-03)
+## Phase 3: Infrastructure Testing
 
-- [ ] **2.2** Create `tests/domain/person.logic.test.ts`:
-  - Test `sortCreditsByDate` with mixed dates and nulls (covering: CI-09-01, CI-09-02)
-  - Test `deduplicateCredits` keeping lowest order (covering: CI-08-04)
-  - Test `formatBirthInfo` with all combinations (covering: CI-06-01, CI-06-02)
-  - Test `formatDeathInfo` (covering: CI-06-03)
-  - Test `hasExternalLinks` true/false cases (covering: CI-07-03)
-  - Test `buildExternalUrl` for each platform (covering: CI-07-04)
-
-- [ ] **2.3** Run `npm run test` — confirm new tests fail (test-first)
-
-## Phase 3: Infrastructure Layer
-
-- [ ] **3.1** Update `src/infrastructure/provider.client.ts`:
-  - Add `getPersonDetails(id: number): Promise<PersonDetailWithCredits>` method
-  - Endpoint: `/person/{id}?append_to_response=combined_credits,external_ids`
-  - Parse response with `PersonDetailWithCreditsSchema`
-  - Follow existing error handling patterns (404, 429, network errors)
-
-## Phase 4: Infrastructure Testing
-
-- [ ] **4.1** Create `tests/infrastructure/provider.client.person.test.ts`:
-  - Test successful person fetch (covering: CI-03-01, CI-04-01)
+- [ ] **3.1** Create `tests/infrastructure/provider.client.person.test.ts`:
+  - Test successful person fetch passes both `language={Settings.language}` and `append_to_response=combined_credits,external_ids` (covering: CI-04-02; validates CI-NFR-04)
+  - Test successful response parsing through `PersonDetailWithCreditsSchema` (covering: CI-03-01, CI-04-01, CI-08-03)
   - Test 404 response handling (covering: CI-12-01)
-  - Test network error handling (covering: CI-12-02)
+  - Test network error handling without automatic retry (covering: CI-12-02)
   - (implementation detail) Test Zod validation failure
 
-- [ ] **4.2** Run `npm run test` — confirm new tests fail (test-first)
+- [ ] **3.2** Run `npm run test -- tests/infrastructure/provider.client.person.test.ts` and confirm the new tests fail before implementation.
 
-## Phase 5: Application Layer
+## Phase 4: Infrastructure Layer
 
-- [ ] **5.1** Create `src/application/use-person.ts`:
-  - Export `usePerson(id: Ref<number>)` composable
-  - Return shape: `{ person: Ref<PersonDetailWithCredits|null>, loading: Ref<boolean>, error: Ref<Error|null>, refresh: () => void }`
-  - On mount: fetch person details, set loading states
-  - On error: set error ref, trigger toast via `useToast()`
-  - Watch id ref for route changes, re-fetch on change
+- [ ] **4.1** Update `src/infrastructure/provider.client.ts`:
+  - Add `getPersonDetails(id: number, language: string): Promise<PersonDetailWithCredits>`
+  - Endpoint path: `/person/{id}`
+  - Query params: `language` from `Settings.language` and `append_to_response=combined_credits,external_ids`
+  - Parse response with `PersonDetailWithCreditsSchema`
+  - Follow existing provider error handling patterns: 404 passes through for inline not-found handling, 429 uses automatic backoff, network/server errors surface to callers for manual retry
 
-## Phase 6: Application Testing
+- [ ] **4.2** Run `npm run test -- tests/infrastructure/provider.client.person.test.ts`; infrastructure tests should pass.
 
-- [ ] **6.1** Create `tests/application/use-person.test.ts`:
-  - Test loading state transitions: idle → loading → success (covering: CI-11-01)
-  - Test loading state transitions: idle → loading → error (covering: CI-12-03)
-  - Test refresh re-fetches data (implementation detail)
-  - Test id reactivity triggers new fetch (implementation detail)
+## Phase 5: Application Testing
 
-- [ ] **6.2** Run `npm run test` — confirm new tests fail (test-first)
+- [ ] **5.1** Create `tests/application/use-person.test.ts`:
+  - Test loading state transitions: idle → loading → success with `data` populated (covering: CI-11-01)
+  - Test loading state transitions: idle → loading → error with `error` populated (covering: CI-12-02)
+  - Test `refresh` re-fetches data after an error (covering: CI-12-03)
+  - Test current `Settings.language` is passed to `getPersonDetails` (covering: CI-04-02; validates CI-NFR-04)
+  - Test returned `data.filmography` is deduplicated and sorted before Presentation receives it (covering: CI-08-06, CI-09-01, CI-09-02)
+  - Test returned view data includes formatted birth/death info and external link URLs (covering: CI-06-01, CI-06-02, CI-07-02)
+  - (implementation detail) Test id reactivity triggers a new fetch
 
-## Phase 7: Routing
+- [ ] **5.2** Run `npm run test -- tests/application/use-person.test.ts` and confirm the new tests fail before implementation.
 
-- [ ] **7.1** Update `src/presentation/router.ts`:
+## Phase 6: Application Layer
+
+- [ ] **6.1** Create `src/application/use-person.ts`:
+  - Export `usePerson(id: MaybeRef<number>)`
+  - Import `useSettings()` and call `getPersonDetails(toValue(id), language.value)`
+  - Use Domain functions to deduplicate, sort, format dates, and build external URLs inside the Application layer
+  - Return the standard shape `{ data, loading, error, refresh }`
+  - `data` is `Ref<PersonPageData|null>` where `PersonPageData` is an Application-facing view model containing profile fields, formatted birth/death strings, external link view models, and sorted/deduplicated filmography view models
+  - Export Application-facing types such as `PersonPageData`, `PersonExternalLinkViewModel`, and `PersonCreditViewModel` for Presentation props; Presentation must not import Domain types or Domain functions
+  - Watch the id ref for route changes and re-fetch on change
+
+- [ ] **6.2** Run `npm run test -- tests/application/use-person.test.ts`; application tests should pass.
+
+## Phase 7: Routing Testing
+
+- [ ] **7.1** Create `tests/presentation/router.person.test.ts`:
+  - Test `/person/500` resolves to the person route (covering: CI-02-01)
+  - Test `/person/abc` redirects to `/` (covering: CI-02-02)
+  - Test `/person/123abc` redirects to `/` (covering: CI-02-03)
+  - (implementation detail) Test route component is lazy-loaded via dynamic import (validates CI-NFR-05)
+
+- [ ] **7.2** Run `npm run test -- tests/presentation/router.person.test.ts` and confirm the new tests fail before implementation.
+
+## Phase 8: Routing
+
+- [ ] **8.1** Update `src/presentation/router.ts`:
   - Add route `{ path: '/person/:id', component: () => import('./views/person-screen.vue') }`
   - Add navigation guard: reject non-numeric `:id`, redirect to `/`
   - Place route alongside existing `/movie/:id` and `/show/:id` routes
 
-## Phase 8: Presentation Components
+- [ ] **8.2** Run `npm run test -- tests/presentation/router.person.test.ts`; routing tests should pass.
 
-- [ ] **8.1** Create `src/presentation/components/details/person-hero.vue`:
-  - Props: `person: PersonDetail`
+## Phase 9: Presentation Testing
+
+- [ ] **9.1** Create component tests for person detail components, mocking only Application-facing data shapes:
+  - `tests/presentation/components/details/person-bio.test.ts` covers truncation, expansion, empty state, and localized controls (covering: CI-05-01, CI-05-02, CI-05-03, CI-05-04, CI-05-05)
+  - `tests/presentation/components/details/person-links.test.ts` covers available/missing links, `target="_blank"`, `rel="noopener noreferrer"`, and accessible labels (covering: CI-07-01, CI-07-02, CI-07-03, CI-07-04; validates CI-NFR-08)
+  - `tests/presentation/components/details/filmography-card.test.ts` covers displayed fields, media badges, lazy poster images, keyboard activation, and mobile touch target sizing (covering: CI-08-03, CI-08-04, CI-08-05, CI-10-01, CI-10-02, CI-10-03, CI-10-04; validates CI-NFR-06, CI-NFR-10)
+
+- [ ] **9.2** Create `tests/presentation/views/person-screen.test.ts`, mocking `usePerson()` and `useToast()`:
+  - Test skeleton displays during loading with live region semantics (covering: CI-11-01; validates CI-NFR-11)
+  - Test person data renders profile image/name/department/biography/birth info/filmography (covering: CI-03-01, CI-03-02, CI-04-01, CI-05-01, CI-06-01, CI-08-01, CI-08-02, CI-08-03)
+  - Test large filmography renders without duplicate or ordering regressions (covering: CI-08-06, CI-08-07, CI-09-01, CI-09-02)
+  - Test 404 state displays inline "Person not found" with Home link and alert semantics (covering: CI-12-01; validates CI-NFR-11)
+  - Test network error dispatches a toast with Retry action, and clicking Retry calls `refresh` (covering: CI-12-02, CI-12-03)
+  - Test empty filmography message (covering: CI-14-01)
+  - Test browser back and back arrow behavior, including minimum touch target sizing (covering: CI-13-01, CI-13-02, CI-13-03)
+  - (implementation detail) Test semantic article/section/link structure and visible focus states (validates CI-NFR-07, CI-NFR-09)
+
+- [ ] **9.3** Run the new presentation tests and confirm they fail before implementation.
+
+## Phase 10: Presentation Components and View
+
+- [ ] **10.1** Create `src/presentation/components/details/person-hero.vue`:
+  - Props: `name: string`, `knownForDepartment: string`, `profilePath: string|null`
   - Display circular profile image (200×200px desktop, 160×160px mobile) with User icon fallback
-  - Display name (`text-2xl font-bold text-white`) and known_for_department (`text-sm text-slate-400`)
+  - Display name (`text-2xl font-bold text-white`) and known-for department (`text-sm text-slate-400`)
   - Responsive layout: centered on mobile, left-aligned on desktop
 
-- [ ] **8.2** Create `src/presentation/components/details/person-bio.vue`:
+- [ ] **10.2** Create `src/presentation/components/details/person-bio.vue`:
   - Props: `biography: string|null`
-  - Section heading "Biography" with i18n key `person.biography`
-  - Display biography text with `line-clamp-6`, "Read more" expansion button
-  - Empty state: "No biography available." with i18n key `person.biographyEmpty`
-  - Use `ref` to toggle expanded state
+  - Section heading with i18n key `person.biography`
+  - Display biography text with `line-clamp-6`, `person.readMore` / `person.readLess` expansion button
+  - Empty state with i18n key `person.biographyEmpty`
 
-- [ ] **8.3** Create `src/presentation/components/details/person-info.vue`:
-  - Props: `birthday: string|null, placeOfBirth: string|null, deathday: string|null`
-  - Display formatted birth info and death info (if applicable)
-  - Hide section entirely if all values null
+- [ ] **10.3** Create `src/presentation/components/details/person-info.vue`:
+  - Props: `birthInfo: string|null`, `deathInfo: string|null`
+  - Display formatted birth info and death info from Application-provided strings
+  - Hide section entirely if both values are null
   - i18n keys: `person.born`, `person.died`
 
-- [ ] **8.4** Create `src/presentation/components/details/person-links.vue`:
-  - Props: `externalIds: ExternalIds`
-  - Display row of icon buttons: IMDB, Instagram, Twitter (using lucide-vue-next icons)
-  - Only render icons for non-null IDs
-  - Hide entire section if `hasExternalLinks()` returns false
+- [ ] **10.4** Create `src/presentation/components/details/person-links.vue`:
+  - Props: `links: PersonExternalLinkViewModel[]` imported from `src/application/use-person.ts`
+  - Display row of icon links for IMDB, Instagram, and Twitter entries present in `links`
+  - Hide entire section when `links.length === 0`
   - Open links in new tab with `target="_blank" rel="noopener noreferrer"`
+  - Use localized accessible labels such as `person.external.imdb`
 
-- [ ] **8.5** Create `src/presentation/components/details/filmography-card.vue`:
-  - Props: `credit: PersonCredit`
+- [ ] **10.5** Create `src/presentation/components/details/filmography-card.vue`:
+  - Props: `credit: PersonCreditViewModel` imported from `src/application/use-person.ts`
   - Display poster thumbnail (w185 size) with placeholder fallback
-  - Display title, year (or "TBA" if null), media type badge (teal for movie, violet for TV), character name
-  - RouterLink to `/movie/:id` or `/show/:id` based on media_type
-  - Hover state: `scale-105` transition
-  - Lazy load image with `loading="lazy"`
+  - Display title, localized year label (or `person.tba` if null), localized media type badge (`person.media.movie` / `person.media.tv`), and character name
+  - Render as `RouterLink` to the Application-provided route (`/movie/:id` or `/show/:id`)
+  - Hover state uses `transition-transform duration-200 ease-in-out`
+  - Lazy load poster image with `loading="lazy"`
 
-- [ ] **8.6** Create `src/presentation/components/details/filmography-grid.vue`:
-  - Props: `credits: PersonCredit[]`
-  - Section heading "Filmography" with count, i18n key `person.filmography`
-  - Responsive grid: 2 cols max-sm, 3 cols max-md, 4 cols max-lg, 6 cols base
+- [ ] **10.6** Create `src/presentation/components/details/filmography-grid.vue`:
+  - Props: `credits: PersonCreditViewModel[]`
+  - Section heading with i18n key `person.filmography` and count
+  - Responsive grid: 2 columns at max-sm, 3 at max-md, 4 at max-lg, 6 at base
   - Render `FilmographyCard` for each credit
-  - Empty state: "No credits available." with i18n key `person.creditsEmpty`
+  - Empty state with i18n key `person.creditsEmpty`
 
-- [ ] **8.7** Create `src/presentation/components/details/person-skeleton.vue`:
-  - Skeleton layout matching PersonScreen structure
+- [ ] **10.7** Create `src/presentation/components/details/person-skeleton.vue`:
+  - Skeleton layout matching `PersonScreen`
   - Circular profile placeholder, text lines for name/bio, grid of card skeletons
   - Use `animate-pulse` for shimmer effect
 
-## Phase 9: Presentation View
+- [ ] **10.8** Create `src/presentation/views/person-screen.vue`:
+  - Use `usePerson()` composable with route param and read `data`, `loading`, `error`, and `refresh`
+  - Conditional rendering: skeleton (loading), inline 404 state, network/server error state, content
+  - Compose `PersonHero`, `PersonBio`, `PersonInfo`, `PersonLinks`, and `FilmographyGrid` from Application-provided view data
+  - Do not import Domain types, Domain functions, or Infrastructure
+  - Back button uses `router.back()` when history exists and falls back to `/` on direct entry
+  - Network/server errors dispatch a toast with localized `person.retry` action that calls `refresh`
+  - Semantic HTML: page root `<article>`; biography, info, links, and filmography use `<section>` with headings
+  - `aria-live="polite"` on loading region; `role="alert"` on error region
 
-- [ ] **9.1** Create `src/presentation/views/person-screen.vue`:
-  - Use `usePerson()` composable with route param
-  - Conditional rendering: skeleton (loading), error state (error), content (success)
-  - Compose: PersonHero, PersonBio, PersonInfo, PersonLinks, FilmographyGrid
-  - Process credits: deduplicate, then sort by date
-  - Back button in header using router.back() or link to Home
-  - 404 state: "Person not found" with link to Home, i18n key `person.notFound`
-  - Semantic HTML: `<article>`, `<section>` elements
-  - `aria-live="polite"` on loading/error regions, `role="alert"` on error
-
-## Phase 10: CastCarousel Update
-
-- [ ] **10.1** Update `src/presentation/components/details/cast-carousel.vue`:
-  - Change cast member container from `<div>` to `<RouterLink :to="`/person/${member.id}`"`
-  - Add cursor-pointer and hover styles
-  - Maintain existing layout and styling
-
-## Phase 11: Presentation Testing
+## Phase 11: CastCarousel Testing
 
 - [ ] **11.1** Update `tests/presentation/components/details/cast-carousel.test.ts`:
   - Test click on cast member navigates to `/person/:id` (covering: CI-01-01)
-  - Test RouterLink renders with correct path (covering: CI-01-02)
+  - Test cast member card is a focusable RouterLink and Enter activates it (covering: CI-01-02)
 
-- [ ] **11.2** Create `tests/presentation/views/person-screen.test.ts`:
-  - Test skeleton displays during loading (covering: CI-11-02)
-  - Test person data renders correctly (covering: CI-03-02, CI-04-02, CI-05-01, CI-08-05)
-  - Test 404 state displays (covering: CI-12-04)
-  - Test filmography grid renders with sorted, deduplicated credits (covering: CI-08-06, CI-09-03)
-  - Test empty filmography message (covering: CI-14-01)
-  - Test external links render only for available IDs (covering: CI-07-05)
-  - Test back button exists (covering: CI-13-01)
+- [ ] **11.2** Run `npm run test -- tests/presentation/components/details/cast-carousel.test.ts` and confirm the new tests fail before implementation.
 
-- [ ] **11.3** Run `npm run test` — confirm new tests fail (test-first)
+## Phase 12: CastCarousel Update
 
-## Phase 12: i18n
+- [ ] **12.1** Update `src/presentation/components/details/cast-carousel.vue`:
+  - Change cast member container from `<div>` to a `<RouterLink>` whose `to` target is `/person/${member.id}`
+  - Add pointer affordance and hover styling consistent with existing card hover patterns
+  - Maintain existing layout, cast ordering, profile fallback, and text rendering
 
-- [ ] **12.1** Add i18n keys to `src/presentation/i18n/locales/en.json`:
-  - `person.biography`, `person.biographyEmpty`, `person.readMore`, `person.readLess`
-  - `person.born`, `person.died`
-  - `person.filmography`, `person.creditsEmpty`
-  - `person.notFound`, `person.backToHome`
+- [ ] **12.2** Run `npm run test -- tests/presentation/components/details/cast-carousel.test.ts`; CastCarousel tests should pass.
 
-- [ ] **12.2** Add corresponding keys to `es.json` and `fr.json`
+## Phase 13: i18n
 
-## Phase 13: Implementation
+- [ ] **13.1** Update locale-key tests to require the new person keys in `en.json`, `es.json`, and `fr.json`:
+  - Text keys: `person.biography`, `person.biographyEmpty`, `person.readMore`, `person.readLess`, `person.born`, `person.died`, `person.filmography`, `person.creditsEmpty`, `person.notFound`, `person.backToHome`, `person.retry`, `person.tba`
+  - Media labels: `person.media.movie`, `person.media.tv`
+  - External link labels: `person.external.imdb`, `person.external.instagram`, `person.external.twitter`
+  - Error/back labels: `person.error`, `person.back`
 
-- [ ] **13.1** Implement Domain layer (person.schema.ts, person.logic.ts)
-- [ ] **13.2** Run `npm run test` — domain tests should pass
-- [ ] **13.3** Implement Infrastructure layer (provider.client.ts update)
-- [ ] **13.4** Run `npm run test` — infrastructure tests should pass
-- [ ] **13.5** Implement Application layer (use-person.ts)
-- [ ] **13.6** Run `npm run test` — application tests should pass
-- [ ] **13.7** Implement Routing (router.ts update)
-- [ ] **13.8** Implement Presentation components (person-hero, person-bio, person-info, person-links, filmography-card, filmography-grid, person-skeleton)
-- [ ] **13.9** Implement Presentation view (person-screen.vue)
-- [ ] **13.10** Implement CastCarousel update
-- [ ] **13.11** Run `npm run test` — all tests should pass
+- [ ] **13.2** Run locale-key tests and confirm they fail before implementation.
+
+- [ ] **13.3** Add all person keys to `src/presentation/i18n/locales/en.json`, `es.json`, and `fr.json`; rerun locale-key tests and presentation tests.
 
 ## Phase 14: Documentation
 
 - [ ] **14.1** Update `docs/technical/api.md`:
-  - Add Person endpoint section: `GET /person/{id}` with `append_to_response=combined_credits,external_ids`
-  - Document PersonDetail, PersonCredit, ExternalIds response types
-  - Add curl example
+  - Add Person endpoint section: `GET /person/{id}` with `language={Settings.language}` and `append_to_response=combined_credits,external_ids`
+  - Document `PersonDetail`, `PersonCredit`, and `ExternalIds` response types
+  - Add curl example including `language`
 
 - [ ] **14.2** Update `docs/technical/architecture.md`:
   - Add `/person/:id` to routing table with purpose "Person details"
+  - Note that it follows the same numeric guard, lazy loading, skeleton, inline 404, and manual retry behavior as movie/show detail routes
+
+- [ ] **14.3** Update `docs/product/04 - entry-details/requirements.md`:
+  - Document that `CastCarousel` cast cards navigate to `/person/:id`
+  - Note that the existing cast display remains capped and sorted by billing order
+
+- [ ] **14.4** Review `docs/product/02 - home/requirements.md` and update only if its detail-page navigation text needs a cross-reference to person pages.
 
 ## Phase 15: Verification
 
@@ -211,8 +240,10 @@ Feature ID: R-09
   - Verify biography with Read more expansion
   - Verify birth/death info displays when available
   - Verify external links open in new tabs
-  - Verify filmography grid with correct sorting
+  - Verify filmography grid with correct sorting and deduplication
   - Verify responsive layout at all breakpoints
   - Verify skeleton loader during API fetch
-  - Verify 404 state with invalid person ID
-  - Verify back navigation works
+  - Verify numeric missing person ID shows 404 state
+  - Verify non-numeric person ID redirects home
+  - Verify Retry action re-fetches after a network error
+  - Verify back navigation works from in-app and direct-entry flows

@@ -27,3 +27,18 @@ Feature: Biography
     Given a person with no biography
     When I view the person page
     Then I see "No biography available."
+
+  Scenario Outline: CI-05-05 — Biography controls use active locale
+    Given the app is running
+    And my language setting is <locale>
+    And a person with a long biography
+    When I view the person page
+    Then the biography expansion button displays <readMore>
+    When I click <readMore>
+    Then the biography collapse button displays <readLess>
+
+    Examples:
+      | locale | readMore       | readLess       |
+      | "en"   | "Read more"    | "Read less"    |
+      | "es"   | "Leer más"     | "Leer menos"   |
+      | "fr"   | "Lire la suite" | "Lire moins"   |
