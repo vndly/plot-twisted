@@ -15,20 +15,18 @@ Feature: Filmography grid
 
     Examples:
       | viewport | columns |
-      | desktop  | 6       |
-      | lg       | 4       |
+      | mobile   | 2       |
       | md       | 3       |
-      | sm       | 2       |
+      | lg       | 4       |
+      | xl       | 6       |
 
   Scenario: CI-08-03 — Credit card shows required info
     When I view the person page
-    Then each filmography item shows:
-      | field       |
-      | poster      |
-      | title       |
-      | year        |
-      | media badge |
-      | character   |
+    Then each filmography item shows a poster
+    And each filmography item shows a title
+    And each filmography item shows a year or "TBA"
+    And each filmography item shows a media badge
+    And each filmography item shows a character or role name
 
   Scenario: CI-08-04 — Movie badge displays in teal
     Given a person with movie credits
@@ -47,8 +45,10 @@ Feature: Filmography grid
     And the character shown is from the highest billing
 
   Scenario: CI-08-07 — Large filmography remains usable
-    Given a person with 120 combined movie and TV credits
+    Given a person with 120 unique combined movie and TV credits
     When I view the filmography
-    Then the filmography displays all credits without duplicate media entries
+    Then 120 filmography credit links are rendered
     And the credits remain sorted by release date descending
-    And the page remains responsive to scrolling and focus navigation
+    And no duplicate media entries are displayed
+    When I Tab through the first 10 filmography credit links
+    Then focus moves sequentially through those 10 links without leaving the filmography grid

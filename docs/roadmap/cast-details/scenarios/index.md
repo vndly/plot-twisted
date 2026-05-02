@@ -12,7 +12,7 @@
 8. **[CI-08.feature](./CI-08.feature)**: Filmography grid (7 scenarios).
 9. **[CI-09.feature](./CI-09.feature)**: Filmography sorting (2 scenarios).
 10. **[CI-10.feature](./CI-10.feature)**: Filmography navigation (4 scenarios).
-11. **[CI-11.feature](./CI-11.feature)**: Loading state (1 scenario).
-12. **[CI-12.feature](./CI-12.feature)**: Error handling (3 scenarios).
+11. **[CI-11.feature](./CI-11.feature)**: Loading state (2 scenarios).
+12. **[CI-12.feature](./CI-12.feature)**: Error handling (4 scenarios).
 13. **[CI-13.feature](./CI-13.feature)**: Back navigation (3 scenarios).
 14. **[CI-14.feature](./CI-14.feature)**: Empty filmography (1 scenario).

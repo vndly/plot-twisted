@@ -29,8 +29,7 @@ Feature: Biography
     Then I see "No biography available."
 
   Scenario Outline: CI-05-05 — Biography controls use active locale
-    Given the app is running
-    And my language setting is <locale>
+    Given my language setting is <locale>
     And a person with a long biography
     When I view the person page
     Then the biography expansion button displays <readMore>

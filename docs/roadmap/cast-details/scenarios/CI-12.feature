@@ -13,11 +13,22 @@ Feature: Error handling
   Scenario: CI-12-02 — Network error shows toast
     When I navigate to a person page
     And a network error occurs
-    Then an error toast appears
-    And the toast has a "Retry" action
+    Then a localized network error toast appears
+    And the toast has a localized "Retry" action
 
-  Scenario: CI-12-03 — Retry action refetches person data
-    Given a network error toast is displayed
+  Scenario Outline: CI-12-03 — Retry action refetches person data
+    Given a <errorType> error toast is displayed
     When I click the "Retry" action
     Then the person API request is attempted again
     And the person detail page displays if the retry succeeds
+
+    Examples:
+      | errorType |
+      | network   |
+      | server    |
+
+  Scenario: CI-12-04 — Server error shows retry toast
+    When I navigate to a person page
+    And the API returns a 500 server error
+    Then a localized server error toast appears
+    And the toast has a localized "Retry" action

@@ -36,6 +36,11 @@ Currently, cast members are displayed in a carousel on movie/show detail pages w
 - **[docs/technical/api.md](../../technical/api.md)**: New Person endpoint (`/person/{id}` with `language={Settings.language}` and `append_to_response=combined_credits,external_ids`) needs to be documented with response schema (`PersonDetail`, `PersonCredit`, `ExternalIds` types) and usage patterns.
 - **[docs/technical/architecture.md](../../technical/architecture.md)**: Routing table updated with `/person/:id` route.
 - **src/domain/**: New `person.schema.ts` with `PersonDetailSchema` and related types following existing schema patterns.
+- **src/infrastructure/provider.client.ts**: New `getPersonDetails` method for the TMDB Person endpoint, following existing auth, retry, and Zod validation patterns.
+- **src/presentation/router.ts**: New `/person/:id` route using the existing numeric route guard and lazy loading pattern.
+- **src/application/**: New `use-person.ts` composable that is the Presentation layer's only data-access path for person details.
+- **src/presentation/i18n/locales/**: New person UI translation keys mirrored across `en.json`, `es.json`, and `fr.json`.
+- **src/presentation/composables/use-toast.ts**: Existing toast queue used for manual retry actions on person network and server errors.
 
 In this feature, **Person** means an individual in the TMDB database identified by a unique person ID. **Cast member** means a person's role in a specific movie or show. **Filmography** means the combined movie and TV credits sourced from TMDB `combined_credits`.
 
@@ -55,7 +60,7 @@ In this feature, **Person** means an individual in the TMDB database identified 
 - Filmography displayed as a combined grid sorted by release date (newest first)
 - Clickable filmography items that navigate to `/movie/:id` or `/show/:id`
 - Loading skeleton states
-- Error handling (404, network errors)
+- Error handling (404, network errors, 500+ server errors)
 - i18n support for all UI text
 
 ### Out of Scope
@@ -98,7 +103,7 @@ In this feature, **Person** means an individual in the TMDB database identified 
 | CI-09 | Filmography sorting    | Sort filmography by release date descending (newest first); entries with null release dates appear at the end with "TBA" displayed                                      | P0       |
 | CI-10 | Filmography navigation | Each filmography item navigates to `/movie/:id` or `/show/:id` when clicked                                                                                             | P0       |
 | CI-11 | Loading state          | Show skeleton loader while person data is being fetched                                                                                                                 | P0       |
-| CI-12 | Error handling         | Show appropriate error states for 404 (person not found) and network errors                                                                                             | P0       |
+| CI-12 | Error handling         | Show appropriate error states for 404 (person not found), network errors, and 500+ server errors; network and server errors provide a manual Retry action               | P0       |
 | CI-13 | Back navigation        | Browser back button works correctly; include a back arrow button in the page header for discoverability                                                                 | P1       |
 | CI-14 | Empty filmography      | Handle empty filmography with appropriate message (e.g., "No credits available")                                                                                        | P1       |
 
@@ -109,7 +114,7 @@ In this feature, **Person** means an individual in the TMDB database identified 
 | ID        | Requirement              | Threshold                                                                                                 |
 | --------- | ------------------------ | --------------------------------------------------------------------------------------------------------- |
 | CI-NFR-01 | Profile image sizing     | 160×160px on mobile, 200×200px on desktop                                                                 |
-| CI-NFR-02 | Filmography grid columns | 2 columns at max-sm, 3 columns at max-md, 4 columns at max-lg, 6 columns at base (desktop)                |
+| CI-NFR-02 | Filmography grid columns | 2 columns below `md`, 3 columns at `md`, 4 columns at `lg`, 6 columns at `xl` and above                   |
 | CI-NFR-03 | Biography text width     | Biography text container uses `max-w-prose` (or max 72ch) with at least 16px horizontal padding on mobile |
 
 ### Performance
@@ -180,6 +185,22 @@ In this feature, **Person** means an individual in the TMDB database identified 
 
 - **404**: "Person not found" centered message with link to Home
 - **Network error**: Toast notification with Retry action
+- **500+ server error**: Toast notification with Retry action
+
+### i18n Keys
+
+The English copy values in this specification are backed by these translation keys:
+
+- `person.biography`: "Biography"
+- `person.biographyEmpty`: "No biography available."
+- `person.readMore`: "Read more"
+- `person.readLess`: "Read less"
+- `person.filmography`: "Filmography"
+- `person.creditsEmpty`: "No credits available."
+- `person.notFound`: "Person not found"
+- `person.error.network`: Network error toast message
+- `person.error.server`: Server error toast message
+- `person.retry`: "Retry"
 
 ## Risks & Assumptions
 
@@ -210,6 +231,7 @@ In this feature, **Person** means an individual in the TMDB database identified 
 - [ ] Death date displays when applicable (CI-06)
 - [ ] External links (IMDB, Instagram, Twitter) render as clickable icons (CI-07)
 - [ ] External links open in new tabs (CI-07)
+- [ ] External links use `target="_blank"` and `rel="noopener noreferrer"` (CI-NFR-08)
 - [ ] Missing external links are not displayed (no broken icons) (CI-07)
 - [ ] External Links section is hidden entirely when no IMDB, Instagram, or Twitter links are available (CI-07)
 - [ ] Filmography displays as a combined grid of movies and TV shows (CI-08)
@@ -220,22 +242,24 @@ In this feature, **Person** means an individual in the TMDB database identified 
 - [ ] Clicking a filmography item navigates to the correct detail page (CI-10)
 - [ ] Skeleton loader displays while data is loading (CI-11)
 - [ ] Error toast appears on network failure with Retry action (CI-12)
-- [ ] Retry action re-attempts the failed person request (CI-12)
+- [ ] Error toast appears on 500+ server failure with Retry action (CI-12)
+- [ ] Retry action re-attempts the failed network or server person request (CI-12)
 - [ ] "Person not found" message appears for numeric person IDs that return 404 (CI-12)
 - [ ] Back navigation works correctly (CI-13)
 - [ ] Empty filmography shows appropriate message (CI-14)
-- [ ] Page is responsive across all breakpoints (CI-NFR-01, CI-NFR-02, CI-NFR-03)
+- [ ] Profile image measures 160×160px below `md` and 200×200px at `md` and above (CI-NFR-01)
+- [ ] Filmography grid uses 2 columns below `md`, 3 columns at `md`, 4 columns at `lg`, and 6 columns at `xl` and above (CI-NFR-02)
+- [ ] Biography text uses `max-w-prose` or max 72ch with at least 16px horizontal padding on mobile (CI-NFR-03)
 - [ ] Single API call fetches person details, credits, and external IDs using the current `Settings.language` (CI-NFR-04)
 - [ ] Person route component is lazy-loaded via dynamic import (CI-NFR-05)
 - [ ] Filmography poster images use `loading="lazy"` (CI-NFR-06)
 - [ ] Person page uses the required semantic article, section, heading, and link structure (CI-NFR-07)
-- [ ] External links open in new tabs with `rel="noopener noreferrer"` (CI-NFR-08)
-- [ ] Filmography renders without visible jank for persons with 100+ credits (performance)
-- [ ] All UI text uses i18n translation keys
+- [ ] A person with 120 unique combined credits renders all sorted, deduplicated filmography items and preserves keyboard focus navigation through the grid (CI-08)
+- [ ] Implementation verification: all person UI text keys are present in `en.json`, `es.json`, and `fr.json` and enforced by locale-key tests
 - [ ] Keyboard navigation works for filmography grid (CI-NFR-10)
 - [ ] Focus states are visible on interactive elements (CI-NFR-09)
 - [ ] Loading and error states are announced through the specified live regions and alert role (CI-NFR-11)
 - [ ] Biography "Read more" button text uses i18n translation key
 - [ ] Empty biography message uses i18n translation key
-- [ ] `docs/technical/api.md` updated with `/person/{id}` endpoint documentation
-- [ ] `docs/technical/architecture.md` routing table includes `/person/:id`
+- [ ] Documentation verification: `docs/technical/api.md` documents the `/person/{id}` endpoint, parameters, and response types
+- [ ] Documentation verification: `docs/technical/architecture.md` routing table includes `/person/:id`
