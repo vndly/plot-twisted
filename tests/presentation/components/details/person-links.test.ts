@@ -45,6 +45,7 @@ describe('PersonLinks', () => {
       expect(anchor.attributes('rel')).toBe('noopener noreferrer')
       expect(anchor.attributes('aria-label')).toBe(labels[link.type])
     }
+    expect(wrapper.get('[data-testid="person-link-imdb"] svg').classes()).toContain('lucide-film')
   })
 
   it('hides missing links and renders only provided entries', () => {

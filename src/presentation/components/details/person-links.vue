@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BadgeInfo, Instagram, Twitter } from 'lucide-vue-next'
+import { Film, Instagram, Twitter } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import type { Component } from 'vue'
 import type { PersonExternalLinkViewModel } from '@/application/use-person'
@@ -11,7 +11,7 @@ defineProps<{
 const { t } = useI18n()
 
 const iconByType: Record<PersonExternalLinkViewModel['type'], Component> = {
-  imdb: BadgeInfo,
+  imdb: Film,
   instagram: Instagram,
   twitter: Twitter,
 }
