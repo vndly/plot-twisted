@@ -37,3 +37,10 @@ Feature: LBS-05 Query normalization
     When I type a query containing two spaces between "deep" and "space"
     And 300ms elapses without more typing
     Then only the entry titled "Exact Spacing" is visible
+
+  Scenario: LBS-05-05 - Over-limit queries are truncated before matching
+    Given the Watchlist contains an entry titled "Boundary Match" with notes containing the first 120 characters of the over-limit query
+    And the Watchlist contains an entry titled "Overflow Match" with notes containing only characters after position 120 of the over-limit query
+    When I type a search query longer than 120 characters after trimming
+    And 300ms elapses without more typing
+    Then only the entry titled "Boundary Match" is visible

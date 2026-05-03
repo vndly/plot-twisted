@@ -29,19 +29,15 @@ Users with large libraries (50+ entries) struggle to locate specific movies or s
 
 - **R-05 (Library Management: Sorting and Filtering)**: The Library screen, `useLibraryEntries` composable, and filter infrastructure must be in place.
 
-### Affected Documentation
-
-- **docs/product/03 - library**: When promoted, update the Library Management sections for library controls, filter composition, filtered empty states, responsive layout, and `useLibraryEntries` behavior.
-
 ## Decisions
 
-| Decision            | Choice                                                     | Rationale                                                                                                                                |
-| ------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Search Data Source  | Search local, validated `LibraryEntry` data only           | Titles, tags, and notes already live in localStorage and must not require TMDB or server-side search.                                    |
-| Searchable Fields   | Search validated `LibraryEntry` data before projection     | `tags` and `notes` exist on `LibraryEntry`; searching before `LibraryViewItem` projection avoids widening the view item only for search. |
-| Query Normalization | Parse with a domain Zod schema, then trim and lowercase    | This satisfies boundary validation and user-input sanitization rules while keeping matching predictable and literal.                     |
-| URL/Storage State   | Keep search query in volatile screen state only            | R-05 keeps persistent filters out of scope except sort preference, and this feature excludes URL query sync.                             |
-| Component Coupling  | Use `LibrarySearchBar` or a shared presentation-only input | The Home `SearchBar` is tied to API search behavior and must not be coupled to local library search.                                     |
+| Decision            | Choice                                                     | Rationale                                                                                                                                 |
+| ------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Search Data Source  | Search local, validated `LibraryEntry` data only           | Titles, tags, and notes already live in localStorage and must not require TMDB or server-side search.                                     |
+| Searchable Fields   | Search validated `LibraryEntry` data before projection     | `tags` and `notes` exist on `LibraryEntry`; searching before `LibraryViewItem` projection avoids widening the view item only for search.  |
+| Query Normalization | Parse with a domain Zod schema, then trim and lowercase    | This satisfies boundary validation and user-input sanitization rules while keeping matching predictable and literal.                      |
+| URL/Storage State   | Keep search query in volatile screen state only            | R-05 keeps persistent filters out of scope except sort preference, and this feature excludes URL query sync.                              |
+| Component Coupling  | Use `LibrarySearchBar` or a shared presentation-only input | The Home `SearchBar` is presentation-only but home-scoped; Library search must not couple to the Home screen API search workflow or keys. |
 
 ## Scope
 
@@ -53,7 +49,7 @@ Users with large libraries (50+ entries) struggle to locate specific movies or s
 - Case-insensitive matching across title, tags, and notes
 - Debounced input to optimize performance
 - Clear/reset search functionality
-- Empty state when no entries match the search query
+- Empty state when no entries match the search query and/or active filters
 - Integration with existing filters (search results are further filtered by active genre/media type/rating filters)
 - Responsive design (search bar adapts to mobile layout)
 
@@ -70,18 +66,18 @@ Users with large libraries (50+ entries) struggle to locate specific movies or s
 
 ## Functional Requirements
 
-| ID     | Requirement          | Description                                                                                                                                                                                                                                                                                                                                                                                                                    | Priority |
-| ------ | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
-| LBS-01 | Search input         | A text input field is displayed in the Library screen's sticky controls area: full-width above filters below `md`, and inline with filters at `md` and above. The input has placeholder text indicating searchable fields (e.g., "Search titles, tags, notes...").                                                                                                                                                             | P0       |
-| LBS-02 | Debounced filtering  | After the user stops typing for 300ms, library entries are filtered to show only entries matching the normalized search query. Matching is performed by pure domain logic against validated `LibraryEntry.title`, `LibraryEntry.tags`, and `LibraryEntry.notes`; `useLibraryEntries` applies search before projecting entries to `LibraryViewItem` for existing filter and sort composition.                                   | P0       |
-| LBS-03 | Case-insensitive     | Search matching is case-insensitive. Searching "batman" matches "Batman", "BATMAN", and "The Batman".                                                                                                                                                                                                                                                                                                                          | P0       |
-| LBS-04 | Partial matching     | Search matches partial strings. Searching "bat" matches "Batman", "Combat", and any entry with "bat" in title, tags, or notes.                                                                                                                                                                                                                                                                                                 | P0       |
-| LBS-05 | Query normalization  | Search queries are parsed through a domain-level Zod schema (for example, `LibrarySearchQuerySchema`) before matching, then trimmed and lowercased with `toLowerCase()`. Whitespace-only queries are treated as empty, internal whitespace is preserved and matched literally, special characters are matched as literal text, and matching must not interpret the query as a raw regular expression.                          | P0       |
-| LBS-06 | Clear search         | A clear button (X icon) appears when the search input has text. Clicking it clears the search query immediately, returns focus to the input, and shows all entries (subject to other active filters).                                                                                                                                                                                                                          | P0       |
-| LBS-07 | Filter integration   | Search results are combined with existing filters. If a user searches "action" while the genre filter is set to "Comedy", only Comedy entries containing "action" in title/tags/notes are shown.                                                                                                                                                                                                                               | P0       |
-| LBS-08 | Empty search results | When a non-empty Watchlist or Watched tab scope is reduced to zero entries by the search query combined with active filters, a search/filter empty state is displayed with localized heading "No matches found", supporting text "Try a different search term or clear your filters", and a contextual CTA. Base empty Watchlist/Watched states remain unchanged when the selected tab has no entries before search/filtering. | P0       |
-| LBS-09 | Tab-state retention  | The search query remains in volatile Library screen state while switching between Watchlist and Watched tabs. It is not persisted to localStorage, synced to URL query parameters, or retained across page reloads.                                                                                                                                                                                                            | P1       |
-| LBS-10 | Keyboard support     | Pressing Enter in the search input does not submit a form or trigger navigation. Pressing Escape clears the search input immediately and shows all entries subject to other active filters.                                                                                                                                                                                                                                    | P1       |
+| ID     | Requirement          | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Priority |
+| ------ | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| LBS-01 | Search input         | A text input field is displayed in the Library screen's sticky controls area: full-width above filters below `md`, and inline with filters at `md` and above. The input has placeholder text indicating searchable fields (e.g., "Search titles, tags, notes...").                                                                                                                                                                                              | P0       |
+| LBS-02 | Debounced filtering  | After the user stops typing for 300ms, library entries are filtered to show only entries matching the normalized search query. Matching is performed by pure domain logic against validated `LibraryEntry.title`, `LibraryEntry.tags`, and `LibraryEntry.notes`; `useLibraryEntries` applies search before projecting entries to `LibraryViewItem` for existing filter and sort composition.                                                                    | P0       |
+| LBS-03 | Case-insensitive     | Search matching is case-insensitive. Searching "batman" matches "Batman", "BATMAN", and "The Batman".                                                                                                                                                                                                                                                                                                                                                           | P0       |
+| LBS-04 | Partial matching     | Search matches partial strings. Searching "bat" matches "Batman", "Combat", and any entry with "bat" in title, tags, or notes.                                                                                                                                                                                                                                                                                                                                  | P0       |
+| LBS-05 | Query normalization  | Search queries are parsed through a domain-level Zod schema (for example, `LibrarySearchQuerySchema`) before matching, then trimmed, truncated to a maximum of 120 characters after trimming, and lowercased with `toLowerCase()`. Whitespace-only queries are treated as empty, internal whitespace is preserved and matched literally, special characters are matched as literal text, and matching must not interpret the query as a raw regular expression. | P0       |
+| LBS-06 | Clear search         | A clear button (X icon) appears when the search input has text. Clicking it clears the search query immediately, returns focus to the input, and shows all entries (subject to other active filters).                                                                                                                                                                                                                                                           | P0       |
+| LBS-07 | Filter integration   | Search results are combined with existing filters. If a user searches "action" while the genre filter is set to "Comedy", only Comedy entries containing "action" in title/tags/notes are shown.                                                                                                                                                                                                                                                                | P0       |
+| LBS-08 | Empty search results | When a non-empty Watchlist or Watched tab scope is reduced to zero entries by the search query and/or active filters, a search/filter empty state extends R-05's filtered empty-state behavior with localized heading "No matches found", supporting text "Try a different search term or clear your filters", and a contextual CTA. Base empty Watchlist/Watched states remain unchanged when the selected tab has no entries before search/filtering.         | P0       |
+| LBS-09 | Tab-state retention  | The search query remains in volatile Library screen state while switching between Watchlist and Watched tabs. It is not persisted to localStorage, synced to URL query parameters, or retained across page reloads.                                                                                                                                                                                                                                             | P1       |
+| LBS-10 | Keyboard support     | Pressing Enter in the search input does not submit a form or trigger navigation. Pressing Escape clears the search input immediately and shows all entries subject to other active filters.                                                                                                                                                                                                                                                                     | P1       |
 
 ## Non-Functional Requirements
 
@@ -102,27 +98,42 @@ Users with large libraries (50+ entries) struggle to locate specific movies or s
 - Clear button has accessible name (e.g., `aria-label="Clear search"`).
 - Focus remains in search input after clearing.
 
+### Internationalization
+
+- All new `library.search.*` and search/filter empty-state i18n keys exist in `en.json`, `es.json`, and `fr.json`, with `en.json` as the canonical source.
+- Locale-key validation passes after the new keys are added, and rendered tests cover at least one non-default locale for Library search text.
+
 ### Testing
 
-- Unit tests for search matching logic (title, tags, notes matching).
-- Unit tests for filter integration (search + genre/media type/rating filters).
-- Unit tests for edge cases: empty query, whitespace-only query, special characters as literal text, and preserved internal whitespace.
-- Unit tests use fake timers for the 300ms debounce and a fixed 500-entry fixture for the < 50ms pure filtering/composable update threshold.
-- Unit tests verify that clear and Escape cancel any pending debounce so advancing timers cannot re-apply a stale query.
+- Vitest `*.test.ts` files mirror the `src/` structure and follow Arrange-Act-Assert.
+- Domain tests cover `LibrarySearchQuerySchema`, query normalization, title/tag/note matching, literal special-character handling, preserved internal whitespace, and 120-character truncation.
+- Application tests cover 300ms debounce behavior with fake timers, stale debounce cancellation, volatile search state, search/filter/sort composition, and `status: "none"` exclusion.
+- Presentation tests cover non-trivial `LibrarySearchBar` and Library screen interactions, including i18n text, accessibility labels, touch target, focus return, Enter/Escape behavior, responsive placement, and contextual empty-state CTAs.
+- Performance tests use a fixed 500-entry fixture for the < 50ms pure filtering/composable update threshold.
+
+## Constraints
+
+- Library search is client-only against validated local `LibraryEntry` data; it must not call TMDB, add server-side search, or add API caching.
+- Search query state remains volatile in the mounted Library screen; it must not be persisted to localStorage, synced to URL query parameters, or retained after reload.
+- The persisted `LibraryEntry` schema does not change, so no data migration or schema version bump is required.
+- Search query input is parsed by a domain Zod schema, trimmed, truncated to 120 characters, lowercased, and matched literally.
+- Matching must use escaped Vue template rendering only; no `v-html`, raw HTML insertion, or raw regular-expression interpretation is introduced for query, tag, or note text.
+- UI changes use Tailwind utility classes and existing Library/Home input styling patterns; no inline styles or separate CSS files are added.
+- All new user-facing strings use mirrored `en`, `es`, and `fr` i18n keys.
 
 ## UI/UX Specs
 
 ### Search Input
 
 - Positioned in the Library screen's sticky controls area. On desktop (`md` and above), it appears inline with filter controls; on mobile (below `md`), it spans full width above filter controls.
-- Uses the same input styling as the Home screen search input for visual consistency, but the implementation must use a `LibrarySearchBar` component or a shared presentation-only input without Home/API search behavior.
+- Uses the same input styling as the Home screen search input for visual consistency, but the implementation must use a `LibrarySearchBar` component or extract a shared presentation-only input with Library-specific i18n and without coupling to `HomeScreen` or `useSearch`.
 - Includes a search icon (magnifying glass) on the left side of the input.
 - Clear button (X icon) appears on the right when input has text.
 - Placeholder text: "Search titles, tags, notes..." (localized via i18n).
 
 ### Empty State
 
-- Displayed only when a non-empty Watchlist or Watched base scope is reduced to zero results by search and active filters.
+- Displayed only when a non-empty Watchlist or Watched base scope is reduced to zero results by search and/or active filters.
 - Centered layout with:
   - Icon: Search or empty-results icon
   - Heading: "No matches found"
@@ -164,13 +175,15 @@ Users with large libraries (50+ entries) struggle to locate specific movies or s
 - [ ] **LBS-04**: Searching "bat" matches entries with "bat" anywhere in title, tags, or notes, including examples like "Batman" and "Combat".
 - [ ] **LBS-05**: Searching " bat " behaves the same as searching "bat".
 - [ ] **LBS-05**: The search query is parsed through a domain-level Zod schema before matching.
+- [ ] **LBS-05**: Search queries longer than 120 characters after trimming are truncated to 120 characters before lowercasing and matching.
 - [ ] **LBS-05**: A whitespace-only query is treated as empty and shows all entries subject to other active filters.
 - [ ] **LBS-05**: Special characters in the query are matched as literal text and do not behave as regular expressions.
 - [ ] **LBS-05**: Internal whitespace in the query is preserved and matched literally.
 - [ ] **LBS-06**: Clearing the search input immediately shows all entries subject to other active filters and returns focus to the search input.
 - [ ] **LBS-07**: Searching "action" with genre filter set to "Comedy" shows only Comedy entries containing "action".
 - [ ] **LBS-07**: Searching with an active user rating filter shows only entries that match both the search query and the selected rating range.
-- [ ] **LBS-08**: The search/filter empty state appears only when a non-empty tab scope is reduced to zero entries by search and filters.
+- [ ] **LBS-02, LBS-08**: Entries with `status: "none"` are never surfaced by Library search and do not count as Watchlist/Watched base-scope entries.
+- [ ] **LBS-08**: The search/filter empty state appears only when a non-empty Watchlist or Watched tab scope is reduced to zero entries by search and/or filters.
 - [ ] **LBS-08**: The search/filter empty-state CTA clears search, filters, or both based on the active empty-result causes.
 - [ ] **LBS-09**: Search query remains applied when switching between Watchlist and Watched tabs, but is not retained after page reload.
 - [ ] **LBS-10**: Pressing Escape in the search input clears the query immediately.
@@ -179,4 +192,4 @@ Users with large libraries (50+ entries) struggle to locate specific movies or s
 - [ ] **Performance NFR**: Pure search/filter computation and composable recomputation complete in < 50ms for a library of 500 entries after the debounce fires, excluding DOM rendering.
 - [ ] **Responsive NFR**: Clear button has a touch target of at least 44×44px on mobile.
 - [ ] **Accessibility NFR**: Search input has a visible label or `aria-label`, clear button has an accessible name, and focus remains in the input after clearing.
-- [ ] **i18n**: All user-facing text uses i18n keys (no hardcoded strings).
+- [ ] **i18n**: All user-facing text uses mirrored `en`, `es`, and `fr` i18n keys, and locale-key validation or rendered locale tests cover the new keys.

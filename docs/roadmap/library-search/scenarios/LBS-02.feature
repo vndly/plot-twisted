@@ -32,3 +32,14 @@ Feature: LBS-02 Debounced filtering
     Then the pure search/filter computation completes in less than 50ms
     And the composable recomputation completes in less than 50ms
     And only the entry titled "Batman Benchmark" is visible
+
+  Scenario: LBS-02-04 - Matching none-status entries stay outside Library tab scopes
+    Given the Watchlist contains an entry titled "Batman Begins"
+    And the library contains an entry titled "Batman Draft" with status "none"
+    When I type "batman" in the Library search input
+    And 300ms elapses without more typing
+    Then only the entry titled "Batman Begins" is visible
+    And the entry titled "Batman Draft" is not visible
+    When I switch to the Watched tab
+    Then the entry titled "Batman Draft" is not visible
+    And the base Watched empty state is visible
