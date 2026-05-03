@@ -22,6 +22,11 @@ const genres = ref([{ id: 1, name: 'Action' }])
 const fetchGenres = vi.fn()
 const language = ref('en')
 
+const query = ref('')
+const appliedQuery = ref('')
+const hasSearchQuery = ref(false)
+const clearSearch = vi.fn()
+
 vi.mock('@/application/use-library-filters', () => ({
   useLibraryFilters: () => ({
     filters,
@@ -58,6 +63,15 @@ vi.mock('@/application/use-settings', () => ({
   }),
 }))
 
+vi.mock('@/application/use-library-search', () => ({
+  useLibrarySearch: () => ({
+    query,
+    appliedQuery,
+    hasSearchQuery,
+    clearSearch,
+  }),
+}))
+
 function createTestI18n() {
   return createI18n({
     legacy: false,
@@ -76,6 +90,8 @@ function createTestI18n() {
         'library.empty.watched.title': 'Nothing watched yet',
         'library.empty.watched.description': 'Titles you finish will appear here.',
         'home.filters.clear': 'Clear filters',
+        'library.search.clear': 'Clear search',
+        'library.search.clearAll': 'Clear all',
       },
     },
   })
@@ -110,6 +126,11 @@ function renderLibraryScreen() {
           template:
             '<div data-testid="empty-state"><h2>{{ title }}</h2><p>{{ description }}</p><slot /></div>',
         },
+        LibrarySearchBar: {
+          name: 'LibrarySearchBar',
+          props: ['modelValue'],
+          template: '<div data-testid="search-bar">{{ modelValue }}</div>',
+        },
       },
     },
   })
@@ -128,9 +149,13 @@ describe('LibraryScreen', () => {
     allEntries.value = []
     genres.value = [{ id: 1, name: 'Action' }]
     language.value = 'en'
+    query.value = ''
+    appliedQuery.value = ''
+    hasSearchQuery.value = false
     clearFilters.mockReset()
     refresh.mockReset()
     fetchGenres.mockReset()
+    clearSearch.mockReset()
   })
 
   it('renders the default watchlist empty state and fetches genres on mount', () => {
@@ -208,5 +233,45 @@ describe('LibraryScreen', () => {
     expect(sortField.value).toBe('title')
     expect(sortOrder.value).toBe('asc')
     expect(filters.value.mediaType).toBe('movie')
+  })
+
+  describe('Search Integration', () => {
+    it('integrates search bar and updates query', async () => {
+      const wrapper = renderLibraryScreen()
+      const searchBar = wrapper.find('[data-testid="search-bar"]')
+      expect(searchBar.exists()).toBe(true)
+
+      wrapper.findComponent({ name: 'LibrarySearchBar' }).vm.$emit('update:modelValue', 'batman')
+      expect(query.value).toBe('batman')
+    })
+
+    it('shows search empty state and clears search from CTA (LBS-08-01)', async () => {
+      allEntries.value = [{ id: 1, title: 'Arrival', status: 'watchlist' }]
+      hasSearchQuery.value = true
+      activeFilterCount.value = 0
+
+      const wrapper = renderLibraryScreen()
+      expect(wrapper.get('[data-testid="empty-state"] h2').text()).toBe('No matches')
+
+      const clearButton = wrapper.get('[data-testid="empty-state"] button')
+      expect(clearButton.text()).toBe('Clear search')
+
+      await clearButton.trigger('click')
+      expect(clearSearch).toHaveBeenCalled()
+    })
+
+    it('shows combined empty state and clear all from CTA (LBS-08-01)', async () => {
+      allEntries.value = [{ id: 1, title: 'Arrival', status: 'watchlist' }]
+      hasSearchQuery.value = true
+      activeFilterCount.value = 1
+
+      const wrapper = renderLibraryScreen()
+      const clearButton = wrapper.get('[data-testid="empty-state"] button')
+      expect(clearButton.text()).toBe('Clear all')
+
+      await clearButton.trigger('click')
+      expect(clearSearch).toHaveBeenCalled()
+      expect(clearFilters).toHaveBeenCalled()
+    })
   })
 })

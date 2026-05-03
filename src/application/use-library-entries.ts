@@ -8,18 +8,24 @@ import {
   getLibraryComparator,
   type LibraryViewItem,
 } from '@/domain/filter.logic'
+import {
+  matchesLibrarySearchQuery,
+  normalizeLibrarySearchQuery,
+} from '@/domain/library-search.logic'
 
 /**
  * Composable for accessing, filtering, and sorting library entries.
  * @param filters - Optional reactive library filter state
  * @param sortField - Optional reactive sort field
  * @param sortOrder - Optional reactive sort order
+ * @param searchQuery - Optional reactive search query
  * @returns Object containing all entries and methods to filter them
  */
 export function useLibraryEntries(
   filters?: Ref<LibraryFilterState>,
   sortField?: Ref<SortField>,
   sortOrder?: Ref<SortOrder>,
+  searchQuery?: Ref<string>,
 ) {
   const allEntries = ref<LibraryEntry[]>(getAllLibraryEntries())
 
@@ -27,7 +33,16 @@ export function useLibraryEntries(
    * Computed list of normalized library view items, filtered and sorted.
    */
   const entries = computed<LibraryViewItem[]>(() => {
-    let items = allEntries.value.map(toLibraryViewItem)
+    let rawEntries = allEntries.value
+
+    // Apply search if provided
+    if (searchQuery?.value) {
+      rawEntries = rawEntries.filter((entry) =>
+        matchesLibrarySearchQuery(entry, normalizeLibrarySearchQuery(searchQuery.value)),
+      )
+    }
+
+    let items = rawEntries.map(toLibraryViewItem)
 
     // Apply filters if provided
     if (filters?.value) {

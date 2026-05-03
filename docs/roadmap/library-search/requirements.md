@@ -1,7 +1,7 @@
 ---
 id: R-10
 title: Library Search
-status: approved
+status: under_test
 type: functional
 importance: medium
 tags: [library, search, filtering]

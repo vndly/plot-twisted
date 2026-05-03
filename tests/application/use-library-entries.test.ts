@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+import { ref } from 'vue'
 import { useLibraryEntries } from '@/application/use-library-entries'
 import { useLibraryFilters } from '@/application/use-library-filters'
 import { useSort } from '@/application/use-sort'
@@ -86,6 +87,43 @@ describe('useLibraryEntries', () => {
       expect(entries.value).toHaveLength(2)
       expect(entries.value[0].id).toBe(2) // A
       expect(entries.value[1].id).toBe(1) // B
+    })
+  })
+
+  describe('search composition', () => {
+    it('filters entries by search query (LBS-02-02)', () => {
+      // Arrange
+      saveLibraryEntry(createEntry({ id: 1, title: 'Batman' }))
+      saveLibraryEntry(createEntry({ id: 2, title: 'Superman' }))
+
+      const searchQuery = ref('bat')
+      const { entries } = useLibraryEntries(undefined, undefined, undefined, searchQuery)
+
+      // Act & Assert
+      expect(entries.value).toHaveLength(1)
+      expect(entries.value[0].title).toBe('Batman')
+
+      searchQuery.value = 'man'
+      expect(entries.value).toHaveLength(2)
+    })
+
+    it('combines search with filters (LBS-07-01)', () => {
+      // Arrange
+      saveLibraryEntry(createEntry({ id: 1, title: 'Batman', mediaType: 'movie' }))
+      saveLibraryEntry(createEntry({ id: 2, title: 'Batwoman', mediaType: 'tv' }))
+
+      const { filters } = useLibraryFilters()
+      const searchQuery = ref('bat')
+      const { entries } = useLibraryEntries(filters, undefined, undefined, searchQuery)
+
+      // Act: Filter by mediaType
+      filters.value.mediaType = 'movie'
+      expect(entries.value).toHaveLength(1)
+      expect(entries.value[0].title).toBe('Batman')
+
+      filters.value.mediaType = 'tv'
+      expect(entries.value).toHaveLength(1)
+      expect(entries.value[0].title).toBe('Batwoman')
     })
   })
 
