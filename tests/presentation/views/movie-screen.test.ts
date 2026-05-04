@@ -402,6 +402,7 @@ describe('MovieScreen', () => {
       '/poster.jpg',
       8.4,
       '1999-10-15',
+      [],
     )
     expect(wrapper.get('[data-testid="action-buttons"]').text()).toContain('/movie/550|none')
   })

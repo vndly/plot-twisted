@@ -44,6 +44,7 @@ watch(
         newShow.poster_path,
         newShow.vote_average,
         newShow.first_air_date,
+        newShow.genres.map((g) => g.id),
       )
     } else {
       libraryEntryRef.value = null

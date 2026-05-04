@@ -45,6 +45,7 @@ watch(
         newMovie.poster_path,
         newMovie.vote_average,
         newMovie.release_date,
+        newMovie.genres.map((g) => g.id),
       )
     } else {
       libraryEntryRef.value = null

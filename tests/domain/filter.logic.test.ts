@@ -266,16 +266,17 @@ describe('filter.logic', () => {
       ).toBe(false)
     })
 
-    it('filters by genre (AND logic)', () => {
+    it('filters by genre (OR logic)', () => {
       expect(matchesLibraryFilters(item, { ...DEFAULT_LIBRARY_FILTER_STATE, genres: [28] })).toBe(
         true,
       )
       expect(matchesLibraryFilters(item, { ...DEFAULT_LIBRARY_FILTER_STATE, genres: [35] })).toBe(
         false,
       )
+      // OR logic: item has genre 28, so [28, 35] matches
       expect(
         matchesLibraryFilters(item, { ...DEFAULT_LIBRARY_FILTER_STATE, genres: [28, 35] }),
-      ).toBe(false)
+      ).toBe(true)
     })
 
     it('counts active filters correctly', () => {

@@ -105,6 +105,66 @@ describe('useLibraryEntry', () => {
 
       saveSpy.mockRestore()
     })
+
+    it('synchronizes genreIds from the latest detail payload', () => {
+      const saveSpy = vi.spyOn(storageService, 'saveLibraryEntry')
+      saveLibraryEntry(
+        createEntry({
+          genreIds: [18],
+        }),
+      )
+
+      const { entry } = useLibraryEntry(
+        550,
+        'movie',
+        'Fight Club',
+        '/poster.jpg',
+        8.4,
+        '1999-10-15',
+        [18, 53],
+      )
+
+      expect(entry.value?.genreIds).toEqual([18, 53])
+      expect(saveSpy).toHaveBeenCalled()
+
+      saveSpy.mockRestore()
+    })
+
+    it('does not resave when genreIds already match', () => {
+      const saveSpy = vi.spyOn(storageService, 'saveLibraryEntry')
+      saveLibraryEntry(
+        createEntry({
+          posterPath: '/poster.jpg',
+          voteAverage: 8.4,
+          releaseDate: '1999-10-15',
+          genreIds: [18, 53],
+        }),
+      )
+      saveSpy.mockClear()
+
+      useLibraryEntry(550, 'movie', 'Fight Club', '/poster.jpg', 8.4, '1999-10-15', [18, 53])
+
+      expect(saveSpy).not.toHaveBeenCalled()
+
+      saveSpy.mockRestore()
+    })
+
+    it('includes genreIds when creating a new entry', () => {
+      const { setRating } = useLibraryEntry(
+        550,
+        'movie',
+        'Fight Club',
+        '/poster.jpg',
+        8.4,
+        '1999-10-15',
+        [18, 53],
+      )
+
+      setRating(5)
+
+      const stored = getLibraryEntry(550, 'movie')
+      expect(stored?.genreIds).toEqual([18, 53])
+    })
   })
 
   describe('setRating', () => {

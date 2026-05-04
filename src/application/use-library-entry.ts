@@ -19,6 +19,7 @@ export function useLibraryEntry(
   posterPath: string | null,
   voteAverage?: number,
   releaseDate?: string,
+  genreIds?: number[],
 ) {
   const entry: Ref<LibraryEntry | null> = ref(null)
 
@@ -39,6 +40,10 @@ export function useLibraryEntry(
       }
       if (releaseDate !== undefined && stored.releaseDate !== releaseDate) {
         stored.releaseDate = releaseDate
+        changed = true
+      }
+      if (genreIds !== undefined && JSON.stringify(stored.genreIds) !== JSON.stringify(genreIds)) {
+        stored.genreIds = genreIds
         changed = true
       }
 
@@ -67,6 +72,7 @@ export function useLibraryEntry(
       addedAt: new Date().toISOString(),
       voteAverage,
       releaseDate,
+      genreIds,
     }
   }
 

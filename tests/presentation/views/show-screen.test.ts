@@ -395,6 +395,7 @@ describe('ShowScreen', () => {
       '/poster.jpg',
       9.5,
       '2008-01-20',
+      [],
     )
     expect(wrapper.get('[data-testid="action-buttons"]').text()).toContain('/show/1396|none')
   })

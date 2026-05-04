@@ -54,10 +54,10 @@ export function matchesLibraryFilters(item: LibraryViewItem, filters: LibraryFil
     return false
   }
 
-  // Genre Filter (AND logic within the active library scope)
+  // Genre Filter (OR logic: matches any selected genre)
   if (filters.genres.length > 0) {
-    const hasAllGenres = filters.genres.every((id) => item.genreIds.includes(id))
-    if (!hasAllGenres) {
+    const hasAnyGenre = filters.genres.some((id) => item.genreIds.includes(id))
+    if (!hasAnyGenre) {
       return false
     }
   }
@@ -126,12 +126,12 @@ export function matchesFilters(item: SearchResultItem, filters: FilterState): bo
     return false
   }
 
-  // Genre Filter (AND logic: matches all selected genres)
+  // Genre Filter (OR logic: matches any selected genre)
   if (filters.genres.length > 0) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const genreIds = 'genre_ids' in item ? ((item as any).genre_ids ?? []) : []
-    const hasAllGenres = filters.genres.every((id) => genreIds.includes(id))
-    if (!hasAllGenres) {
+    const hasAnyGenre = filters.genres.some((id) => genreIds.includes(id))
+    if (!hasAnyGenre) {
       return false
     }
   }
