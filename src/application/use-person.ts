@@ -27,6 +27,7 @@ export type PersonCreditViewModel = {
   character: string | null
   releaseYear: string | null
   posterUrl: string | null
+  voteAverage: number
   route: string
 }
 
@@ -116,6 +117,7 @@ function toCreditViewModel(credit: PersonCredit): PersonCreditViewModel {
     character: credit.character,
     releaseYear: date ? date.substring(0, 4) : null,
     posterUrl: buildImageUrl(credit.poster_path, IMAGE_SIZES.poster.small),
+    voteAverage: credit.vote_average,
     route: credit.media_type === 'movie' ? `/movie/${credit.id}` : `/show/${credit.id}`,
   }
 }

@@ -1,13 +1,19 @@
 <script setup lang="ts">
-import { Film } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { Film, Star } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import type { PersonCreditViewModel } from '@/application/use-person'
 
-defineProps<{
+const props = defineProps<{
   credit: PersonCreditViewModel
 }>()
 
 const { t } = useI18n()
+
+const displayRating = computed(() => {
+  if (!props.credit.voteAverage || props.credit.voteAverage <= 0) return null
+  return props.credit.voteAverage.toFixed(1)
+})
 </script>
 
 <template>
@@ -15,7 +21,7 @@ const { t } = useI18n()
     :to="credit.route"
     class="group block min-h-11 transition-transform duration-200 ease-in-out hover:scale-105"
   >
-    <div class="overflow-hidden rounded-lg bg-slate-800 shadow-lg">
+    <div class="relative overflow-hidden rounded-lg bg-slate-800 shadow-lg">
       <div class="aspect-[2/3] bg-slate-900">
         <img
           v-if="credit.posterUrl"
@@ -32,20 +38,31 @@ const { t } = useI18n()
           <Film class="size-10" aria-hidden="true" />
         </div>
       </div>
+      <div
+        v-if="displayRating"
+        class="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-white"
+      >
+        <Star class="size-3 fill-current" aria-hidden="true" />
+        <span>{{ displayRating }}</span>
+      </div>
     </div>
 
-    <div class="mt-2 space-y-1">
-      <div class="flex items-center gap-2">
-        <span
-          class="rounded-full px-2 py-0.5 text-xs font-medium text-white"
-          :class="credit.mediaType === 'movie' ? 'bg-teal-600' : 'bg-violet-600'"
-        >
-          {{ t(`person.media.${credit.mediaType}`) }}
-        </span>
-        <span class="text-xs text-slate-400">{{ credit.releaseYear ?? t('person.tba') }}</span>
-      </div>
-      <h3 class="truncate text-sm font-medium text-white">{{ credit.title }}</h3>
-      <p v-if="credit.character" class="truncate text-xs text-slate-400">
+    <div class="mt-2 space-y-0.5">
+      <h3 class="truncate text-sm font-medium text-slate-950 dark:text-white">
+        {{ credit.title }}
+      </h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400">
+        {{ t(`person.media.${credit.mediaType}`) }}
+        <template v-if="credit.releaseYear">
+          <span class="mx-1">·</span>
+          {{ credit.releaseYear }}
+        </template>
+        <template v-else>
+          <span class="mx-1">·</span>
+          {{ t('person.tba') }}
+        </template>
+      </p>
+      <p v-if="credit.character" class="truncate text-xs text-slate-500 dark:text-slate-400">
         {{ credit.character }}
       </p>
     </div>

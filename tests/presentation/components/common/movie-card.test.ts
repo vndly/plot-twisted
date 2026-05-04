@@ -1,10 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { createI18n } from 'vue-i18n'
 import MovieCard from '@/presentation/components/common/movie-card.vue'
 import type { MovieListItem } from '@/domain/movie.schema'
 import type { ShowListItem } from '@/domain/show.schema'
 import * as imageHelper from '@/infrastructure/image.helper'
+
+const i18n = createI18n({
+  legacy: false,
+  locale: 'en',
+  flatJson: true,
+  messages: {
+    en: {
+      'page.movie.title': 'Movie',
+      'page.show.title': 'Show',
+    },
+  },
+})
 
 describe('MovieCard', () => {
   it('renders a grid movie card with poster, year, and rating badge', () => {
@@ -28,6 +41,7 @@ describe('MovieCard', () => {
           video: false,
         },
       },
+      global: { plugins: [i18n] },
     })
 
     expect(wrapper.text()).toContain('Fight Club')
@@ -60,6 +74,7 @@ describe('MovieCard', () => {
         },
         variant: 'list',
       },
+      global: { plugins: [i18n] },
     })
 
     expect(wrapper.find('img').exists()).toBe(false)
@@ -82,6 +97,7 @@ describe('MovieCard', () => {
         } as any,
         variant: 'list',
       },
+      global: { plugins: [i18n] },
     })
 
     expect(wrapper.get('img').attributes('alt')).toBe('Arrival')
@@ -101,6 +117,7 @@ describe('MovieCard', () => {
         } as unknown as (MovieListItem | ShowListItem) & { media_type?: 'movie' | 'tv' | 'person' },
         variant: 'list',
       },
+      global: { plugins: [i18n] },
     })
 
     expect(wrapper.text()).toContain('Brad Pitt')
@@ -117,6 +134,7 @@ describe('MovieCard', () => {
           poster_path: null,
         } as any,
       },
+      global: { plugins: [i18n] },
     })
 
     expect(wrapper.attributes('aria-label')).toBe('')
@@ -147,6 +165,7 @@ describe('MovieCard', () => {
           video: false,
         },
       },
+      global: { plugins: [i18n] },
     })
 
     const article = wrapper.get('[role="button"]')
@@ -168,6 +187,7 @@ describe('MovieCard', () => {
           vote_average: 0,
         } as any,
       },
+      global: { plugins: [i18n] },
     })
 
     await wrapper.get('[role="button"]').trigger('keydown', { key: 'Escape' })
@@ -187,6 +207,7 @@ describe('MovieCard', () => {
         } as any,
         variant: 'grid',
       },
+      global: { plugins: [i18n] },
     })
 
     // Should show placeholder instead of img
@@ -206,6 +227,7 @@ describe('MovieCard', () => {
         } as any,
         variant: 'list',
       },
+      global: { plugins: [i18n] },
     })
 
     // Should show placeholder instead of img
@@ -234,6 +256,7 @@ describe('MovieCard', () => {
           } as any,
           variant: 'grid',
         },
+        global: { plugins: [i18n] },
       })
 
       const img = wrapper.find('img')
@@ -253,6 +276,7 @@ describe('MovieCard', () => {
           } as any,
           variant: 'list',
         },
+        global: { plugins: [i18n] },
       })
 
       const img = wrapper.find('img')

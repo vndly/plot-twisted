@@ -37,6 +37,7 @@ const mockPersonDetail = {
         character: 'Role A',
         release_date: '1999-10-15',
         poster_path: '/older.jpg',
+        vote_average: 7.5,
         order: 1,
       },
       {
@@ -46,6 +47,7 @@ const mockPersonDetail = {
         character: 'Role B',
         first_air_date: '2024-02-01',
         poster_path: '/newest.jpg',
+        vote_average: 8.2,
         order: 1,
       },
       {
@@ -55,6 +57,7 @@ const mockPersonDetail = {
         character: 'Duplicate Better Billing',
         release_date: '1999-10-15',
         poster_path: '/older.jpg',
+        vote_average: 7.5,
         order: 0,
       },
       {
@@ -64,6 +67,7 @@ const mockPersonDetail = {
         character: null,
         release_date: null,
         poster_path: null,
+        vote_average: 0,
         order: null,
       },
     ],

@@ -33,6 +33,7 @@ describe('FilmographyCard', () => {
       character: 'Tyler Durden',
       releaseYear: '1999',
       posterUrl: 'https://image.tmdb.org/t/p/w185/poster.jpg',
+      voteAverage: 8.4,
       route: '/movie/550',
     }
 
@@ -61,6 +62,7 @@ describe('FilmographyCard', () => {
       character: null,
       releaseYear: null,
       posterUrl: null,
+      voteAverage: 0,
       route: '/show/1396',
     }
 
@@ -85,6 +87,7 @@ describe('FilmographyCard', () => {
       character: 'Tyler Durden',
       releaseYear: '1999',
       posterUrl: null,
+      voteAverage: 8.4,
       route: '/movie/550',
     }
 

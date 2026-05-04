@@ -18,6 +18,12 @@ const posterUrl = computed(() => {
 function navigateToDetail() {
   router.push(`/movie/${props.movie.id}`)
 }
+
+function handleMiddleClick(event: MouseEvent) {
+  if (event.button !== 1) return
+  event.preventDefault()
+  window.open(`/movie/${props.movie.id}`, '_blank')
+}
 </script>
 
 <template>
@@ -26,6 +32,7 @@ function navigateToDetail() {
     role="button"
     :aria-label="movie.title"
     @click="navigateToDetail"
+    @auxclick="handleMiddleClick"
   >
     <div class="h-8 w-6 flex-shrink-0 overflow-hidden rounded-sm bg-slate-200 dark:bg-slate-700">
       <img

@@ -20,6 +20,7 @@ describe('person logic', () => {
           character: 'A',
           release_date: '1999-10-15',
           poster_path: null,
+          vote_average: 7.5,
           order: 1,
         },
         {
@@ -29,6 +30,7 @@ describe('person logic', () => {
           character: 'B',
           first_air_date: '2024-02-01',
           poster_path: null,
+          vote_average: 8.0,
           order: 1,
         },
         {
@@ -38,6 +40,7 @@ describe('person logic', () => {
           character: 'C',
           release_date: null,
           poster_path: null,
+          vote_average: 0,
           order: 1,
         },
         {
@@ -47,6 +50,7 @@ describe('person logic', () => {
           character: 'D',
           first_air_date: '2010-01-01',
           poster_path: null,
+          vote_average: 6.5,
           order: 1,
         },
       ]
@@ -71,6 +75,7 @@ describe('person logic', () => {
           character: 'Narrator',
           release_date: '1999-10-15',
           poster_path: null,
+          vote_average: 8.4,
           order: 5,
         },
         {
@@ -80,6 +85,7 @@ describe('person logic', () => {
           character: 'Tyler Durden',
           release_date: '1999-10-15',
           poster_path: null,
+          vote_average: 8.4,
           order: 1,
         },
         {
@@ -89,6 +95,7 @@ describe('person logic', () => {
           character: 'Guest',
           first_air_date: '2020-01-01',
           poster_path: null,
+          vote_average: 7.0,
           order: 0,
         },
       ]
@@ -112,6 +119,7 @@ describe('person logic', () => {
           character: 'First',
           release_date: '2020-01-01',
           poster_path: null,
+          vote_average: 7.0,
           order: null,
         },
         {
@@ -121,6 +129,7 @@ describe('person logic', () => {
           character: 'Second',
           release_date: '2020-01-01',
           poster_path: null,
+          vote_average: 7.0,
           order: null,
         },
       ]

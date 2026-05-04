@@ -41,6 +41,7 @@ export const PersonMovieCreditSchema = z.object({
   character: z.string().nullable(),
   release_date: z.string().nullable(),
   poster_path: z.string().nullable(),
+  vote_average: z.number().optional().default(0),
   order: z.number().nullable().default(null),
 })
 
@@ -54,6 +55,7 @@ export const PersonTvCreditSchema = z.object({
   character: z.string().nullable(),
   first_air_date: z.string().nullable(),
   poster_path: z.string().nullable(),
+  vote_average: z.number().optional().default(0),
   order: z.number().nullable().default(null),
 })
 
