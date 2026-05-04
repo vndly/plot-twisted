@@ -147,6 +147,14 @@ describe('TrendingCarousel', () => {
       configurable: true,
       value: 600,
     })
+    // Mock scrollWidth > clientWidth to trigger canScroll = true
+    Object.defineProperty(scrollContainer, 'scrollWidth', {
+      configurable: true,
+      value: 1200,
+    })
+    // Trigger the updateCanScroll function by calling the resize observer callback
+    ;(wrapper.vm as any).updateCanScroll()
+    await wrapper.vm.$nextTick()
 
     expect(wrapper.get('[data-testid="trending-carousel"]').classes()).toContain(
       '[scrollbar-width:none]',
@@ -176,11 +184,12 @@ describe('TrendingCarousel', () => {
     expect(push).not.toHaveBeenCalled()
   })
 
-  it('hides scroll controls when there is only one item', () => {
+  it('hides scroll controls when content does not overflow', () => {
     const wrapper = mount(TrendingCarousel, {
       props: { items: [mockItems[0]], loading: false },
     })
 
+    // In jsdom, scrollWidth === clientWidth by default, so canScroll stays false
     expect(wrapper.find('[data-testid="trending-scroll-next"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="trending-scroll-previous"]').exists()).toBe(false)
   })

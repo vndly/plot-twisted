@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ChevronLeft, ChevronRight, Film, Star } from 'lucide-vue-next'
@@ -7,7 +7,7 @@ import type { MediaResult } from '@/application/use-browse'
 import { buildImageSrcSet, buildImageUrl } from '@/infrastructure/image.helper'
 import { IMAGE_SIZES } from '@/domain/constants'
 
-defineProps<{
+const props = defineProps<{
   items: MediaResult[]
   loading: boolean
 }>()
@@ -15,6 +15,47 @@ defineProps<{
 const router = useRouter()
 const { t } = useI18n()
 const carouselRef = ref<HTMLElement | null>(null)
+const canScroll = ref(false)
+let resizeObserver: globalThis.ResizeObserver | null = null
+
+/** Checks if the carousel has overflow and needs scroll buttons. */
+function updateCanScroll() {
+  if (carouselRef.value) {
+    canScroll.value = carouselRef.value.scrollWidth > carouselRef.value.clientWidth
+  }
+}
+
+onMounted(() => {
+  resizeObserver = new globalThis.ResizeObserver(updateCanScroll)
+  if (carouselRef.value) {
+    resizeObserver.observe(carouselRef.value)
+  }
+  updateCanScroll()
+})
+
+onUnmounted(() => {
+  resizeObserver?.disconnect()
+})
+
+// Observe carouselRef when it becomes available (handles conditional rendering)
+watch(carouselRef, (newRef, oldRef) => {
+  if (oldRef) {
+    resizeObserver?.unobserve(oldRef)
+  }
+  if (newRef) {
+    resizeObserver?.observe(newRef)
+    updateCanScroll()
+  }
+})
+
+// Recalculate when items change (e.g., after filtering)
+watch(
+  () => props.items,
+  async () => {
+    await nextTick()
+    updateCanScroll()
+  },
+)
 
 /**
  * Navigates to the detail page for the given item.
@@ -111,7 +152,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
         {{ t('home.browse.trending') }}
       </h2>
 
-      <div v-if="!loading && items.length > 1" class="flex items-center gap-2">
+      <div v-if="canScroll" class="flex items-center gap-2">
         <button
           data-testid="trending-scroll-previous"
           type="button"

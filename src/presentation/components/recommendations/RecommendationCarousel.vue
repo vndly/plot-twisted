@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ChevronLeft, ChevronRight, Film, Star } from 'lucide-vue-next'
@@ -24,7 +24,7 @@ type SearchTvItem = SearchResultItem & {
   vote_average: number
 }
 
-defineProps<{
+const props = defineProps<{
   titleKey: string
   titleParams?: Record<string, string>
   items: SearchResultItem[]
@@ -41,10 +41,39 @@ const router = useRouter()
 const { t } = useI18n()
 const sectionRef = ref<HTMLElement | null>(null)
 const carouselRef = ref<HTMLElement | null>(null)
+const canScroll = ref(false)
+let resizeObserver: globalThis.ResizeObserver | null = null
 const { observe, isIntersecting } = useIntersectionObserver(sectionRef)
+
+/** Checks if the carousel has overflow and needs scroll buttons. */
+function updateCanScroll() {
+  if (carouselRef.value) {
+    canScroll.value = carouselRef.value.scrollWidth > carouselRef.value.clientWidth
+  }
+}
 
 onMounted(() => {
   observe()
+  resizeObserver = new globalThis.ResizeObserver(updateCanScroll)
+  if (carouselRef.value) {
+    resizeObserver.observe(carouselRef.value)
+  }
+  updateCanScroll()
+})
+
+onUnmounted(() => {
+  resizeObserver?.disconnect()
+})
+
+// Observe carouselRef when it becomes available (handles conditional rendering)
+watch(carouselRef, (newRef, oldRef) => {
+  if (oldRef) {
+    resizeObserver?.unobserve(oldRef)
+  }
+  if (newRef) {
+    resizeObserver?.observe(newRef)
+    updateCanScroll()
+  }
 })
 
 // When the component is about to enter viewport, emit intersect to parent
@@ -53,6 +82,15 @@ watch(isIntersecting, (val) => {
     emit('intersect')
   }
 })
+
+// Recalculate when items change (e.g., after filtering)
+watch(
+  () => props.items,
+  async () => {
+    await nextTick()
+    updateCanScroll()
+  },
+)
 
 function handleItemClick(item: SearchResultItem) {
   if (!isMovieItem(item) && !isTvItem(item)) {
@@ -164,7 +202,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
         {{ t(titleKey, titleParams ?? {}) }}
       </h3>
 
-      <div v-if="!loading && !error && fetched && items.length > 1" class="flex items-center gap-2">
+      <div v-if="canScroll" class="flex items-center gap-2">
         <button
           data-testid="recommendation-scroll-previous"
           type="button"

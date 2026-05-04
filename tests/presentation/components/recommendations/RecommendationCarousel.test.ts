@@ -176,6 +176,14 @@ describe('RecommendationCarousel', () => {
       configurable: true,
       value: 600,
     })
+    // Mock scrollWidth > clientWidth to trigger canScroll = true
+    Object.defineProperty(scrollContainer, 'scrollWidth', {
+      configurable: true,
+      value: 1200,
+    })
+    // Trigger the updateCanScroll function
+    ;(wrapper.vm as any).updateCanScroll()
+    await wrapper.vm.$nextTick()
 
     expect(wrapper.get('[data-testid="recommendation-carousel"]').classes()).toContain(
       '[scrollbar-width:none]',
@@ -200,11 +208,12 @@ describe('RecommendationCarousel', () => {
     })
   })
 
-  it('hides scroll controls when there is only one recommendation', () => {
+  it('hides scroll controls when content does not overflow', () => {
     const wrapper = renderCarousel({
       items: [movieItem],
     })
 
+    // In jsdom, scrollWidth === clientWidth by default, so canScroll stays false
     expect(wrapper.find('[data-testid="recommendation-scroll-next"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="recommendation-scroll-previous"]').exists()).toBe(false)
   })
