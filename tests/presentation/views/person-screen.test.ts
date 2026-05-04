@@ -269,4 +269,204 @@ describe('PersonScreen', () => {
     // Assert - no toast should be shown for rate limit
     expect(addToast).not.toHaveBeenCalled()
   })
+
+  it('handles errors with numeric status property for 404', () => {
+    // Arrange - test error with status property
+    const errorWithStatus = new Error('Not Found') as Error & { status: number }
+    errorWithStatus.status = 404
+    error.value = errorWithStatus
+
+    // Act
+    const wrapper = renderPersonScreen()
+
+    // Assert - should show not found state
+    expect(wrapper.text()).toContain('Person not found')
+    expect(addToast).not.toHaveBeenCalled()
+  })
+
+  it('handles errors with numeric status property for 429', () => {
+    // Arrange - test error with status property
+    const errorWithStatus = new Error('Too Many Requests') as Error & { status: number }
+    errorWithStatus.status = 429
+    error.value = errorWithStatus
+
+    // Act
+    renderPersonScreen()
+
+    // Assert - should not show toast for rate limit
+    expect(addToast).not.toHaveBeenCalled()
+  })
+
+  it('handles errors with numeric status property for 5xx', () => {
+    // Arrange - test error with status property for server error
+    const errorWithStatus = new Error('Server Error') as Error & { status: number }
+    errorWithStatus.status = 503
+    error.value = errorWithStatus
+
+    // Act
+    renderPersonScreen()
+
+    // Assert - should show server error toast
+    expect(addToast).toHaveBeenCalledWith({
+      message: 'Server error while loading person details.',
+      type: 'error',
+      action: { label: 'Retry', handler: refresh },
+    })
+  })
+
+  it('handles errors with non-numeric status property', () => {
+    // Arrange - test error with non-numeric status
+    const errorWithStringStatus = new Error('Server Error') as Error & { status: string }
+    ;(errorWithStringStatus as any).status = 'not-a-number'
+    error.value = errorWithStringStatus
+
+    // Act
+    renderPersonScreen()
+
+    // Assert - should not crash and should handle gracefully
+    expect(addToast).not.toHaveBeenCalled()
+  })
+
+  it('handles null error state without crashing', () => {
+    // Arrange
+    error.value = null
+
+    // Act
+    const wrapper = renderPersonScreen()
+
+    // Assert - should not crash
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false)
+  })
+
+  it('detects server error from message when status property is not present', () => {
+    // Arrange - test error without status property but with 5xx in message
+    error.value = new Error('Server responded with 503 Service Unavailable')
+
+    // Act
+    renderPersonScreen()
+
+    // Assert - should show server error toast
+    expect(addToast).toHaveBeenCalledWith({
+      message: 'Server error while loading person details.',
+      type: 'error',
+      action: { label: 'Retry', handler: refresh },
+    })
+  })
+
+  it('handles generic error without network or server keywords', () => {
+    // Arrange - error without specific keywords (not network, not server, not 404, not 429)
+    error.value = new Error('Unknown error occurred')
+
+    // Act
+    renderPersonScreen()
+
+    // Assert - should not dispatch toast for unrecognized error types
+    expect(addToast).not.toHaveBeenCalled()
+  })
+
+  it('detects 404 error from message when errorStatus is null', () => {
+    // Arrange - error without status but with 404 in message
+    error.value = new Error('Resource not found 404')
+
+    // Act
+    const wrapper = renderPersonScreen()
+
+    // Assert - should show not found state
+    expect(wrapper.text()).toContain('Person not found')
+  })
+
+  it('detects 429 error from message when errorStatus is null', () => {
+    // Arrange - error without status but with 429 in message
+    error.value = new Error('Rate limited 429')
+
+    // Act
+    renderPersonScreen()
+
+    // Assert - should not show toast
+    expect(addToast).not.toHaveBeenCalled()
+  })
+
+  it('evaluates error computed properties with ?? false fallbacks when error is null', async () => {
+    // Arrange - start with an error then clear it
+    error.value = new Error('test error')
+
+    // Act
+    const wrapper = renderPersonScreen()
+
+    // Assert - alert should exist
+    expect(wrapper.find('[role="alert"]').exists()).toBe(true)
+
+    // Now clear the error
+    error.value = null
+    await wrapper.vm.$nextTick()
+
+    // The ?? false fallbacks should now be evaluated when error is null
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false)
+  })
+
+  it('transitions from error to person data state', async () => {
+    // Arrange - start with error
+    error.value = new Error('Network error')
+
+    // Act
+    const wrapper = renderPersonScreen()
+    expect(wrapper.find('[role="alert"]').exists()).toBe(true)
+
+    // Clear error and set person data
+    error.value = null
+    personData.value = {
+      id: 287,
+      name: 'Brad Pitt',
+      knownForDepartment: 'Acting',
+      biography: 'An actor.',
+      profileUrl: '/profile.jpg',
+      birthInfo: null,
+      deathInfo: null,
+      externalLinks: [],
+      filmography: [],
+    }
+    await wrapper.vm.$nextTick()
+
+    // Assert - should show person data
+    expect(wrapper.text()).toContain('Brad Pitt')
+    expect(wrapper.find('[role="alert"]').exists()).toBe(false)
+  })
+
+  it('handles message check when error message does not contain error codes', () => {
+    // Arrange - error message without any error codes
+    error.value = new Error('Something went wrong')
+
+    // Act
+    const wrapper = renderPersonScreen()
+
+    // Assert - should show generic error state, not 404 or rate limited
+    expect(wrapper.text()).toContain('Unable to load person details')
+    expect(wrapper.text()).not.toContain('Person not found')
+  })
+
+  it('evaluates computed error flags when error transitions to null', async () => {
+    // Arrange - set an error first
+    error.value = new Error('test')
+
+    // Act
+    const wrapper = renderPersonScreen()
+    const vm = wrapper.vm as any
+
+    // Assert - with error set
+    expect(vm.isNotFound).toBe(false)
+    expect(vm.isRateLimited).toBe(false)
+    expect(vm.isServerError).toBe(false)
+    expect(vm.isNetworkError).toBe(false)
+
+    // Now clear error to force ?? false branches
+    error.value = null
+    await wrapper.vm.$nextTick()
+
+    // The computed properties should now use the ?? false fallback
+    // since error.value?.message is undefined when error.value is null
+    expect(vm.isNotFound).toBe(false)
+    expect(vm.isRateLimited).toBe(false)
+    expect(vm.isServerError).toBe(false)
+    expect(vm.isNetworkError).toBe(false)
+  })
 })

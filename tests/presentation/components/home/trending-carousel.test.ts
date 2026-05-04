@@ -280,4 +280,41 @@ describe('TrendingCarousel', () => {
     // The watch should have set scrollLeft to 0
     expect(scrollLeftSetterSpy).toHaveBeenCalledWith(0)
   })
+
+  it('hides rating badge when vote_average is undefined', () => {
+    const wrapper = mount(TrendingCarousel, {
+      props: {
+        items: [
+          {
+            ...mockItems[0],
+            id: 5,
+            vote_average: undefined as unknown as number,
+          },
+        ],
+        loading: false,
+      },
+    })
+
+    // Rating badge should not be visible when vote_average is undefined
+    expect(wrapper.find('.bg-accent').exists()).toBe(false)
+  })
+
+  it('renders srcset as undefined when buildImageSrcSet returns null', async () => {
+    // Mock buildImageSrcSet to return null
+    const imageHelper = await import('@/infrastructure/image.helper')
+    const originalBuildImageSrcSet = imageHelper.buildImageSrcSet
+    vi.spyOn(imageHelper, 'buildImageSrcSet').mockReturnValue(null)
+
+    const wrapper = mount(TrendingCarousel, {
+      props: { items: mockItems, loading: false },
+    })
+
+    const img = wrapper.find('img')
+    expect(img.exists()).toBe(true)
+    // srcset should be undefined when buildImageSrcSet returns null
+    expect(img.attributes('srcset')).toBeUndefined()
+
+    // Restore
+    vi.spyOn(imageHelper, 'buildImageSrcSet').mockImplementation(originalBuildImageSrcSet)
+  })
 })

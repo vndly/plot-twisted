@@ -548,4 +548,40 @@ describe('RecommendationCarousel', () => {
     expect(getPosterUrl(personItem)).toBeNull()
     expect(getPosterSrcSet(personItem)).toBeUndefined()
   })
+
+  it('renders title without params when titleParams is undefined', () => {
+    const wrapper = mount(RecommendationCarousel, {
+      props: {
+        titleKey: 'recommendations.mediaType.movie',
+        // titleParams is undefined/omitted
+        items: [movieItem],
+        loading: false,
+        error: null,
+        fetched: true,
+      },
+      global: {
+        plugins: [i18n],
+      },
+    })
+
+    // Should render title without error when titleParams is undefined
+    expect(wrapper.text()).toContain('Movie')
+  })
+
+  it('returns undefined from getPosterSrcSet when buildImageSrcSet returns null', async () => {
+    // Mock buildImageSrcSet to return null
+    const imageHelper = await import('@/infrastructure/image.helper')
+    vi.spyOn(imageHelper, 'buildImageSrcSet').mockReturnValue(null)
+
+    const wrapper = renderCarousel()
+
+    // Access internal function
+    const vm = wrapper.vm as any
+    const getPosterSrcSet = vm.$.setupState.getPosterSrcSet
+
+    // Should return undefined (not null) when buildImageSrcSet returns null
+    expect(getPosterSrcSet(movieItem)).toBeUndefined()
+
+    vi.restoreAllMocks()
+  })
 })

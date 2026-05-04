@@ -437,4 +437,42 @@ describe('usePerson', () => {
     expect(data.value?.birthInfo).toContain('December')
     expect(data.value?.birthInfo).not.toContain(' - ')
   })
+
+  it('returns null biography when biography is whitespace only', async () => {
+    // Arrange
+    const personWithWhitespaceBio = {
+      ...mockPersonDetail,
+      biography: '   ',
+    }
+    mockGetPersonDetail.mockResolvedValueOnce(personWithWhitespaceBio)
+
+    // Act
+    const { data } = usePerson(287)
+    await flushPromises()
+
+    // Assert - biography should be null when it's only whitespace
+    expect(data.value?.biography).toBeNull()
+  })
+
+  it('handles Instagram-only external links', async () => {
+    // Arrange
+    const personWithInstagramOnly = {
+      ...mockPersonDetail,
+      external_ids: {
+        imdb_id: null,
+        instagram_id: 'actor',
+        twitter_id: null,
+      },
+    }
+    mockGetPersonDetail.mockResolvedValueOnce(personWithInstagramOnly)
+
+    // Act
+    const { data } = usePerson(287)
+    await flushPromises()
+
+    // Assert
+    expect(data.value?.externalLinks).toEqual([
+      { type: 'instagram', url: 'https://www.instagram.com/actor' },
+    ])
+  })
 })

@@ -285,6 +285,103 @@ describe('MovieCard', () => {
     })
   })
 
+  it('displays rating fallback when vote_average is undefined', () => {
+    const wrapper = mount(MovieCard, {
+      props: {
+        item: {
+          id: 1,
+          media_type: 'movie',
+          title: 'Test Movie',
+          poster_path: '/poster.jpg',
+          // vote_average is missing (undefined)
+        } as any,
+      },
+      global: { plugins: [i18n] },
+    })
+
+    // The displayRating computed should return '0.0' when vote_average is undefined
+    // But the rating badge is only shown when vote_average > 0
+    expect(wrapper.text()).not.toContain('0.0')
+
+    // Directly access the computed to trigger the || '0.0' branch
+    const vm = wrapper.vm as any
+    expect(vm.displayRating).toBe('0.0')
+  })
+
+  it('displays separator between mediaTypeLabel and year only when both are present', () => {
+    // Test with both mediaTypeLabel and year
+    const wrapperBoth = mount(MovieCard, {
+      props: {
+        item: {
+          id: 1,
+          media_type: 'movie',
+          title: 'Test',
+          release_date: '2024-01-01',
+          poster_path: null,
+          vote_average: 0,
+        } as any,
+      },
+      global: { plugins: [i18n] },
+    })
+    expect(wrapperBoth.text()).toContain('·')
+
+    // Test with only mediaTypeLabel (no year)
+    const wrapperLabelOnly = mount(MovieCard, {
+      props: {
+        item: {
+          id: 1,
+          media_type: 'movie',
+          title: 'Test',
+          release_date: '',
+          poster_path: null,
+          vote_average: 0,
+        } as any,
+      },
+      global: { plugins: [i18n] },
+    })
+    expect(wrapperLabelOnly.text()).toContain('Movie')
+    expect(wrapperLabelOnly.text()).not.toContain('·')
+
+    // Test with neither (no media_type, no year)
+    const wrapperNeither = mount(MovieCard, {
+      props: {
+        item: {
+          id: 1,
+          title: 'Test',
+          release_date: '',
+          poster_path: null,
+          vote_average: 0,
+        } as any,
+      },
+      global: { plugins: [i18n] },
+    })
+    expect(wrapperNeither.text()).not.toContain('Movie')
+    expect(wrapperNeither.text()).not.toContain('·')
+  })
+
+  it('displays only year when media type is unknown', () => {
+    // Test with year but no known media_type (triggers displayYear but not mediaTypeLabel)
+    const wrapper = mount(MovieCard, {
+      props: {
+        item: {
+          id: 1,
+          media_type: 'unknown' as any, // Unknown type gives empty mediaTypeLabel
+          name: 'Test',
+          first_air_date: '2024-01-01',
+          poster_path: null,
+          vote_average: 0,
+        } as any,
+      },
+      global: { plugins: [i18n] },
+    })
+
+    // Should show year but not movie/show label and no separator
+    expect(wrapper.text()).toContain('2024')
+    expect(wrapper.text()).not.toContain('Movie')
+    expect(wrapper.text()).not.toContain('Show')
+    expect(wrapper.text()).not.toContain('·')
+  })
+
   describe('middle click behavior', () => {
     it('emits middleClick on middle mouse button auxclick', async () => {
       const wrapper = mount(MovieCard, {

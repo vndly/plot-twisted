@@ -115,4 +115,38 @@ describe('useLibrarySearch', () => {
     // The appliedQuery should still be empty since unmount cleared the timeout
     expect(result.appliedQuery.value).toBe('')
   })
+
+  it('does nothing when onUnmounted is called without an active debounce', async () => {
+    const { createApp, defineComponent, h } = await import('vue')
+
+    const holder: { result: ReturnType<typeof useLibrarySearch> | null } = { result: null }
+
+    const TestComponent = defineComponent({
+      setup() {
+        holder.result = useLibrarySearch()
+        return () => h('div')
+      },
+    })
+
+    const app = createApp(TestComponent)
+    const container = document.createElement('div')
+    app.mount(container)
+
+    expect(holder.result).not.toBeNull()
+
+    // Unmount immediately without setting a query (no debounce timeout active)
+    app.unmount()
+
+    // Should not throw - the if (debounceTimeout) check handles null
+    expect(true).toBe(true)
+  })
+
+  it('does nothing when clearSearch is called without an active debounce', () => {
+    const { clearSearch, appliedQuery } = useLibrarySearch()
+
+    // Call clearSearch immediately without any query set (no timeout active)
+    clearSearch()
+
+    expect(appliedQuery.value).toBe('')
+  })
 })

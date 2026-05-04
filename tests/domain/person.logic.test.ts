@@ -238,6 +238,72 @@ describe('person logic', () => {
       expect(result).toHaveLength(1)
       expect(result[0].character).toBe('First')
     })
+
+    it('replaces credit when existing has null order and new has numeric order', () => {
+      // Arrange - test the existing.order === null branch
+      const credits: PersonCredit[] = [
+        {
+          id: 1,
+          media_type: 'movie',
+          title: 'Same Title',
+          character: 'First (null order)',
+          release_date: '2020-01-01',
+          poster_path: null,
+          vote_average: 7.0,
+          order: null,
+        },
+        {
+          id: 1,
+          media_type: 'movie',
+          title: 'Same Title',
+          character: 'Second (with order)',
+          release_date: '2020-01-01',
+          poster_path: null,
+          vote_average: 7.0,
+          order: 5,
+        },
+      ]
+
+      // Act
+      const result = deduplicateCredits(credits)
+
+      // Assert - second should replace first because existing.order is null
+      expect(result).toHaveLength(1)
+      expect(result[0].character).toBe('Second (with order)')
+    })
+
+    it('keeps existing credit when new credit has higher order number', () => {
+      // Arrange - test when credit.order < existing.order is false
+      const credits: PersonCredit[] = [
+        {
+          id: 1,
+          media_type: 'movie',
+          title: 'Same Title',
+          character: 'First (lower order)',
+          release_date: '2020-01-01',
+          poster_path: null,
+          vote_average: 7.0,
+          order: 1,
+        },
+        {
+          id: 1,
+          media_type: 'movie',
+          title: 'Same Title',
+          character: 'Second (higher order)',
+          release_date: '2020-01-01',
+          poster_path: null,
+          vote_average: 7.0,
+          order: 10,
+        },
+      ]
+
+      // Act
+      const result = deduplicateCredits(credits)
+
+      // Assert - first should be kept because it has lower order
+      expect(result).toHaveLength(1)
+      expect(result[0].character).toBe('First (lower order)')
+    })
   })
 
   describe('normalizePersonDates', () => {
