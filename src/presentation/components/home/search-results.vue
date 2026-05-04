@@ -47,6 +47,14 @@ function handleCardClick(result: MediaResult) {
 }
 
 /**
+ * Opens the detail page in a new tab.
+ */
+function handleMiddleClick(result: MediaResult) {
+  const path = result.media_type === 'movie' ? `/movie/${result.id}` : `/show/${result.id}`
+  window.open(path, '_blank')
+}
+
+/**
  * Handles retry button click.
  */
 function handleRetry() {
@@ -104,6 +112,7 @@ function handleRetry() {
       :key="`${result.media_type}-${result.id}`"
       :item="result"
       @click="handleCardClick(result)"
+      @middle-click="handleMiddleClick(result)"
     />
   </div>
 </template>

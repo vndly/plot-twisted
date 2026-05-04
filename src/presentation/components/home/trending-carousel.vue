@@ -25,6 +25,16 @@ function handleItemClick(item: MediaResult) {
 }
 
 /**
+ * Opens the detail page in a new tab on middle click.
+ */
+function handleMiddleClick(event: MouseEvent, item: MediaResult) {
+  if (event.button !== 1) return
+  event.preventDefault()
+  const path = item.media_type === 'movie' ? `/movie/${item.id}` : `/show/${item.id}`
+  window.open(path, '_blank')
+}
+
+/**
  * Returns the title for movies or name for TV shows.
  */
 function getTitle(item: MediaResult) {
@@ -140,6 +150,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
         tabindex="0"
         :aria-label="getTitle(item)"
         @click="handleItemClick(item)"
+        @auxclick="handleMiddleClick($event, item)"
         @keydown.enter.prevent="handleItemClick(item)"
         @keydown.space.prevent="handleItemClick(item)"
       >

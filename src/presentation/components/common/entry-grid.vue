@@ -17,6 +17,15 @@ function navigateToDetail(entry: LibraryEntry) {
   const path = entry.mediaType === 'movie' ? `/movie/${entry.id}` : `/show/${entry.id}`
   router.push(path)
 }
+
+/**
+ * Opens the detail screen in a new tab.
+ * @param entry - The library entry
+ */
+function openInNewTab(entry: LibraryEntry) {
+  const path = entry.mediaType === 'movie' ? `/movie/${entry.id}` : `/show/${entry.id}`
+  window.open(path, '_blank')
+}
 </script>
 
 <template>
@@ -39,6 +48,7 @@ function navigateToDetail(entry: LibraryEntry) {
         } as any
       "
       @click="navigateToDetail(entry)"
+      @middle-click="openInNewTab(entry)"
     />
   </div>
 </template>

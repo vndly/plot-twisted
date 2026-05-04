@@ -24,6 +24,14 @@ function handleCardClick(item: MediaResult) {
   const path = item.media_type === 'movie' ? `/movie/${item.id}` : `/show/${item.id}`
   router.push(path)
 }
+
+/**
+ * Opens the detail page in a new tab.
+ */
+function handleMiddleClick(item: MediaResult) {
+  const path = item.media_type === 'movie' ? `/movie/${item.id}` : `/show/${item.id}`
+  window.open(path, '_blank')
+}
 </script>
 
 <template>
@@ -55,6 +63,7 @@ function handleCardClick(item: MediaResult) {
         :item="item"
         :variant="variant"
         @click="handleCardClick(item)"
+        @middle-click="handleMiddleClick(item)"
       />
     </div>
   </section>

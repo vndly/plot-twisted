@@ -87,35 +87,35 @@ describe('SearchBar', () => {
   })
 
   it('emits clear and empty string on escape key (LBS-10-01)', async () => {
-    const wrapper = mountComponent({ modelValue: 'test' });
-    const input = wrapper.find('input');
-    await input.trigger('keydown.escape');
-    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['']);
-    expect(wrapper.emitted('clear')).toBeTruthy();
-  });
+    const wrapper = mountComponent({ modelValue: 'test' })
+    const input = wrapper.find('input')
+    await input.trigger('keydown.escape')
+    expect(wrapper.emitted('update:modelValue')?.[0]).toEqual([''])
+    expect(wrapper.emitted('clear')).toBeTruthy()
+  })
 
   it('prevents enter key from submitting form (LBS-10-01)', async () => {
-    const wrapper = mountComponent();
-    const input = wrapper.find('input');
-    const preventDefault = vi.fn();
-    await input.trigger('keydown.enter', { preventDefault });
-    expect(preventDefault).toHaveBeenCalled();
-  });
+    const wrapper = mountComponent()
+    const input = wrapper.find('input')
+    const preventDefault = vi.fn()
+    await input.trigger('keydown.enter', { preventDefault })
+    expect(preventDefault).toHaveBeenCalled()
+  })
 
   it('has custom placeholder support', () => {
-    const wrapper = mountComponent({ placeholder: 'Custom' });
-    expect(wrapper.find('input').attributes('placeholder')).toBe('Custom');
-  });
+    const wrapper = mountComponent({ placeholder: 'Custom' })
+    expect(wrapper.find('input').attributes('placeholder')).toBe('Custom')
+  })
 
   it('has default placeholder from i18n', () => {
-    const wrapper = mountComponent();
-    expect(wrapper.find('input').attributes('placeholder')).toBe('Search movies and shows...');
-  });
+    const wrapper = mountComponent()
+    expect(wrapper.find('input').attributes('placeholder')).toBe('Search movies and shows...')
+  })
 
   it('has maxlength support', () => {
-    const wrapper = mountComponent({ maxlength: 50 });
-    expect(wrapper.find('input').attributes('maxlength')).toBe('50');
-  });
+    const wrapper = mountComponent({ maxlength: 50 })
+    expect(wrapper.find('input').attributes('maxlength')).toBe('50')
+  })
 
   it('has correct aria-label on clear button for accessibility', () => {
     // Arrange

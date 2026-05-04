@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Film, Star } from 'lucide-vue-next'
 import type { MovieListItem } from '@/domain/movie.schema'
 import type { ShowListItem } from '@/domain/show.schema'
@@ -18,7 +19,10 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   click: []
+  middleClick: []
 }>()
+
+const { t } = useI18n()
 
 /** Returns the title for movies or name for TV shows. */
 const displayTitle = computed(() => {
@@ -75,8 +79,8 @@ const posterSizes = computed(() => {
 
 /** Returns the media type label. */
 const mediaTypeLabel = computed(() => {
-  if (props.item.media_type === 'movie') return 'Movie'
-  if (props.item.media_type === 'tv') return 'Show'
+  if (props.item.media_type === 'movie') return t('page.movie.title')
+  if (props.item.media_type === 'tv') return t('page.show.title')
   return ''
 })
 
@@ -96,6 +100,16 @@ function handleKeydown(event: KeyboardEvent) {
     emit('click')
   }
 }
+
+/**
+ * Handles middle mouse button click to open in new tab.
+ */
+function handleMiddleClick(event: MouseEvent) {
+  if (event.button === 1) {
+    event.preventDefault()
+    emit('middleClick')
+  }
+}
 </script>
 
 <template>
@@ -110,6 +124,7 @@ function handleKeydown(event: KeyboardEvent) {
     tabindex="0"
     :aria-label="displayTitle"
     @click="handleClick"
+    @auxclick="handleMiddleClick"
     @keydown="handleKeydown"
   >
     <!-- Grid Layout -->
@@ -142,8 +157,10 @@ function handleKeydown(event: KeyboardEvent) {
         <h3 class="truncate text-sm font-medium text-slate-950 dark:text-white">
           {{ displayTitle }}
         </h3>
-        <p v-if="displayYear" class="text-xs text-slate-500 dark:text-slate-400">
-          {{ displayYear }}
+        <p v-if="mediaTypeLabel || displayYear" class="text-xs text-slate-500 dark:text-slate-400">
+          <span v-if="mediaTypeLabel">{{ mediaTypeLabel }}</span>
+          <template v-if="mediaTypeLabel && displayYear"> · </template>
+          <span v-if="displayYear">{{ displayYear }}</span>
         </p>
       </div>
     </template>

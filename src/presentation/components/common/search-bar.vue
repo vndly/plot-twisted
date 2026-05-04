@@ -1,66 +1,66 @@
 <script setup lang="ts">
-import { computed, useTemplateRef, onMounted, onActivated } from 'vue';
-import { Search, X } from 'lucide-vue-next';
-import { useI18n } from 'vue-i18n';
+import { computed, useTemplateRef, onMounted, onActivated } from 'vue'
+import { Search, X } from 'lucide-vue-next'
+import { useI18n } from 'vue-i18n'
 
 const props = withDefaults(
   defineProps<{
-    modelValue: string;
-    placeholder?: string;
-    maxlength?: number;
-    autofocus?: boolean;
+    modelValue: string
+    placeholder?: string
+    maxlength?: number
+    autofocus?: boolean
   }>(),
   {
     placeholder: '',
     maxlength: 120,
     autofocus: false,
   },
-);
+)
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string];
-  clear: [];
-}>();
+  'update:modelValue': [value: string]
+  clear: []
+}>()
 
-const { t } = useI18n();
-const searchInput = useTemplateRef<HTMLInputElement>('searchInput');
+const { t } = useI18n()
+const searchInput = useTemplateRef<HTMLInputElement>('searchInput')
 
 /** Whether the clear button should be visible. */
-const showClear = computed(() => props.modelValue.length > 0);
+const showClear = computed(() => props.modelValue.length > 0)
 
 /**
  * Handles input changes and emits the new value.
  */
 function handleInput(event: Event) {
-  const input = event.target as HTMLInputElement;
-  emit('update:modelValue', input.value);
+  const input = event.target as HTMLInputElement
+  emit('update:modelValue', input.value)
 }
 
 /**
  * Emits clear intent and returns focus to input.
  */
 function handleClear() {
-  emit('update:modelValue', '');
-  emit('clear');
-  searchInput.value?.focus();
+  emit('update:modelValue', '')
+  emit('clear')
+  searchInput.value?.focus()
 }
 
 /**
  * Handles escape key to clear search.
  */
 function handleEscape() {
-  emit('update:modelValue', '');
-  emit('clear');
+  emit('update:modelValue', '')
+  emit('clear')
 }
 
 function focusInput() {
   if (props.autofocus) {
-    searchInput.value?.focus();
+    searchInput.value?.focus()
   }
 }
 
-onMounted(focusInput);
-onActivated(focusInput);
+onMounted(focusInput)
+onActivated(focusInput)
 </script>
 
 <template>

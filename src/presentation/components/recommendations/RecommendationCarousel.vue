@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight, Star } from 'lucide-vue-next'
 import { useIntersectionObserver } from '@/presentation/composables/use-intersection-observer'
 import { buildImageSrcSet, buildImageUrl } from '@/infrastructure/image.helper'
 import { IMAGE_SIZES } from '@/domain/constants'
@@ -13,6 +13,7 @@ type SearchMovieItem = SearchResultItem & {
   title: string
   release_date: string
   poster_path: string | null
+  vote_average: number
 }
 
 type SearchTvItem = SearchResultItem & {
@@ -20,6 +21,7 @@ type SearchTvItem = SearchResultItem & {
   name: string
   first_air_date: string
   poster_path: string | null
+  vote_average: number
 }
 
 defineProps<{
@@ -123,6 +125,22 @@ function getMediaTypeKey(item: SearchResultItem) {
     : 'recommendations.mediaType.tv'
 }
 
+function getRating(item: SearchResultItem) {
+  if (!isMovieItem(item) && !isTvItem(item)) return null
+  const voteAverage = item.vote_average
+  if (!voteAverage || voteAverage <= 0) return null
+  return voteAverage.toFixed(1)
+}
+
+function handleMiddleClick(event: MouseEvent, item: SearchResultItem) {
+  if (event.button !== 1) return
+  if (!isMovieItem(item) && !isTvItem(item)) return
+
+  event.preventDefault()
+  const path = item.media_type === 'movie' ? `/movie/${item.id}` : `/show/${item.id}`
+  window.open(path, '_blank')
+}
+
 /**
  * Scrolls the carousel in the requested direction.
  */
@@ -210,6 +228,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
         role="button"
         tabindex="0"
         @click="handleItemClick(item)"
+        @auxclick="handleMiddleClick($event, item)"
         @keydown.enter.prevent="handleItemClick(item)"
         @keydown.space.prevent="handleItemClick(item)"
       >
@@ -231,10 +250,17 @@ function scrollCarousel(direction: 'previous' | 'next') {
           >
             <span class="text-xs text-center px-2">{{ getTitle(item) }}</span>
           </div>
+          <div
+            v-if="getRating(item)"
+            class="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-white"
+          >
+            <Star class="size-3 fill-current" aria-hidden="true" />
+            <span>{{ getRating(item) }}</span>
+          </div>
         </div>
 
         <div class="mt-2 space-y-0.5">
-          <h4 class="truncate text-sm font-medium text-white">
+          <h4 class="truncate text-sm font-medium text-slate-950 dark:text-white">
             {{ getTitle(item) }}
           </h4>
           <p class="text-xs text-slate-400">

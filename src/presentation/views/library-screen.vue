@@ -121,7 +121,7 @@ function handleClearAll() {
       class="sticky top-0 z-40 -mx-4 flex flex-col gap-4 bg-slate-50 px-4 pb-4 md:-mx-6 md:px-6 dark:bg-bg-primary"
     >
       <!-- Full-width Search -->
-      <SearchBar v-model="query" @clear="clearSearch" />
+      <SearchBar v-model="query" autofocus @clear="clearSearch" />
 
       <!-- Other Controls Row -->
       <div class="flex flex-wrap items-center justify-between gap-4">
