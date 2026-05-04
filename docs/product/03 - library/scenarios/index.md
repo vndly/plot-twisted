@@ -1,4 +1,4 @@
-# Scenarios: Library Management, Sorting, and Filtering
+# Scenarios: Library Management, Sorting, Filtering, and Search
 
 ## Contents
 
@@ -18,3 +18,13 @@
 14. **[LU-02: FilterBar Integration](./LU-02.feature)**: Library filter controls appear below the tabs and stay sticky.
 15. **[LU-03: FilterBar Customization](./LU-03.feature)**: FilterBar adapts its available filters to the current screen.
 16. **[LU-04: Empty State](./LU-04.feature)**: A populated tab shows a filtered empty state when filters remove all results.
+17. **[LBS-01: Search Input](./LBS-01.feature)**: Covers three scenarios for placement, responsiveness, and accessibility.
+18. **[LBS-02: Debounced Filtering](./LBS-02.feature)**: Covers four scenarios for debounce, pre-projection search, performance, and tab scope.
+19. **[LBS-03: Case-insensitive Matching](./LBS-03.feature)**: Covers one scenario for case variants across searchable fields.
+20. **[LBS-04: Partial Matching](./LBS-04.feature)**: Covers one scenario for title, tag, and note substrings.
+21. **[LBS-05: Query Normalization](./LBS-05.feature)**: Covers five scenarios for trimming, empty queries, literals, spacing, and limits.
+22. **[LBS-06: Clear Search](./LBS-06.feature)**: Covers three scenarios for clearing, debounce cancellation, and active filters.
+23. **[LBS-07: Filter Integration](./LBS-07.feature)**: Covers two scenarios for filter composition.
+24. **[LBS-08: Empty Search Results](./LBS-08.feature)**: Covers three scenarios for tab-scoped empty states and contextual CTAs.
+25. **[LBS-09: Tab-state Retention](./LBS-09.feature)**: Covers two scenarios for tabs and reload reset.
+26. **[LBS-10: Keyboard Support](./LBS-10.feature)**: Covers three scenarios for Enter, Escape, and active filters.
