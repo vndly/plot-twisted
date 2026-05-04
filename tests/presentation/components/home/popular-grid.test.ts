@@ -136,4 +136,56 @@ describe('PopularGrid', () => {
 
     expect(push).toHaveBeenCalledWith('/show/2')
   })
+
+  it('opens movie detail in new tab on middle-click', async () => {
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
+
+    const wrapper = mount(PopularGrid, {
+      props: {
+        title: 'Popular Movies',
+        items: [mockItems[0]],
+        loading: false,
+      },
+      global: {
+        stubs: {
+          MovieCard: {
+            props: ['item', 'variant'],
+            template:
+              '<button data-testid="movie-card" @click="$emit(\'middle-click\')">{{ item.media_type }}</button>',
+          },
+        },
+      },
+    })
+
+    await wrapper.get('[data-testid="movie-card"]').trigger('click')
+
+    expect(openSpy).toHaveBeenCalledWith('/movie/1', '_blank')
+    openSpy.mockRestore()
+  })
+
+  it('opens show detail in new tab on middle-click', async () => {
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
+
+    const wrapper = mount(PopularGrid, {
+      props: {
+        title: 'Popular Shows',
+        items: [mockItems[1]],
+        loading: false,
+      },
+      global: {
+        stubs: {
+          MovieCard: {
+            props: ['item', 'variant'],
+            template:
+              '<button data-testid="movie-card" @click="$emit(\'middle-click\')">{{ item.media_type }}</button>',
+          },
+        },
+      },
+    })
+
+    await wrapper.get('[data-testid="movie-card"]').trigger('click')
+
+    expect(openSpy).toHaveBeenCalledWith('/show/2', '_blank')
+    openSpy.mockRestore()
+  })
 })

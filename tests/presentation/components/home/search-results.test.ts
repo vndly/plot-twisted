@@ -298,5 +298,73 @@ describe('SearchResults', () => {
       // Assert
       expect(pushSpy).toHaveBeenCalledWith('/show/1396')
     })
+
+    it('opens movie detail in new tab on middle-click', async () => {
+      // Arrange
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
+      const wrapper = mount(SearchResults, {
+        props: {
+          results: [mockMovieResult],
+          loading: false,
+          error: null,
+          hasSearched: true,
+          query: 'test',
+        },
+        global: {
+          plugins: [i18n, router],
+          stubs: {
+            MovieCard: {
+              template:
+                '<div data-testid="movie-card" @click="$emit(\'middle-click\')"><slot /></div>',
+              props: ['item'],
+            },
+            MovieCardSkeleton: {
+              template: '<div data-testid="skeleton" />',
+            },
+          },
+        },
+      })
+
+      // Act
+      await wrapper.find('[data-testid="movie-card"]').trigger('click')
+
+      // Assert
+      expect(openSpy).toHaveBeenCalledWith('/movie/550', '_blank')
+      openSpy.mockRestore()
+    })
+
+    it('opens show detail in new tab on middle-click', async () => {
+      // Arrange
+      const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
+      const wrapper = mount(SearchResults, {
+        props: {
+          results: [mockTvResult],
+          loading: false,
+          error: null,
+          hasSearched: true,
+          query: 'test',
+        },
+        global: {
+          plugins: [i18n, router],
+          stubs: {
+            MovieCard: {
+              template:
+                '<div data-testid="movie-card" @click="$emit(\'middle-click\')"><slot /></div>',
+              props: ['item'],
+            },
+            MovieCardSkeleton: {
+              template: '<div data-testid="skeleton" />',
+            },
+          },
+        },
+      })
+
+      // Act
+      await wrapper.find('[data-testid="movie-card"]').trigger('click')
+
+      // Assert
+      expect(openSpy).toHaveBeenCalledWith('/show/1396', '_blank')
+      openSpy.mockRestore()
+    })
   })
 })

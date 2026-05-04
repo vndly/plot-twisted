@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import PersonScreen from '@/presentation/views/person-screen.vue'
 import { usePerson } from '@/application/use-person'
 import { useToast } from '@/presentation/composables/use-toast'
@@ -78,6 +78,8 @@ function renderPersonScreen() {
 }
 
 describe('PersonScreen', () => {
+  const originalHistory = window.history
+
   beforeEach(() => {
     personData.value = null
     loading.value = false
@@ -94,6 +96,13 @@ describe('PersonScreen', () => {
     Object.defineProperty(window, 'history', {
       configurable: true,
       value: { length: 2 },
+    })
+  })
+
+  afterEach(() => {
+    Object.defineProperty(window, 'history', {
+      configurable: true,
+      value: originalHistory,
     })
   })
 
@@ -225,5 +234,39 @@ describe('PersonScreen', () => {
     expect(personIdArg.value).toBe(287)
     expect(wrapper.find('[data-testid="person-back-button"]').exists()).toBe(false)
     expect(back).not.toHaveBeenCalled()
+  })
+
+  it('calls refresh when retry button is clicked for non-404 errors', async () => {
+    // Arrange
+    error.value = new Error('API request failed: 500 Internal Server Error')
+
+    // Act
+    const wrapper = renderPersonScreen()
+    await wrapper.get('[data-testid="person-retry-button"]').trigger('click')
+
+    // Assert
+    expect(refresh).toHaveBeenCalled()
+  })
+
+  it('does not dispatch toast for 404 errors', () => {
+    // Arrange
+    error.value = new Error('API request failed: 404 Not Found')
+
+    // Act
+    renderPersonScreen()
+
+    // Assert - no toast should be shown for 404
+    expect(addToast).not.toHaveBeenCalled()
+  })
+
+  it('does not dispatch toast for 429 rate limit errors', () => {
+    // Arrange
+    error.value = new Error('API request failed: 429 Too Many Requests')
+
+    // Act
+    renderPersonScreen()
+
+    // Assert - no toast should be shown for rate limit
+    expect(addToast).not.toHaveBeenCalled()
   })
 })

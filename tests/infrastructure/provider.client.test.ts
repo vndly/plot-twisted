@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
+  fetchWithRetry,
   getMovieGenres,
   getTvGenres,
   getTrending,
@@ -139,5 +140,21 @@ describe('provider.client (additional coverage)', () => {
 
     expect(new URL(mockFetch.mock.calls[0][0]).pathname).toBe('/3/tv/1396/recommendations')
     expect(result.results[0].media_type).toBe('tv')
+  })
+
+  it('wraps network errors with a descriptive message', async () => {
+    mockFetch.mockRejectedValueOnce(new Error('Failed to fetch'))
+
+    await expect(fetchWithRetry('https://api.themoviedb.org/3/test')).rejects.toThrow(
+      'Network error: Failed to fetch',
+    )
+  })
+
+  it('wraps non-Error network failures with unknown message', async () => {
+    mockFetch.mockRejectedValueOnce('string error')
+
+    await expect(fetchWithRetry('https://api.themoviedb.org/3/test')).rejects.toThrow(
+      'Network error: Unknown connection failure',
+    )
   })
 })

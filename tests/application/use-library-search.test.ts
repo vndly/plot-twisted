@@ -83,4 +83,36 @@ describe('useLibrarySearch', () => {
     await nextTick()
     expect(hasSearchQuery.value).toBe(false)
   })
+
+  it('clears pending debounce timeout on unmount', async () => {
+    const { createApp, defineComponent, h } = await import('vue')
+
+    const holder: { result: ReturnType<typeof useLibrarySearch> | null } = { result: null }
+
+    const TestComponent = defineComponent({
+      setup() {
+        holder.result = useLibrarySearch()
+        return () => h('div')
+      },
+    })
+
+    const app = createApp(TestComponent)
+    const container = document.createElement('div')
+    app.mount(container)
+
+    // Set a query to trigger debounce timeout
+    expect(holder.result).not.toBeNull()
+    const result = holder.result as ReturnType<typeof useLibrarySearch>
+    result.query.value = 'test'
+    await nextTick()
+
+    // Unmount before debounce completes
+    app.unmount()
+
+    // Advance timers - should not cause any errors
+    await vi.advanceTimersByTimeAsync(500)
+
+    // The appliedQuery should still be empty since unmount cleared the timeout
+    expect(result.appliedQuery.value).toBe('')
+  })
 })

@@ -69,4 +69,35 @@ describe('ReleaseCard', () => {
 
     expect(push).toHaveBeenCalledWith('/movie/7')
   })
+
+  it('opens detail in new tab on middle mouse click', async () => {
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
+
+    const wrapper = mount(ReleaseCard, {
+      props: {
+        movie,
+      },
+    })
+
+    await wrapper.get('[role="button"]').trigger('auxclick', { button: 1 })
+
+    expect(openSpy).toHaveBeenCalledWith('/movie/7', '_blank')
+    openSpy.mockRestore()
+  })
+
+  it('ignores non-middle mouse button auxclick events', async () => {
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
+
+    const wrapper = mount(ReleaseCard, {
+      props: {
+        movie,
+      },
+    })
+
+    await wrapper.get('[role="button"]').trigger('auxclick', { button: 0 })
+    await wrapper.get('[role="button"]').trigger('auxclick', { button: 2 })
+
+    expect(openSpy).not.toHaveBeenCalled()
+    openSpy.mockRestore()
+  })
 })

@@ -247,4 +247,194 @@ describe('usePerson', () => {
     expect(mockGetPersonDetail).toHaveBeenCalledTimes(2)
     expect(mockGetPersonDetail).toHaveBeenLastCalledWith(288, 'en')
   })
+
+  it('builds external links including Twitter when available', async () => {
+    // Arrange
+    const personWithTwitter = {
+      ...mockPersonDetail,
+      external_ids: {
+        imdb_id: 'nm0000093',
+        instagram_id: null,
+        twitter_id: 'bradpitt',
+      },
+    }
+    mockGetPersonDetail.mockResolvedValueOnce(personWithTwitter)
+
+    // Act
+    const { data } = usePerson(287)
+    await flushPromises()
+
+    // Assert
+    expect(data.value?.externalLinks).toEqual([
+      { type: 'imdb', url: 'https://www.imdb.com/name/nm0000093' },
+      { type: 'twitter', url: 'https://twitter.com/bradpitt' },
+    ])
+  })
+
+  it('returns empty external links when no supported IDs exist', async () => {
+    // Arrange
+    const personNoLinks = {
+      ...mockPersonDetail,
+      external_ids: {
+        imdb_id: null,
+        instagram_id: null,
+        twitter_id: null,
+      },
+    }
+    mockGetPersonDetail.mockResolvedValueOnce(personNoLinks)
+
+    // Act
+    const { data } = usePerson(287)
+    await flushPromises()
+
+    // Assert
+    expect(data.value?.externalLinks).toEqual([])
+  })
+
+  it('ignores stale responses when person ID changes rapidly', async () => {
+    // Arrange
+    const personId = ref(287)
+    let resolveFirst!: (value: typeof mockPersonDetail) => void
+    let resolveSecond!: (value: typeof mockPersonDetail) => void
+
+    mockGetPersonDetail
+      .mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveFirst = resolve
+        }),
+      )
+      .mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveSecond = resolve
+        }),
+      )
+
+    const { data, loading } = usePerson(personId)
+    await nextTick()
+
+    // Change ID before first request completes
+    personId.value = 288
+    await nextTick()
+
+    // Resolve second request first
+    resolveSecond({ ...mockPersonDetail, name: 'Second Person' })
+    await flushPromises()
+
+    // Assert second request populates data
+    expect(data.value?.name).toBe('Second Person')
+
+    // Resolve first (stale) request
+    resolveFirst({ ...mockPersonDetail, name: 'First Person' })
+    await flushPromises()
+
+    // Assert stale response is ignored
+    expect(data.value?.name).toBe('Second Person')
+    expect(loading.value).toBe(false)
+  })
+
+  it('ignores stale error responses when person ID changes rapidly', async () => {
+    // Arrange
+    const personId = ref(287)
+    let rejectFirst!: (error: Error) => void
+    let resolveSecond!: (value: typeof mockPersonDetail) => void
+
+    mockGetPersonDetail
+      .mockReturnValueOnce(
+        new Promise((_, reject) => {
+          rejectFirst = reject
+        }),
+      )
+      .mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveSecond = resolve
+        }),
+      )
+
+    const { data, error } = usePerson(personId)
+    await nextTick()
+
+    // Change ID before first request completes
+    personId.value = 288
+    await nextTick()
+
+    // Resolve second request first
+    resolveSecond({ ...mockPersonDetail, name: 'Second Person' })
+    await flushPromises()
+
+    // Assert second request populates data
+    expect(data.value?.name).toBe('Second Person')
+    expect(error.value).toBeNull()
+
+    // Reject first (stale) request
+    rejectFirst(new Error('Network error'))
+    await flushPromises()
+
+    // Assert stale error is ignored
+    expect(data.value?.name).toBe('Second Person')
+    expect(error.value).toBeNull()
+  })
+
+  it('wraps non-Error exceptions in a generic Error', async () => {
+    // Arrange
+    mockGetPersonDetail.mockRejectedValueOnce('string error')
+
+    // Act
+    const { error } = usePerson(287)
+    await flushPromises()
+
+    // Assert
+    expect(error.value?.message).toBe('Failed to fetch person details')
+  })
+
+  it('returns non-ISO formatted dates as-is', async () => {
+    // Arrange
+    const personWithNonIsoDate = {
+      ...mockPersonDetail,
+      birthday: '1963', // Non-ISO format (just year)
+      deathday: null,
+    }
+    mockGetPersonDetail.mockResolvedValueOnce(personWithNonIsoDate)
+
+    // Act
+    const { data } = usePerson(287)
+    await flushPromises()
+
+    // Assert - birthday should be returned as-is since it's not in YYYY-MM-DD format
+    expect(data.value?.birthInfo).toContain('1963')
+  })
+
+  it('returns place of birth when birthday is null', async () => {
+    // Arrange
+    const personWithOnlyPlace = {
+      ...mockPersonDetail,
+      birthday: null,
+      place_of_birth: 'Los Angeles, CA',
+    }
+    mockGetPersonDetail.mockResolvedValueOnce(personWithOnlyPlace)
+
+    // Act
+    const { data } = usePerson(287)
+    await flushPromises()
+
+    // Assert - should show only place of birth
+    expect(data.value?.birthInfo).toBe('Los Angeles, CA')
+  })
+
+  it('returns only birthday when place of birth is null', async () => {
+    // Arrange
+    const personWithOnlyBirthday = {
+      ...mockPersonDetail,
+      birthday: '1963-12-18',
+      place_of_birth: null,
+    }
+    mockGetPersonDetail.mockResolvedValueOnce(personWithOnlyBirthday)
+
+    // Act
+    const { data } = usePerson(287)
+    await flushPromises()
+
+    // Assert - should show only formatted birthday
+    expect(data.value?.birthInfo).toContain('December')
+    expect(data.value?.birthInfo).not.toContain(' - ')
+  })
 })

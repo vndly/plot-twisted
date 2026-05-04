@@ -62,6 +62,103 @@ describe('person logic', () => {
       expect(result.map((credit) => credit.id)).toEqual([2, 4, 1, 3])
       expect(credits.map((credit) => credit.id)).toEqual([1, 2, 3, 4])
     })
+
+    it('returns 0 when both credits have the same date', () => {
+      // Arrange
+      const credits: PersonCredit[] = [
+        {
+          id: 1,
+          media_type: 'movie',
+          title: 'Movie A',
+          character: 'A',
+          release_date: '2020-01-01',
+          poster_path: null,
+          vote_average: 7.5,
+          order: 1,
+        },
+        {
+          id: 2,
+          media_type: 'movie',
+          title: 'Movie B',
+          character: 'B',
+          release_date: '2020-01-01',
+          poster_path: null,
+          vote_average: 8.0,
+          order: 2,
+        },
+      ]
+
+      // Act
+      const result = sortCreditsByDate(credits)
+
+      // Assert - order preserved when dates are equal
+      expect(result.map((credit) => credit.id)).toEqual([1, 2])
+    })
+
+    it('places credits with null bDate before credits with aDate when sorting', () => {
+      // Arrange - test the !bDate branch specifically
+      const credits: PersonCredit[] = [
+        {
+          id: 1,
+          media_type: 'movie',
+          title: 'Has Date',
+          character: 'A',
+          release_date: '2020-01-01',
+          poster_path: null,
+          vote_average: 7.5,
+          order: 1,
+        },
+        {
+          id: 2,
+          media_type: 'movie',
+          title: 'No Date',
+          character: 'B',
+          release_date: null,
+          poster_path: null,
+          vote_average: 8.0,
+          order: 2,
+        },
+      ]
+
+      // Act
+      const result = sortCreditsByDate(credits)
+
+      // Assert - credit with date comes before credit without date
+      expect(result.map((credit) => credit.id)).toEqual([1, 2])
+    })
+
+    it('sorts credit without date after credit with date when no-date comes first', () => {
+      // Arrange - test the !bDate branch by putting the no-date credit first
+      // This ensures the sort comparator is called with aDate=null first, then bDate=null
+      const credits: PersonCredit[] = [
+        {
+          id: 1,
+          media_type: 'movie',
+          title: 'No Date',
+          character: 'A',
+          release_date: null,
+          poster_path: null,
+          vote_average: 7.5,
+          order: 1,
+        },
+        {
+          id: 2,
+          media_type: 'movie',
+          title: 'Has Date',
+          character: 'B',
+          release_date: '2020-01-01',
+          poster_path: null,
+          vote_average: 8.0,
+          order: 2,
+        },
+      ]
+
+      // Act
+      const result = sortCreditsByDate(credits)
+
+      // Assert - credit with date comes before credit without date
+      expect(result.map((credit) => credit.id)).toEqual([2, 1])
+    })
   })
 
   describe('deduplicateCredits', () => {

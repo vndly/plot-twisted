@@ -193,4 +193,91 @@ describe('TrendingCarousel', () => {
     expect(wrapper.find('[data-testid="trending-scroll-next"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="trending-scroll-previous"]').exists()).toBe(false)
   })
+
+  it('opens detail in new tab on middle mouse click', async () => {
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
+
+    const wrapper = mount(TrendingCarousel, {
+      props: { items: mockItems, loading: false },
+    })
+
+    const cards = wrapper.findAll('[role="button"]')
+    await cards[0].trigger('auxclick', { button: 1 })
+    await cards[1].trigger('auxclick', { button: 1 })
+
+    expect(openSpy).toHaveBeenNthCalledWith(1, '/movie/1', '_blank')
+    expect(openSpy).toHaveBeenNthCalledWith(2, '/show/2', '_blank')
+
+    openSpy.mockRestore()
+  })
+
+  it('ignores non-middle mouse button auxclick events', async () => {
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null)
+
+    const wrapper = mount(TrendingCarousel, {
+      props: { items: mockItems, loading: false },
+    })
+
+    const card = wrapper.find('[role="button"]')
+    await card.trigger('auxclick', { button: 0 })
+    await card.trigger('auxclick', { button: 2 })
+
+    expect(openSpy).not.toHaveBeenCalled()
+    openSpy.mockRestore()
+  })
+
+  it('handles ref changes between loading and loaded states', async () => {
+    // Start in loading state (carouselRef not rendered)
+    const wrapper = mount(TrendingCarousel, {
+      props: { items: [], loading: true },
+    })
+
+    // No carousel should exist
+    expect(wrapper.find('[data-testid="trending-carousel"]').exists()).toBe(false)
+
+    // Switch to loaded state (carouselRef now exists)
+    await wrapper.setProps({ items: mockItems, loading: false })
+
+    // Carousel should now exist
+    expect(wrapper.find('[data-testid="trending-carousel"]').exists()).toBe(true)
+
+    // Switch back to loading (carouselRef removed)
+    await wrapper.setProps({ items: [], loading: true })
+
+    // Carousel should be gone again
+    expect(wrapper.find('[data-testid="trending-carousel"]').exists()).toBe(false)
+  })
+
+  it('resets scroll position and updates canScroll when items change', async () => {
+    const wrapper = mount(TrendingCarousel, {
+      props: { items: mockItems, loading: false },
+    })
+
+    // Track calls to the scrollLeft setter
+    const scrollLeftSetterSpy = vi.fn()
+    const scrollContainer = wrapper.get('[data-testid="trending-carousel"]').element as HTMLElement
+    Object.defineProperty(scrollContainer, 'scrollLeft', {
+      configurable: true,
+      get: () => 100,
+      set: scrollLeftSetterSpy,
+    })
+
+    // Update items
+    await wrapper.setProps({
+      items: [
+        {
+          ...mockItems[0],
+          id: 10,
+          title: 'New Movie',
+        },
+      ],
+    })
+
+    // Wait for the watcher and nextTick to process
+    await wrapper.vm.$nextTick()
+    await wrapper.vm.$nextTick()
+
+    // The watch should have set scrollLeft to 0
+    expect(scrollLeftSetterSpy).toHaveBeenCalledWith(0)
+  })
 })

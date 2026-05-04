@@ -125,23 +125,23 @@ describe('MovieCard', () => {
     expect(wrapper.text()).not.toContain('Show')
   })
 
-  it('falls back to empty title and 0.0 rating when name, title, and rating are missing', () => {
+  it('falls back to empty title and hides rating badge when name, title, and rating are missing', () => {
     const wrapper = mount(MovieCard, {
       props: {
         item: {
           id: 99,
           media_type: 'movie',
           poster_path: null,
+          vote_average: 0,
         } as any,
       },
       global: { plugins: [i18n] },
     })
 
+    // Test via public API: aria-label should be empty when no title
     expect(wrapper.attributes('aria-label')).toBe('')
+    // Rating badge should not be visible when vote_average is 0
     expect(wrapper.text()).not.toContain('0.0')
-    const setupState = (wrapper.vm as any).$?.setupState
-    expect(setupState.displayTitle).toBe('')
-    expect(setupState.displayRating).toBe('0.0')
   })
 
   it('emits click on pointer and keyboard activation', async () => {
@@ -282,6 +282,47 @@ describe('MovieCard', () => {
       const img = wrapper.find('img')
       expect(img.exists()).toBe(true)
       expect(img.attributes('srcset')).toBeUndefined()
+    })
+  })
+
+  describe('middle click behavior', () => {
+    it('emits middleClick on middle mouse button auxclick', async () => {
+      const wrapper = mount(MovieCard, {
+        props: {
+          item: {
+            id: 1,
+            media_type: 'movie',
+            title: 'Test Movie',
+            poster_path: null,
+            vote_average: 8.0,
+          } as any,
+        },
+        global: { plugins: [i18n] },
+      })
+
+      await wrapper.get('[role="button"]').trigger('auxclick', { button: 1 })
+
+      expect(wrapper.emitted('middleClick')).toHaveLength(1)
+    })
+
+    it('ignores non-middle mouse button auxclick events', async () => {
+      const wrapper = mount(MovieCard, {
+        props: {
+          item: {
+            id: 1,
+            media_type: 'movie',
+            title: 'Test Movie',
+            poster_path: null,
+            vote_average: 8.0,
+          } as any,
+        },
+        global: { plugins: [i18n] },
+      })
+
+      await wrapper.get('[role="button"]').trigger('auxclick', { button: 0 })
+      await wrapper.get('[role="button"]').trigger('auxclick', { button: 2 })
+
+      expect(wrapper.emitted('middleClick')).toBeUndefined()
     })
   })
 })

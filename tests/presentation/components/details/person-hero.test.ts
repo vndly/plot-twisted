@@ -106,4 +106,83 @@ describe('PersonHero', () => {
       'https://www.imdb.com/name/nm0000093',
     )
   })
+
+  it('renders only birth info when death info is missing', () => {
+    // Arrange & Act
+    const wrapper = mount(PersonHero, {
+      props: {
+        name: 'Brad Pitt',
+        knownForDepartment: 'Acting',
+        profileUrl: null,
+        birthInfo: 'December 18, 1963 - Shawnee, Oklahoma, USA',
+        deathInfo: null,
+        links: [],
+      },
+      global: { plugins: [i18n] },
+    })
+
+    // Assert
+    const info = wrapper.get('[data-testid="person-hero-info"]')
+    expect(info.text()).toContain('Born')
+    expect(info.text()).toContain('December 18, 1963 - Shawnee, Oklahoma, USA')
+    expect(info.text()).not.toContain('Died')
+  })
+
+  it('renders only death info when birth info is missing', () => {
+    // Arrange & Act
+    const wrapper = mount(PersonHero, {
+      props: {
+        name: 'Brad Pitt',
+        knownForDepartment: 'Acting',
+        profileUrl: null,
+        birthInfo: null,
+        deathInfo: 'January 1, 2020',
+        links: [],
+      },
+      global: { plugins: [i18n] },
+    })
+
+    // Assert
+    const info = wrapper.get('[data-testid="person-hero-info"]')
+    expect(info.text()).not.toContain('Born')
+    expect(info.text()).toContain('Died')
+    expect(info.text()).toContain('January 1, 2020')
+  })
+
+  it('does not render metadata section when no birth, death, or links exist', () => {
+    // Arrange & Act
+    const wrapper = mount(PersonHero, {
+      props: {
+        name: 'Brad Pitt',
+        knownForDepartment: 'Acting',
+        profileUrl: null,
+        birthInfo: null,
+        deathInfo: null,
+        links: [],
+      },
+      global: { plugins: [i18n] },
+    })
+
+    // Assert
+    expect(wrapper.find('[data-testid="person-hero-info"]').exists()).toBe(false)
+  })
+
+  it('renders links without birth/death info when only links are provided', () => {
+    // Arrange & Act
+    const wrapper = mount(PersonHero, {
+      props: {
+        name: 'Brad Pitt',
+        knownForDepartment: 'Acting',
+        profileUrl: null,
+        birthInfo: null,
+        deathInfo: null,
+        links: [{ type: 'imdb', url: 'https://www.imdb.com/name/nm0000093' }],
+      },
+      global: { plugins: [i18n] },
+    })
+
+    // Assert - should not show the info dl but should show links
+    expect(wrapper.find('[data-testid="person-hero-info"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="person-link-imdb"]').exists()).toBe(true)
+  })
 })
