@@ -63,7 +63,8 @@ describe('TrendingCarousel', () => {
     const wrapper = mount(TrendingCarousel, {
       props: { items: [], loading: true },
     })
-    expect(wrapper.findAll('.animate-pulse')).toHaveLength(3)
+    // 6 skeleton cards, each with 3 animated elements (poster, title, subtitle)
+    expect(wrapper.findAll('.animate-pulse')).toHaveLength(18)
   })
 
   it('renders items when not loading', () => {
@@ -74,10 +75,11 @@ describe('TrendingCarousel', () => {
     expect(wrapper.text()).toContain('Movie Title')
     expect(wrapper.text()).toContain('Show Name')
     expect(wrapper.findAll('img')).toHaveLength(2)
+    // Now uses poster images with w342 (medium) size
     expect(wrapper.findAll('img')[0].attributes('src')).toContain('/poster.jpg')
-    expect(wrapper.findAll('img')[0].attributes('src')).toContain('/w500/poster.jpg')
+    expect(wrapper.findAll('img')[0].attributes('src')).toContain('/w342/poster.jpg')
     expect(wrapper.findAll('img')[0].attributes('srcset')).toContain('/w342/poster.jpg 342w')
-    expect(wrapper.findAll('img')[1].attributes('src')).toContain('/w1280/backdrop2.jpg')
+    expect(wrapper.findAll('img')[1].attributes('src')).toContain('/w342/poster2.jpg')
     expect(wrapper.text()).not.toContain('not-a-date')
   })
 
@@ -113,7 +115,7 @@ describe('TrendingCarousel', () => {
     expect(wrapper.text()).not.toContain('·')
   })
 
-  it('falls back to an empty image source when no artwork is available', () => {
+  it('falls back to a text placeholder when no artwork is available', () => {
     const wrapper = mount(TrendingCarousel, {
       props: {
         items: [
@@ -128,7 +130,9 @@ describe('TrendingCarousel', () => {
       },
     })
 
-    expect(wrapper.get('img').attributes('src')).toBe('')
+    // No img element when poster is missing; shows text placeholder instead
+    expect(wrapper.find('img').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Movie Title')
   })
 
   it('renders scroll controls and scrolls the carousel when clicked', async () => {

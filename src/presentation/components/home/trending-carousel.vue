@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { ChevronLeft, ChevronRight, Star } from 'lucide-vue-next'
 import type { MediaResult } from '@/application/use-browse'
 import { buildImageSrcSet, buildImageUrl } from '@/infrastructure/image.helper'
 import { IMAGE_SIZES } from '@/domain/constants'
@@ -42,29 +42,21 @@ function getTitle(item: MediaResult) {
 }
 
 /**
- * Returns the backdrop URL with fallbacks.
+ * Returns the poster URL for the item.
  */
-function getBackdropUrl(item: MediaResult) {
-  if (item.backdrop_path) {
-    return buildImageUrl(item.backdrop_path, IMAGE_SIZES.backdrop.large)
-  }
-
-  return buildImageUrl(item.poster_path, IMAGE_SIZES.poster.large)
+function getPosterUrl(item: MediaResult) {
+  return buildImageUrl(item.poster_path, IMAGE_SIZES.poster.medium)
 }
 
 /**
- * Returns responsive backdrop candidates for sharper carousel cards.
+ * Returns responsive poster candidates for sharper carousel cards.
  */
-function getBackdropSrcSet(item: MediaResult) {
-  if (item.backdrop_path) {
-    return buildImageSrcSet(item.backdrop_path, [
-      IMAGE_SIZES.backdrop.small,
-      IMAGE_SIZES.backdrop.medium,
-      IMAGE_SIZES.backdrop.large,
-    ])
-  }
-
-  return buildImageSrcSet(item.poster_path, [IMAGE_SIZES.poster.medium, IMAGE_SIZES.poster.large])
+function getPosterSrcSet(item: MediaResult) {
+  return buildImageSrcSet(item.poster_path, [
+    IMAGE_SIZES.poster.small,
+    IMAGE_SIZES.poster.medium,
+    IMAGE_SIZES.poster.large,
+  ])
 }
 
 /**
@@ -79,6 +71,21 @@ function getYear(item: MediaResult) {
 
   const year = new Date(date).getFullYear()
   return Number.isNaN(year) ? '' : String(year)
+}
+
+/**
+ * Returns the formatted rating for the item.
+ */
+function getRating(item: MediaResult) {
+  if (!item.vote_average || item.vote_average <= 0) return null
+  return item.vote_average.toFixed(1)
+}
+
+/**
+ * Returns the media type translation key.
+ */
+function getMediaTypeKey(item: MediaResult) {
+  return item.media_type === 'movie' ? 'page.movie.title' : 'page.show.title'
 }
 
 /**
@@ -128,11 +135,13 @@ function scrollCarousel(direction: 'previous' | 'next') {
 
     <!-- Skeleton loader during initial fetch -->
     <div v-if="loading" class="flex gap-4 overflow-hidden">
-      <div
-        v-for="n in 3"
-        :key="n"
-        class="aspect-video w-64 flex-shrink-0 animate-pulse rounded-lg bg-slate-200 dark:bg-surface"
-      ></div>
+      <div v-for="n in 6" :key="n" class="w-32 md:w-40 flex-shrink-0 space-y-2">
+        <div
+          class="aspect-[2/3] w-full animate-pulse rounded-lg bg-slate-200 dark:bg-surface"
+        ></div>
+        <div class="h-4 w-full animate-pulse rounded bg-slate-200 dark:bg-surface"></div>
+        <div class="h-3 w-2/3 animate-pulse rounded bg-slate-200 dark:bg-surface"></div>
+      </div>
     </div>
 
     <!-- Scrollable carousel -->
@@ -145,7 +154,7 @@ function scrollCarousel(direction: 'previous' | 'next') {
       <div
         v-for="item in items"
         :key="`${item.media_type}-${item.id}`"
-        class="group relative aspect-video w-64 flex-shrink-0 cursor-pointer overflow-hidden rounded-xl bg-slate-200 transition-transform duration-200 ease-in-out hover:scale-[1.02] snap-start dark:bg-surface"
+        class="w-32 md:w-40 flex-shrink-0 cursor-pointer snap-start group"
         role="button"
         tabindex="0"
         :aria-label="getTitle(item)"
@@ -154,21 +163,43 @@ function scrollCarousel(direction: 'previous' | 'next') {
         @keydown.enter.prevent="handleItemClick(item)"
         @keydown.space.prevent="handleItemClick(item)"
       >
-        <img
-          :src="getBackdropUrl(item) || ''"
-          :srcset="getBackdropSrcSet(item) || undefined"
-          sizes="256px"
-          :alt="getTitle(item)"
-          class="size-full object-cover"
-          loading="lazy"
-        />
         <div
-          class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/85 via-black/15 to-transparent p-4"
+          class="relative aspect-[2/3] w-full overflow-hidden rounded-lg bg-slate-200 transition-transform duration-200 ease-in-out group-hover:scale-105 dark:bg-surface"
         >
-          <h3 class="truncate text-sm font-bold tracking-tight text-white">{{ getTitle(item) }}</h3>
-          <p class="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-300">
-            {{ t(item.media_type === 'movie' ? 'page.movie.title' : 'page.show.title') }}
-            <span v-if="getYear(item)" class="text-slate-400">· {{ getYear(item) }}</span>
+          <img
+            v-if="getPosterUrl(item)"
+            :src="getPosterUrl(item)!"
+            :srcset="getPosterSrcSet(item) || undefined"
+            sizes="(max-width: 768px) 128px, 160px"
+            :alt="getTitle(item)"
+            class="size-full object-cover"
+            loading="lazy"
+          />
+          <div
+            v-else
+            class="size-full flex items-center justify-center text-slate-400 dark:text-slate-500"
+          >
+            <span class="text-xs text-center px-2">{{ getTitle(item) }}</span>
+          </div>
+          <div
+            v-if="getRating(item)"
+            class="absolute right-2 top-2 flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-white"
+          >
+            <Star class="size-3 fill-current" aria-hidden="true" />
+            <span>{{ getRating(item) }}</span>
+          </div>
+        </div>
+
+        <div class="mt-2 space-y-0.5">
+          <h3 class="truncate text-sm font-medium text-slate-950 dark:text-white">
+            {{ getTitle(item) }}
+          </h3>
+          <p class="text-xs text-slate-400">
+            <span>{{ t(getMediaTypeKey(item)) }}</span>
+            <template v-if="getYear(item)">
+              <span class="mx-1">·</span>
+              <span>{{ getYear(item) }}</span>
+            </template>
           </p>
         </div>
       </div>
