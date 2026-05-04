@@ -278,36 +278,10 @@ describe('filter.logic', () => {
       ).toBe(false)
     })
 
-    it('filters by rating range', () => {
-      expect(
-        matchesLibraryFilters(item, {
-          ...DEFAULT_LIBRARY_FILTER_STATE,
-          ratingMin: 3,
-          ratingMax: 5,
-        }),
-      ).toBe(true)
-      expect(
-        matchesLibraryFilters(item, {
-          ...DEFAULT_LIBRARY_FILTER_STATE,
-          ratingMin: 4.5,
-          ratingMax: 5,
-        }),
-      ).toBe(false)
-      expect(
-        matchesLibraryFilters(item, {
-          ...DEFAULT_LIBRARY_FILTER_STATE,
-          ratingMin: 0,
-          ratingMax: 3.5,
-        }),
-      ).toBe(false)
-    })
-
     it('counts active filters correctly', () => {
       expect(countActiveFilters(DEFAULT_LIBRARY_FILTER_STATE)).toBe(0)
       expect(countActiveFilters({ ...DEFAULT_LIBRARY_FILTER_STATE, genres: [28] })).toBe(1)
       expect(countActiveFilters({ ...DEFAULT_LIBRARY_FILTER_STATE, mediaType: 'movie' })).toBe(1)
-      expect(countActiveFilters({ ...DEFAULT_LIBRARY_FILTER_STATE, ratingMin: 1 })).toBe(1)
-      expect(countActiveFilters({ ...DEFAULT_LIBRARY_FILTER_STATE, ratingMax: 4 })).toBe(1)
 
       expect(
         countActiveFilters({

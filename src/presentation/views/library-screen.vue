@@ -139,18 +139,9 @@ function handleClearAll() {
           />
         </div>
 
-        <!-- Right: Sort and Rating (Other Filters) -->
+        <!-- Right: Sort and Tab Toggle -->
         <div class="ml-auto flex flex-wrap items-center gap-4">
           <SortDropdown v-model="sortField" v-model:order="sortOrder" />
-
-          <FilterBar
-            v-model="filters"
-            :genres="genres"
-            :active-filter-count="activeFilterCount"
-            show-rating-range
-            compact-clear
-            @clear="clearFilters"
-          />
 
           <div class="w-full sm:w-64">
             <TabToggle :tabs="tabs" :active-tab="activeTab" @update:active-tab="handleTabChange" />

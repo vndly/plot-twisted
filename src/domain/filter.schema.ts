@@ -35,8 +35,6 @@ export type SortOrder = z.infer<typeof SortOrderSchema>
 export const LibraryFilterStateSchema = z.object({
   genres: z.array(z.number()),
   mediaType: z.enum(['all', 'movie', 'tv']),
-  ratingMin: z.number().min(0).max(5),
-  ratingMax: z.number().min(0).max(5),
 })
 
 /** Inferred type for the library filter state. */
@@ -58,6 +56,4 @@ export const DEFAULT_FILTER_STATE: FilterState = {
 export const DEFAULT_LIBRARY_FILTER_STATE: LibraryFilterState = {
   genres: [],
   mediaType: 'all',
-  ratingMin: 0,
-  ratingMax: 5,
 }

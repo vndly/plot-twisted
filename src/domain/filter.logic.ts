@@ -62,11 +62,6 @@ export function matchesLibraryFilters(item: LibraryViewItem, filters: LibraryFil
     }
   }
 
-  // Rating Range Filter
-  if (item.rating < filters.ratingMin || item.rating > filters.ratingMax) {
-    return false
-  }
-
   return true
 }
 
@@ -111,7 +106,6 @@ export function countActiveFilters(filters: LibraryFilterState): number {
   let count = 0
   if (filters.genres.length > 0) count++
   if (filters.mediaType !== 'all') count++
-  if (filters.ratingMin > 0 || filters.ratingMax < 5) count++
   return count
 }
 
